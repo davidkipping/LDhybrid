@@ -4,7 +4,7 @@ Compiled from the fetch logs and catalogues on 2026-10-09. Every file is in `dat
 
 | source | content | location | size |
 |---|---|---|---|
-| PHOENIX-ACES SpecInt v3.0 | 1,682 models (Teff 2300–7500 K, log g 3.5–5.5, [M/H] −2 … +1, α = 0), reduced to R = 3000 photon bins over 0.1–5.5 µm | `data/reduced/phoenix/` | 5.6 GB |
+| PHOENIX-ACES SpecInt v3.0 | 1,682 models (Teff 2300–7400 K; the in-scope request was ≤ 7500 K, log g 3.5–5.5, [M/H] −2 … +1, α = 0), reduced to R = 3000 photon bins over 0.1–5.5 µm | `data/reduced/phoenix/` | 5.6 GB |
 | PHOENIX raw | 34 P2-subset FITS kept | `data/raw/phoenix/` | 1.1 GB |
 | MPS-ATLAS Set 1, Set 2 | 34,160 models each (3500–9000 K, log g 3.0–5.0, [M/H] −5 … +1.5), read from the zips | `data/raw/mpsatlas/` | 18.9 GB |
 | MURaM 3D-MHD (Kostogryz+2026) | 9 stars F3–M4 (+ G2 at [M/H] −1, +0.5), 5 field states, 10 μ ≥ 0.1 | `data/raw/muram/` | 6 MB |

@@ -105,19 +105,68 @@ def write_table(grid, law):
     return path.name.removesuffix(".gz"), width, n
 
 
+PAPER = Path(__file__).resolve().parent.parent / "paper" / "ldhybrid.tex"
+
+
+def _groups(text, start):
+    """Consecutive {...} groups after position `start` (brace-balanced)."""
+    out, i = [], start
+    while True:
+        while i < len(text) and text[i] in " \t\n":
+            i += 1
+        if i >= len(text) or text[i] != "{":
+            return out
+        depth, j = 0, i
+        while True:
+            depth += {"{": 1, "}": -1}.get(text[j], 0)
+            if depth == 0:
+                break
+            j += 1
+        out.append(text[i + 1:j])
+        i = j + 1
+
+
+def latex_to_text(s):
+    """Plain ASCII for the CDS ReadMe (the macros used in the abstract/title)."""
+    import re
+    s = s.split("\\thanks")[0]
+    for a, b in (("\\ppm{}", " ppm"), ("\\ppm", " ppm"), ("\\varepsilon", "epsilon"),
+                 ("\\mu", "mu"), ("\\teff", "Teff"), ("\\,", " "), ("--", "-"), ("~", " "),
+                 ("^{-2}", "^-2")):
+        s = s.replace(a, b)
+    s = s.replace("$", "")
+    s = re.sub(r"\\[a-zA-Z]+\s*", "", s).replace("{", "").replace("}", "")
+    return re.sub(r"\s+", " ", s).strip()
+
+
+def paper_title_abstract():
+    tex = PAPER.read_text()
+    title = latex_to_text(_groups(tex, tex.index("\\title") + len("\\title"))[0])
+    parts = _groups(tex, tex.index("\\abstract") + len("\\abstract"))
+    labels = ("Context", "Aims", "Methods", "Results", "Conclusions")
+    abstract = [f"{lab}. {latex_to_text(p)}" for lab, p in zip(labels, parts)]
+    return title, abstract
+
+
 def readme(entries):
     L = []
     a = L.append
+    title, abstract = paper_title_abstract()
     a("J/A+A/???/???   Limb darkening: rational hybrid laws      (<authors>, 2026)")
     a("=" * 80)
-    a("Theoretical limb-darkening coefficients for the rational hybrid2, hybrid4")
-    a("and hybrid5 laws, with quadratic, 4-term and power-2 for comparison.")
+    for ln in textwrap.wrap(title, 80):
+        a(ln)
     a("    <authors>")
     a("    <Astron. Astrophys. ???, ??? (2026)>")
     a("=" * 80)
     a("ADC_Keywords: Models, atmosphere ; Stars, late-type")
     a("Keywords: stars: atmospheres - planets and satellites: general -")
-    a("          techniques: photometric - techniques: spectroscopic")
+    a("          techniques: photometric - methods: numerical")
+    a("")
+    a("Abstract:")
+    for para in abstract:
+        for ln in textwrap.wrap(para, 76, break_on_hyphens=False):
+            a("    " + ln)
     a("")
     a("Description:")
     a("    Coefficients fitted to photon-weighted specific-intensity profiles of")

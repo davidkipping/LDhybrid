@@ -49,7 +49,7 @@ power-2 (c, α, I/I(1) = 1 − c(1 − μ^α)).
 
 | grid | models | coverage | bands |
 |---|---|---|---|
-| `phoenix` | 1,682 | PHOENIX-ACES v3.0, 2300–7500 K, log g 3.5–5.5, [M/H] −2 … +1 | 38 |
+| `phoenix` | 1,682 | PHOENIX-ACES v3.0, 2300–7400 K, log g 3.5–5.5, [M/H] −2 … +1 | 38 |
 | `mps2` | 16,974 | MPS-ATLAS Set 2, 3500–7500 K, log g 3.5–5.0, [M/H] −2 … +1 | 38 |
 | `mps1` | 16,974 | MPS-ATLAS Set 1, same grid | 38 |
 | `kurucz` | 507 | ATLAS9 (ExoTiC-LD subset), 3500–6500 K | MIRI LRS only |
