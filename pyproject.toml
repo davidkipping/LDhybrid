@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ldhybrid"
+version = "0.0.1.dev0"
+description = "Theoretical limb-darkening coefficient tables for the rational hybrid2/4/5 laws"
+requires-python = ">=3.10"
+dependencies = ["numpy", "scipy", "astropy", "h5py", "cvxpy"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+study = ["matplotlib"]
+
+[tool.setuptools.packages.find]
+include = ["ldhybrid*"]
+
+[tool.pytest.ini_options]
+markers = ["data: needs downloaded data under data/"]

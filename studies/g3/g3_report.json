@@ -1,0 +1,320 @@
+{
+ "physical": {
+  "phoenix|hybrid2|r": {
+   "rows": 63916,
+   "unphysical": 0,
+   "bound": 39
+  },
+  "phoenix|hybrid2|mu": {
+   "rows": 63916,
+   "unphysical": 0,
+   "bound": 128
+  },
+  "phoenix|hybrid4|r": {
+   "rows": 63916,
+   "unphysical": 0,
+   "bound": 197
+  },
+  "phoenix|hybrid4|mu": {
+   "rows": 63916,
+   "unphysical": 0,
+   "bound": 1279
+  },
+  "phoenix|hybrid5|r": {
+   "rows": 63916,
+   "unphysical": 0,
+   "bound": 615
+  },
+  "phoenix|hybrid5|mu": {
+   "rows": 63916,
+   "unphysical": 0,
+   "bound": 5589
+  },
+  "phoenix|power2|r": {
+   "rows": 63916,
+   "unphysical": 5512,
+   "bound": 0
+  },
+  "phoenix|power2|mu": {
+   "rows": 63916,
+   "unphysical": 11298,
+   "bound": 0
+  },
+  "phoenix|quadratic|r": {
+   "rows": 63916,
+   "unphysical": 0,
+   "bound": 401
+  },
+  "phoenix|quadratic|mu": {
+   "rows": 63916,
+   "unphysical": 0,
+   "bound": 7557
+  },
+  "phoenix|claret4|r": {
+   "rows": 63916,
+   "unphysical": 0,
+   "bound": 1076
+  },
+  "phoenix|claret4|mu": {
+   "rows": 63916,
+   "unphysical": 0,
+   "bound": 3622
+  },
+  "mps1|hybrid2|r": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|hybrid2|mu": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|hybrid4|r": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|hybrid4|mu": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|hybrid5|r": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|hybrid5|mu": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|power2|r": {
+   "rows": 645012,
+   "unphysical": 24254,
+   "bound": 0
+  },
+  "mps1|power2|mu": {
+   "rows": 645012,
+   "unphysical": 19698,
+   "bound": 0
+  },
+  "mps1|quadratic|r": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|quadratic|mu": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 7914
+  },
+  "mps1|claret4|r": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 5183
+  },
+  "mps1|claret4|mu": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 29537
+  },
+  "mps2|hybrid2|r": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|hybrid2|mu": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|hybrid4|r": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|hybrid4|mu": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|hybrid5|r": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|hybrid5|mu": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|power2|r": {
+   "rows": 645012,
+   "unphysical": 22013,
+   "bound": 0
+  },
+  "mps2|power2|mu": {
+   "rows": 645012,
+   "unphysical": 18326,
+   "bound": 0
+  },
+  "mps2|quadratic|r": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|quadratic|mu": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 8479
+  },
+  "mps2|claret4|r": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 6719
+  },
+  "mps2|claret4|mu": {
+   "rows": 645012,
+   "unphysical": 0,
+   "bound": 34735
+  },
+  "kurucz|hybrid2|r": {
+   "rows": 507,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "kurucz|hybrid2|mu": {
+   "rows": 507,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "kurucz|hybrid4|r": {
+   "rows": 507,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "kurucz|hybrid4|mu": {
+   "rows": 507,
+   "unphysical": 0,
+   "bound": 1
+  },
+  "kurucz|hybrid5|r": {
+   "rows": 507,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "kurucz|hybrid5|mu": {
+   "rows": 507,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "kurucz|power2|r": {
+   "rows": 507,
+   "unphysical": 3,
+   "bound": 0
+  },
+  "kurucz|power2|mu": {
+   "rows": 507,
+   "unphysical": 2,
+   "bound": 0
+  },
+  "kurucz|quadratic|r": {
+   "rows": 507,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "kurucz|quadratic|mu": {
+   "rows": 507,
+   "unphysical": 0,
+   "bound": 30
+  },
+  "kurucz|claret4|r": {
+   "rows": 507,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "kurucz|claret4|mu": {
+   "rows": 507,
+   "unphysical": 0,
+   "bound": 0
+  }
+ },
+ "interpolation_ppm": {
+  "teff": {
+   "hybrid2": {
+    "median": 4.893110705017808,
+    "p90": 30.781063496434893,
+    "n": 4028
+   },
+   "hybrid4": {
+    "median": 4.782239174060814,
+    "p90": 30.029300826689596,
+    "n": 4028
+   },
+   "hybrid5": {
+    "median": 4.7170367319746696,
+    "p90": 29.7562391645726,
+    "n": 4028
+   }
+  },
+  "logg": {
+   "hybrid2": {
+    "median": 15.406334878460825,
+    "p90": 67.85319090459426,
+    "n": 4028
+   },
+   "hybrid4": {
+    "median": 15.353603086370843,
+    "p90": 67.23657295839296,
+    "n": 4028
+   },
+   "hybrid5": {
+    "median": 15.358147278642445,
+    "p90": 67.3707987565473,
+    "n": 4028
+   }
+  },
+  "mh": {
+   "hybrid2": {
+    "median": 13.39161138163257,
+    "p90": 61.25997873367676,
+    "n": 4028
+   },
+   "hybrid4": {
+    "median": 13.270785811762138,
+    "p90": 60.74146552703494,
+    "n": 4028
+   },
+   "hybrid5": {
+    "median": 13.301783459608238,
+    "p90": 60.67529873829709,
+    "n": 4028
+   }
+  }
+ },
+ "spectra_closure": {
+  "max_abs_dw": 8.376330740134108e-10,
+  "physical": "448/450",
+  "note": "float32 storage of a_kj and I1"
+ },
+ "systematics": {
+  "points": 1020,
+  "rows": 116280,
+  "max_pairwise_lc_ppm": {
+   "hybrid2": {
+    "median": 93.93748540589397,
+    "p90": 288.6963853857304
+   },
+   "hybrid4": {
+    "median": 93.12503819150845,
+    "p90": 284.56394952702334
+   },
+   "hybrid5": {
+    "median": 93.16325644562282,
+    "p90": 284.70881932735296
+   }
+  }
+ }
+}

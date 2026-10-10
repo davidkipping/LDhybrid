@@ -1,0 +1,81 @@
+400 jobs (0 already done)
+  20/400
+  40/400
+  60/400
+  80/400
+/Users/dkipping/Storage1/Work/Documents/Transit_Work/CODES/LDhybrid/ldhybrid/laws.py:126: RuntimeWarning: divide by zero encountered in power
+  return 1.0 - c * (1.0 - np.asarray(mu, float) ** alpha)
+  100/400
+/Users/dkipping/Storage1/Work/Documents/Transit_Work/CODES/LDhybrid/ldhybrid/laws.py:126: RuntimeWarning: divide by zero encountered in power
+  return 1.0 - c * (1.0 - np.asarray(mu, float) ** alpha)
+  120/400
+  140/400
+/Users/dkipping/Storage1/Work/Documents/Transit_Work/CODES/LDhybrid/ldhybrid/laws.py:126: RuntimeWarning: divide by zero encountered in power
+  return 1.0 - c * (1.0 - np.asarray(mu, float) ** alpha)
+  160/400
+  180/400
+  200/400
+  220/400
+  240/400
+/Users/dkipping/Storage1/Work/Documents/Transit_Work/CODES/LDhybrid/ldhybrid/laws.py:126: RuntimeWarning: divide by zero encountered in power
+  return 1.0 - c * (1.0 - np.asarray(mu, float) ** alpha)
+  260/400
+  280/400
+  300/400
+  320/400
+  340/400
+  360/400
+  380/400
+  400/400
+# P2a: fit weighting
+
+Light-curve error (ppm) of profile fits, over the (p, b) grid (p ∈ {0.03, 0.1, 0.15}, b ∈ {0, …, 0.9}). Each cell: median over models × bands of the per-fit *worst* error / of the per-fit b-averaged rms. M1 limb cut for PHOENIX.
+
+## phoenix (272 model-bands)
+
+| weighting | quadratic | power2 | hybrid2 | claret4 | hybrid4 | hybrid5 |
+|---|---|---|---|---|---|---|
+| mu, native | 187.28 / 67.55 | 63.47 / 17.32 | 175.99 / 50.43 | 44.15 / 14.44 | 13.59 / 3.89 | 22.75 / 6.56 |
+| mu, resample | 182.26 / 65.90 | 57.02 / 16.77 | 167.85 / 48.59 | 54.85 / 17.92 | 24.69 / 7.20 | 12.58 / 3.57 |
+| r, native | 63.74 / 22.20 | 15.12 / 5.17 | 81.70 / 23.03 | 5.99 / 1.62 | 7.74 / 2.04 | 3.33 / 1.07 |
+| r, resample | 62.29 / 21.15 | 22.33 / 6.93 | 77.56 / 22.85 | 13.22 / 3.77 | 6.46 / 1.78 | 4.94 / 1.32 |
+| area, native | 64.91 / 23.96 | 15.08 / 5.14 | 75.31 / 22.05 | 6.95 / 1.98 | 8.71 / 2.41 | 3.84 / 1.15 |
+| area, resample | 58.46 / 21.41 | 18.97 / 6.45 | 70.37 / 22.48 | 12.34 / 3.77 | 6.17 / 1.62 | 3.90 / 0.96 |
+| nodes (Claret) | 289.40 / 103.85 | 246.64 / 61.97 | 286.43 / 93.28 | 74.65 / 22.60 | 126.67 / 35.12 | 42.64 / 12.45 |
+
+Worst case over all model-bands (ppm):
+
+| weighting | quadratic | power2 | hybrid2 | claret4 | hybrid4 | hybrid5 |
+|---|---|---|---|---|---|---|
+| mu, native | 445.6 | 152.7 | 324.4 | 124.1 | 70.7 | 57.9 |
+| mu, resample | 422.4 | 151.6 | 297.8 | 123.0 | 70.3 | 32.9 |
+| r, native | 186.4 | 82.8 | 303.5 | 23.4 | 25.4 | 9.8 |
+| r, resample | 177.5 | 71.6 | 297.6 | 33.4 | 22.6 | 11.4 |
+| area, native | 187.9 | 84.3 | 283.3 | 27.7 | 29.1 | 12.4 |
+| area, resample | 168.5 | 74.6 | 283.8 | 30.9 | 26.3 | 11.1 |
+| nodes (Claret) | 913.9 | 582.1 | 774.3 | 204.2 | 348.5 | 332.8 |
+
+## mps2 (128 model-bands)
+
+| weighting | quadratic | power2 | hybrid2 | claret4 | hybrid4 | hybrid5 |
+|---|---|---|---|---|---|---|
+| mu, native | 140.34 / 50.01 | 24.85 / 6.67 | 113.62 / 30.74 | 3.83 / 1.18 | 19.96 / 5.90 | 3.60 / 1.04 |
+| mu, resample | 139.66 / 49.83 | 23.95 / 6.52 | 112.14 / 30.39 | 3.67 / 1.12 | 20.33 / 6.02 | 4.00 / 1.11 |
+| r, native | 74.53 / 23.11 | 9.92 / 3.61 | 75.77 / 23.43 | 1.43 / 0.39 | 11.38 / 2.94 | 1.43 / 0.38 |
+| r, resample | 73.82 / 23.53 | 10.22 / 3.70 | 73.15 / 22.80 | 1.68 / 0.47 | 11.17 / 2.87 | 1.48 / 0.39 |
+| area, native | 69.95 / 24.68 | 10.71 / 3.68 | 67.11 / 22.04 | 1.61 / 0.47 | 13.24 / 3.61 | 1.61 / 0.42 |
+| area, resample | 70.32 / 24.78 | 10.63 / 3.66 | 66.76 / 21.94 | 1.65 / 0.49 | 13.03 / 3.48 | 1.72 / 0.42 |
+| nodes (Claret) | 255.87 / 68.91 | 60.09 / 12.43 | 222.14 / 64.70 | 8.70 / 2.84 | 15.49 / 4.50 | 8.09 / 2.49 |
+
+Worst case over all model-bands (ppm):
+
+| weighting | quadratic | power2 | hybrid2 | claret4 | hybrid4 | hybrid5 |
+|---|---|---|---|---|---|---|
+| mu, native | 248.5 | 104.6 | 218.5 | 16.6 | 50.4 | 15.7 |
+| mu, resample | 247.2 | 102.0 | 218.7 | 16.2 | 49.9 | 15.9 |
+| r, native | 116.9 | 53.6 | 239.4 | 9.4 | 21.8 | 8.9 |
+| r, resample | 116.1 | 52.4 | 230.7 | 9.5 | 21.8 | 8.8 |
+| area, native | 110.6 | 53.8 | 222.1 | 10.3 | 25.5 | 10.5 |
+| area, resample | 111.1 | 53.9 | 222.5 | 10.1 | 25.0 | 10.4 |
+| nodes (Claret) | 455.6 | 325.6 | 363.7 | 32.9 | 83.8 | 23.2 |
+

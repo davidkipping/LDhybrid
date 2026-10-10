@@ -1,0 +1,10 @@
+data/
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+*.part
+.claude/
+# regenerable raw study outputs (summaries .md/.json are tracked)
+studies/**/*.jsonl
+studies/**/*_rows.csv

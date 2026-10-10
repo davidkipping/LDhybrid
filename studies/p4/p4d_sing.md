@@ -1,0 +1,20 @@
+# P4d: JWST per-bin (ℓ, δ), Sing et al. (2026), μ_min = 0.2
+
+Per-star weighted mean offsets (observed − model), then mean over stars ± star-to-star s.d. (Sing et al. Table 3 convention).
+
+| case | stars | Δℓ | Δδ | per star Δℓ |
+|---|---|---|---|---|
+| mps1|hybrid5 | 6 | +0.033 ± 0.033 | -0.008 ± 0.018 | HAT-P-11 +0.034, WASP-107 +0.039, WASP-121 +0.044, WASP-6 +0.083, WASP-80 -0.017, WASP-94 +0.017 |
+| mps1|recipe | 6 | +0.041 ± 0.033 | -0.012 ± 0.017 | HAT-P-11 +0.040, WASP-107 +0.046, WASP-121 +0.054, WASP-6 +0.090, WASP-80 -0.009, WASP-94 +0.025 |
+| mps2|hybrid5 | 6 | +0.035 ± 0.031 | -0.007 ± 0.018 | HAT-P-11 +0.033, WASP-107 +0.041, WASP-121 +0.048, WASP-6 +0.083, WASP-80 -0.011, WASP-94 +0.019 |
+| mps2|hybrid5+B100G | 6 | +0.024 ± 0.030 | -0.007 ± 0.018 | HAT-P-11 +0.026, WASP-107 +0.037, WASP-121 +0.027, WASP-6 +0.072, WASP-80 -0.015, WASP-94 +0.000 |
+| mps2|recipe | 6 | +0.043 ± 0.031 | -0.011 ± 0.017 | HAT-P-11 +0.040, WASP-107 +0.048, WASP-121 +0.057, WASP-6 +0.090, WASP-80 -0.003, WASP-94 +0.027 |
+| phoenix|hybrid5 | 6 | +0.041 ± 0.044 | -0.005 ± 0.017 | HAT-P-11 +0.038, WASP-107 +0.037, WASP-121 +0.079, WASP-6 +0.088, WASP-80 -0.036, WASP-94 +0.042 |
+| phoenix|recipe | 6 | +0.041 ± 0.044 | -0.004 ± 0.016 | HAT-P-11 +0.037, WASP-107 +0.036, WASP-121 +0.078, WASP-6 +0.087, WASP-80 -0.036, WASP-94 +0.041 |
+
+Sing et al. (2026) Table 3, μ_min = 0.2 (7 stars incl. WASP-12):
+
+* PHOENIX: Δℓ = +0.000 ± 0.041, Δδ = +0.004 ± 0.016
+* MPS1: Δℓ = +0.034 ± 0.033, Δδ = -0.007 ± 0.017
+* MPS2: Δℓ = +0.036 ± 0.031, Δδ = -0.006 ± 0.017
+* STAGGER: Δℓ = +0.020 ± 0.031, Δδ = -0.003 ± 0.016
