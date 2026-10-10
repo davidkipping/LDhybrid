@@ -3,7 +3,10 @@
 Status (2026-10-10): **G0–G4 passed** (P4: `studies/p4/results.md`) (`docs/data.md`, `studies/g1/results.md`,
 `studies/p2/results.md`, `studies/g3/results.md`); v1.0 frozen in
 `ldhybrid/v1.py`; products in `data/products/` (`docs/products.md`);
-next P5.
+P5 in progress (2026-10-10): CDS tables (`scripts/p5_cds.py`, validated with
+astropy's CDS reader), user API (`ldhybrid/api.py`), paper draft
+(`paper/ldhybrid.tex`). Open: author list, citation checks (`% VERIFY`),
+hosting of products (Zenodo), CDS submission, ExoTiC-LD contribution.
 Deferred from P3: Jacobians ∂w/∂(Teff, log g, [M/H]) (users can difference the
 tables) and PLATO/Ariel/Pandora passbands (curves not yet sourced). Goal: Claret-style theoretical tables of
 limb-darkening coefficients for the rational **hybrid2, hybrid4 and hybrid5**
@@ -202,10 +205,8 @@ changed afterwards); method frozen and written up as an internal note.
   profile values h₁′ = I(2/3), h₂′ = h₁′ − I(1/3); the Patel & Espinoza (2022)
   TESS sample.
 * **JWST:** the Sing et al. (2026) (ℓ, δ) constraints for 7 FGK hosts.
-* **Reanalysis:** one or two benchmark planets with HST WFC3 G141 plus JWST
-  (e.g. WASP-39b, HD 209458b). Fit hybrid4/5 freely with simplex priors vs
-  fixed or table-prior coefficients, and quantify the bias in the
-  transmission spectrum.
+* ~~Reanalysis of benchmark planets~~ — dropped (2026-10-10): not part of a
+  Claret-style tables paper; the comparisons above play that role.
 * Deliver recommended empirical offsets / prior widths per grid, after
   Maxted (2023).
 

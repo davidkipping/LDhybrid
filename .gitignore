@@ -8,3 +8,9 @@ __pycache__/
 # regenerable raw study outputs (summaries .md/.json are tracked)
 studies/**/*.jsonl
 studies/**/*_rows.csv
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.fls
+paper/*.fdb_latexmk
+paper/figures/*.png

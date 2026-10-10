@@ -8,14 +8,33 @@ MetalPlanet. The plan of work is in [`docs/plan.md`](docs/plan.md).
 
 ## Status
 
-**P0–P4 complete; Gates G0–G4 passed** (validation: `studies/p4/results.md`). Products in `data/products/`
+**P0–P4 complete; Gates G0–G4 passed** (validation: `studies/p4/results.md`).
+**P5 (release) in progress:** CDS tables, user API and paper draft done. Products in `data/products/`
 (`docs/products.md`; G3 in `studies/g3/results.md`). v1.0 law and method
 definitions are frozen in `ldhybrid/v1.py` (hybrid2 ε = 0.36; r-weighted fits;
 M1 limb). Evidence: `docs/data.md`, `studies/g1/results.md`,
-`studies/p2/results.md`; first end-to-end run in `studies/p1/smoke.md`. Next: P5
-(release). Scope: FGKM dwarfs and subgiants
+`studies/p2/results.md`; first end-to-end run in `studies/p1/smoke.md`. Scope: FGKM dwarfs and subgiants
 (Teff 2300–7500 K, log g 3.5–5.5, [M/H] −2 to +1) in the passbands used for
 transit observations, with emphasis on HST WFC3 and JWST.
+
+## Use
+
+```python
+import ldhybrid as ld
+# tabulated coefficients (linear interpolation within one grid)
+r = ld.coefficients("hybrid5", teff=5600, logg=4.4, mh=0.1, band="TESS", grid="mps2")
+r["w"], r["q"], r["physical"]
+# recommended prior centre for FGK stars (P4): MPS-ATLAS Set 2 + MURaM 100 G
+r = ld.coefficients("hybrid5", 5600, 4.4, 0.1, "TESS", grid="mps2", correction="B100G")
+# any throughput or spectroscopic bin, from the PHOENIX coefficient spectra
+r = ld.coefficients_custom("hybrid4", 4500, 4.6, 0.0, lam_angstrom, throughput)
+law = ld.to_law("hybrid5", r["w"])   # squishierplanet.Law -> closed-form light curves
+```
+
+Products are described in [`docs/products.md`](docs/products.md); the CDS
+release (fixed-width tables + ReadMe) is built by `scripts/p5_cds.py`, the
+paper draft is `paper/ldhybrid.tex` (figures: `paper/make_figures.py`;
+compile with `tectonic`).
 
 ## Data
 

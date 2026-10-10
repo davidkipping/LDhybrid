@@ -131,5 +131,6 @@ Status: **passed** (2026-10-10). Offsets fixed in
    these offsets or for M dwarfs only, where it is the sole grid; there the
    empirical offsets are large and poorly measured (Patel & Espinoza:
    Δu1 = −0.16, Δu2 = +0.22 below 4000 K), so wide priors are advised.
-5. **Not done:** a benchmark reanalysis of HST WFC3 + JWST light curves with
-   free vs table-prior hybrid coefficients (planned in P4) — deferred.
+5. **Out of scope:** a reanalysis of real HST/JWST light curves with free vs
+   table-prior coefficients was dropped, to keep to the Claret-style scope
+   (tables, method, quality, comparison with observed coefficients).
