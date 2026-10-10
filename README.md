@@ -31,6 +31,21 @@ r = ld.coefficients_custom("hybrid4", 4500, 4.6, 0.0, lam_angstrom, throughput)
 law = ld.to_law("hybrid5", r["w"])   # squishierplanet.Law -> closed-form light curves
 ```
 
+**From the published tables alone** (no other LDhybrid data needed), the
+self-contained `ldhybrid/interpolate.py` (numpy + scipy only) reads the CDS
+tables and interpolates them:
+
+```python
+from ldhybrid.interpolate import LDTables
+t = LDTables("path/to/cds")       # the <grid>_<law>.dat[.gz] files
+r = t.coefficients("hybrid5", teff=5600, logg=4.4, mh=0.1, band="TESS", grid="mps2")
+r["coeffs"], r["physical"], r["lc_ppm"]
+```
+
+```bash
+python -m ldhybrid.interpolate hybrid5 5600 4.4 0.1 TESS --grid mps2 --tables path/to/cds
+```
+
 Products are described in [`docs/products.md`](docs/products.md); the CDS
 release (fixed-width tables + ReadMe) is built by `scripts/p5_cds.py`, the
 paper draft is `paper/ldhybrid.tex` (figures: `paper/make_figures.py`;

@@ -73,6 +73,11 @@ Columns:
 
 `<grid>.h5` holds the same quantities as arrays [model, band(, parameter)].
 
+The CDS release (`release/cds/`) carries the same tables in fixed-width
+form; `ldhybrid/interpolate.py` is a self-contained interpolator for them
+(linear within one grid, exact at the models, refuses to extrapolate unless
+asked) and also evaluates every law (`intensity`, `is_physical`).
+
 ## Coefficient spectra: `spectra/phoenix/*.npz` (hybrid2/4/5)
 
 Per PHOENIX model, at R = 3000 over 0.1–5.5 µm: `lam_edges` (Å), `I1` (photon
