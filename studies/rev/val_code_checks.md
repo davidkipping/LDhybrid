@@ -4,7 +4,7 @@
    example hybrid5 TESS (5600±100, 4.4±0.1, 0.1±0.1), + systematic over ['mps2', 'phoenix', 'mps1']: mean [0.0841, 0.1418, 0.0896, 0.1079, 0.2228], sd [0.007, 0.0143, 0.0109, 0.0042, 0.0178]
 2. condition(h1: δ = +0.008, σ = 0.006): sd(h1) 0.0076 → 0.0047 (expected 0.0047); h1 shift +0.0049 (expected +0.0049)
    observables() vs direct evaluation (h1, h2; ℓ, δ as p4d_sing): max |Δ| 8.9e-16
-3. refit at PHOENIX models vs tabulated (40 random model-bands): hybrid5 max |Δ| 6.3e-07, hybrid4 max |Δ| 5.6e-07, hybrid2 max |Δ| 1.1e-07, claret4 max |Δ| 1.5e-05, quadratic max |Δ| 2.0e-07, power2 max |Δ| 6.2e-06
+3. refit at PHOENIX models vs tabulated (40 random model-bands): hybrid5 max |Δ| 6.3e-07, hybrid4 max |Δ| 4.9e-07, hybrid2 max |Δ| 1.1e-07, claret4 max |Δ| 1.5e-05, quadratic max |Δ| 2.0e-07, power2 max |Δ| 6.2e-06
    rows with an active constraint (3): max |Δ| 8.7e-06
 4. leave-one-out across 200 K in Teff (PHOENIX, 200 trials), light-curve error vs the left-out profile, median / 90th pct (ppm):
    hybrid5: interpolated coefficients 4.8 / 27.8; refit of interpolated profiles 4.8 / 27.8; max |Δw| between the two 6.1e-07

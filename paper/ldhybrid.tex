@@ -49,11 +49,11 @@ in the same way. Every fit is scored by the error of the transit light curve
 it produces.}
 {Fitting uniformly in radius rather than in $\mu$, as in the weighted-$r$
 method of Morello et al., reduces the median light-curve error by factors of
-3--9 for spherical and 1.7--3.5 for plane-parallel models. For a planet with
-$R_{\rm p}/R_\star=0.1$, hybrid5 and the four-term law reproduce the light
-curves of the model profiles to 1--3\ppm{} in the median (99th percentile below
-6\ppm), hybrid4 and power-2 to 5--8\ppm, and hybrid2 and the quadratic law to
-40--50\ppm; even polynomials without the poles do 5--30 times worse. The PHOENIX
+3--15 for spherical and 1.7--6 for plane-parallel models. For a planet with
+$R_{\rm p}/R_\star=0.1$, hybrid5, hybrid4, and the four-term law reproduce the
+light curves of the model profiles to 1--3\ppm{} in the median (99th
+percentiles 4--12\ppm), power-2 to 7--8\ppm, and hybrid2 and the quadratic law
+to 40--50\ppm; even polynomials without the poles do 5--30 times worse. The PHOENIX
 advantage of hybrid5 over the four-term law disappears when the latter ignores
 $\mu<0.02$. With fixed coefficients, the transit depths that hybrid5 and the
 four-term law give are biased by at most 1.1\ppm{} in our test cases, against up
@@ -132,8 +132,8 @@ coefficient spectra that integrate exactly to any passband. Two properties are
 specific to them. Their light curve is elementary, and every basis shape is
 monotonic, so a simplex is a sufficient physical region; the fits lie inside
 it, so interpolated coefficients and uniform priors stay physical. With
-tabulated coefficients, their five-parameter member is as accurate as the
-four-term law. For circular-planet users the broader value of this paper may
+tabulated coefficients, their four- and five-parameter members are as accurate
+as the four-term law. For circular-planet users the broader value of this paper may
 lie in the uniform, transit-optimised tables of all six laws, the error budget,
 and the analysis of conventions that comes with them.
 
@@ -174,24 +174,40 @@ are
 The polynomial pair spans the same space as $\{1-\mu^2,1-\mu^4\}$. We chose it
 because both shapes are monotonic, so that non-negative weights suffice for a
 monotonic profile. The poles of hybrid4 and hybrid5 lie on the ladder
-$\varepsilon_k=\exp[(2\pi/\sqrt\alpha)(\sqrt{k+1/2}-\sqrt K)]$, $k=0,\dots,K-1$,
-with $\alpha=1$. For $K=2$ this gives $\varepsilon=0.011762$ and 0.30408, and
-for $K=3$ it gives 0.0015966, 0.041275, and 0.38743. The ladder follows from
-discretising an exact representation of $\mu^{2\alpha}$ as a superposition of
-double poles in $\mu^2$ \citep{squishier}. Its poles cluster exponentially
-towards the limb with the tapered spacing of the ``lightning'' rational
-approximations of \citet{gopal2019} and \citet{herremans2023}, which likewise
-combine clustered poles with a low-degree polynomial, and $K$ is the number of
-poles. We stop at $K=3$, because hybrid5 already reproduces the model light
-curves to $\sim1\ppm$, the level of the ambiguity in the model profile itself
+$\varepsilon_k=\exp[(2\pi/\sqrt\alpha)(\sqrt{k+1/2}-\sqrt K)]$, $k=0,\dots,K-1$.
+The ladder follows from discretising an exact representation of
+$\mu^{2\alpha}$ as a superposition of double poles in $\mu^2$
+\citep{squishier}. Its poles cluster exponentially towards the limb with the
+tapered spacing of the ``lightning'' rational approximations of
+\citet{gopal2019} and \citet{herremans2023}, which likewise combine clustered
+poles with a low-degree polynomial; $K$ is the number of poles and $\alpha$ sets
+how strongly they cluster. For hybrid5 ($K=3$) we use $\alpha=1$, which gives
+$\varepsilon=0.0015966$, 0.041275, and 0.38743. For hybrid4 ($K=2$) we use
+$\alpha=25/16$, which gives $\varepsilon=0.028601$ and 0.38582.
+
+The value for hybrid4 is a tuned constant, chosen as follows. With
+$\alpha=1$ the two poles of hybrid4 sit at 0.0118 and 0.304, so the inner pole
+acts at $\mu\lesssim0.1$. The fits then spend one of four parameters on the
+outermost limb, which a transit light curve barely samples, and lose accuracy
+over the rest of the disc. Scaling $\ln\varepsilon_k$ by a common factor $s$,
+equivalent to $\alpha=1/s^2$, the median light-curve error of hybrid4 on the
+method study (Sect.~\ref{sec:fitting}) falls from 5.0\ppm{} at $s=1$ to a broad
+minimum of 1.9\ppm{} at $s=0.80$--0.83. Optimising the two poles independently
+gains nothing further. The choice holds out of sample. Tuned on PHOENIX alone
+and tested on MPS-ATLAS, or the reverse, it reduces the error on the held-out
+grid by a factor of 1.5--2 relative to $\alpha=1$; random halves of the method
+study select the same poles, at no cost on the other half. On 200 further
+models (8100 model--passband combinations, outside the method study) the median
+error is 1.8\ppm{} for $s=0.8$, against 5.8\ppm{} for $\alpha=1$ and 2.0\ppm{}
+for the four-term law. We adopt $s=0.8$, i.e. $\alpha=25/16$. For hybrid5 the
+same scan is flat ($s=0.7$--1.0 changes the median error by less than
+0.1\ppm), so we keep $\alpha=1$ there. Only the pole positions change; the
+light curve is elementary for any $\varepsilon>0$.
+
+We stop at $K=3$, because hybrid5 already reproduces the model light curves to
+$\sim1\ppm$, the level of the ambiguity in the model profile itself
 (Sect.~\ref{sec:lcerr}), and a transit constrains only one or two combinations
-of the weights (Sect.~\ref{sec:budget}). The ladder is close to optimal for hybrid5: scaling all
-$\ln\varepsilon_k$ by a factor between 0.7 and 1.0 changes its median
-light-curve error on the method study by less than 0.1\ppm. It is not optimal
-for hybrid4: a factor of 0.8 ($\varepsilon=0.0286$ and 0.386) would lower its
-median error from 5.0 to 1.9\ppm, to the level of the four-term law. We keep the
-analytic ladder, which the companion paper derives and uses, and note this as a
-possible improvement of hybrid4. The single pole
+of the weights (Sect.~\ref{sec:budget}). The single pole
 of hybrid2 has no analytic placement. We tuned it on 7524 model--passband
 combinations (198 PHOENIX and MPS-ATLAS models in 38 passbands), which
 moved it from the value 0.208, tuned on J-band PHOENIX profiles by
@@ -378,8 +394,9 @@ transit samples the disc by area.
 
 Table~\ref{tab:weighting} compares the weightings by the error of the light
 curve, defined in Sect.~\ref{sec:lcerr}. Fitting uniformly in $r$ instead of
-$\mu$ reduces the median error by factors of 3--9 for PHOENIX and 1.7--3.5 for
-MPS-ATLAS. Against equal weights on the native nodes the factor is up to 23.
+$\mu$ reduces the median error by factors of 3--15 for PHOENIX and 1.7--6 for
+MPS-ATLAS; the largest factors are for hybrid4, whose poles were chosen for
+the $r$-weighted fit (Sect.~\ref{sec:laws}). Against equal weights on the native nodes the factor is up to 23.
 The metric itself samples the disc by area, so the gain is partly by
 construction. The cost is at the extreme limb. Under $r$-weighting the region
 $\mu<0.04$ ($r>0.9992$) carries 0.08\% of the weight. The $r$-weighted hybrid5
@@ -401,14 +418,14 @@ on the method study.}
 \hline\hline
 Grid & Weighting & hybrid5 & hybrid4 & hybrid2 & Four-term & Power-2 & Quadratic\\
 \hline
-PHOENIX & Equal per node & 43 / 333 & 127 / 348 & 465 / 1270 & 75 / 204 & 247 / 582 & 289 / 914\\
- & Uniform in $\mu$ & 13 / 33 & 25 / 70 & 213 / 461 & 55 / 123 & 56 / 166 & 182 / 422\\
- & Uniform in $r$ & 1.9 / 9.7 & 6.5 / 24 & 56 / 146 & 6.3 / 20 & 12 / 73 & 60 / 176\\
- & Uniform in area & 2.3 / 12 & 7.1 / 27 & 58 / 133 & 7.3 / 23 & 12 / 75 & 58 / 168\\
-MPS-ATLAS 2 & Equal per node & 8.1 / 23 & 15 / 84 & 326 / 499 & 8.7 / 33 & 60 / 326 & 256 / 456\\
- & Uniform in $\mu$ & 4.0 / 16 & 20 / 50 & 170 / 264 & 3.7 / 16 & 24 / 102 & 140 / 247\\
- & Uniform in $r$ & 1.4 / 8.8 & 12 / 22 & 49 / 111 & 1.3 / 9.2 & 9.8 / 52 & 74 / 116\\
- & Uniform in area & 1.7 / 10 & 13 / 25 & 54 / 101 & 1.5 / 10 & 10 / 54 & 70 / 111\\
+PHOENIX & Equal per node & 43 / 333 & 104 / 222 & 465 / 1270 & 75 / 204 & 247 / 582 & 289 / 914\\
+ & Uniform in $\mu$ & 13 / 33 & 58 / 110 & 213 / 461 & 55 / 123 & 56 / 166 & 182 / 422\\
+ & Uniform in $r$ & 1.9 / 9.7 & 3.9 / 11 & 56 / 146 & 6.3 / 20 & 12 / 73 & 60 / 176\\
+ & Uniform in area & 2.3 / 12 & 4.9 / 13 & 58 / 133 & 7.3 / 23 & 12 / 75 & 58 / 168\\
+MPS-ATLAS 2 & Equal per node & 8.1 / 23 & 74 / 140 & 326 / 499 & 8.7 / 33 & 60 / 326 & 256 / 456\\
+ & Uniform in $\mu$ & 4.0 / 16 & 14 / 35 & 170 / 264 & 3.7 / 16 & 24 / 102 & 140 / 247\\
+ & Uniform in $r$ & 1.4 / 8.8 & 2.3 / 8.6 & 49 / 111 & 1.3 / 9.2 & 9.8 / 52 & 74 / 116\\
+ & Uniform in area & 1.7 / 10 & 2.6 / 9.7 & 54 / 101 & 1.5 / 10 & 10 / 54 & 70 / 111\\
 \hline
 \end{tabular}
 \tablefoot{Method study: 34 PHOENIX and 16 MPS-ATLAS Set~2 models in eight
@@ -426,12 +443,15 @@ Constraints differ by law. For hybrid4 and hybrid5 the fits are restricted to
 the simplex, and for hybrid2 to its exact triangle. The quadratic and
 four-term fits are restricted to their exact positive--monotonic regions,
 imposed on a grid of 2001 values of the law's variable. Over the PHOENIX grid
-the constraints bind in 0.5\% (hybrid5), 0.3\% (hybrid4), and 0.06\%
+the constraints bind in 0.5\% (hybrid5), 0.2\% (hybrid4), and 0.06\%
 (hybrid2) of the $r$-weighted fits, and never for MPS-ATLAS. For the four-term
 law they bind more often: in 6.1\% of PHOENIX and 1.1--1.4\% of MPS-ATLAS fits.
 In the uniform-$\mu$ fits, which weight the limb more, they bind more often on
-PHOENIX: 10\% for hybrid5, 2.3\% for hybrid4, 13\% for the quadratic law, and
-6.0\% for the four-term law. A binding constraint breaks the exact summation of
+PHOENIX: 10\% for hybrid5, 20\% for hybrid4, 13\% for the quadratic law, and
+6.0\% for the four-term law. The hybrid4 poles were chosen for the
+$r$-weighted fit, and its uniform-$\mu$ fits are also less accurate
+(Table~\ref{tab:weighting}); for limb-sensitive uses hybrid5 or the four-term
+law is the better choice. A binding constraint breaks the exact summation of
 coefficient spectra, which is one reason we use unconstrained fits there.
 Published four-term tables are unconstrained. In the bound PHOENIX rows an
 unconstrained four-term fit would have a median light-curve error of 1.8\ppm{}
@@ -494,11 +514,11 @@ statistics weight models by the density of each grid (46 metallicities for
 MPS-ATLAS), not by astrophysical relevance.
 
 The comparison must be made at equal parameter count. Among four-parameter
-laws, the four-term law is better than hybrid4 on both grids: the medians are
-3.4 against 4.6\ppm{} on PHOENIX and 1.1 against 6.8\ppm{} on
-MPS-ATLAS. hybrid4 is the four-parameter law with an elementary light curve,
-and it costs a few ppm. The five-parameter hybrid5 is the most accurate law on
-both grids. On PHOENIX it beats the four-term law by a median of 2\ppm{}, and
+laws, hybrid4 is better than the four-term law on PHOENIX (median 2.1 against
+3.4\ppm, 99th percentile 6.6 against 12\ppm) and slightly worse on MPS-ATLAS
+(1.5 against 1.1\ppm). With the poles of the $\alpha=1$ ladder it was worse on
+both (4.6 and 6.8\ppm; Sect.~\ref{sec:laws}). The five-parameter hybrid5 is the
+most accurate law on both grids. On PHOENIX it beats the four-term law by a median of 2\ppm{}, and
 this advantage comes from the extreme limb: fitted only to $\mu\ge0.02$, the
 four-term law matches hybrid5 on the method study (median 1.3 against
 1.2\ppm). On MPS-ATLAS hybrid5 beats
@@ -513,8 +533,8 @@ To show what the poles contribute, we fitted even polynomials in $\mu^2$ with
 the same numbers of parameters and no poles, $1-\sum_{k\le n}w_k(1-\mu^{2k})$.
 With the production metric ($p=0.1$) on the method study, their median
 light-curve errors are 193, 44, and 24\ppm{} for $n=2$, 4, and 5 on PHOENIX,
-against 41, 4.3, and 1.2\ppm{} for the corresponding hybrid laws. The poles
-thus reduce the error by factors of 4.7--20 on PHOENIX and 4.5--30 on
+against 41, 2.1, and 1.2\ppm{} for the corresponding hybrid laws. The poles
+thus reduce the error by factors of 4.7--21 on PHOENIX and 4.5--30 on
 MPS-ATLAS. (Table~\ref{tab:weighting} uses the wider metric with $p$ up to
 0.15, hence its larger values.)
 
@@ -527,8 +547,9 @@ method study, with the metric of Table~\ref{tab:weighting}. The 90th
 percentile of the light-curve error on PHOENIX is then 93\ppm{} at
 $\varepsilon=0.36$, against 102\ppm{} at 0.32 and 99\ppm{} at 0.40, so 0.36
 is still the optimum for PHOENIX and for both grids together; MPS-ATLAS alone
-would prefer 0.40. The poles of hybrid4 and hybrid5 are analytic and were not
-tuned.
+would prefer 0.40. The poles of hybrid5 lie on the analytic
+ladder and were not tuned; the single ladder parameter of hybrid4 was tuned
+and tested out of sample in the same way (Sect.~\ref{sec:laws}).
 
 Every hybrid row is physical, by construction. The worst hybrid5 rows
 (57 of the 67\,280 PHOENIX $r$-weighted rows exceed 15\ppm) are
@@ -551,7 +572,7 @@ percentile / maximum over all models and passbands, $p=0.1$.}
 Law & $n$ & PHOENIX & MPS-ATLAS Set 1 & MPS-ATLAS Set 2\\
 \hline
 hybrid5 & 5 & 1.3 / 5.6 / 51 & 0.83 / 4.3 / 6.9 & 0.85 / 4.3 / 7.0\\
-hybrid4 & 4 & 4.6 / 17 / 62 & 6.9 / 14 / 18 & 6.8 / 14 / 18\\
+hybrid4 & 4 & 2.1 / 6.6 / 51 & 1.6 / 5.6 / 7.4 & 1.5 / 5.7 / 7.4\\
 Four-term & 4 & 3.4 / 12 / 75 & 1.1 / 5.5 / 11 & 1.1 / 5.5 / 10\\
 Power-2 & 2 & 7.9 / 61 / 189 & 6.8 / 33 / 120 & 6.7 / 33 / 122\\
 hybrid2 & 2 & 42 / 112 / 344 & 43 / 83 / 112 & 42 / 82 / 109\\
@@ -637,14 +658,15 @@ most. We used three passbands typical of current work: TESS, HST WFC3 G141,
 and JWST NIRSpec PRISM. The planet has radius $p=0.1$ on a central transit
 ($b=0$). For every law the largest error arises at ingress and egress, where
 the planet crosses the limb. The worst error changes by a median factor of
-1.18, and at most 2.1, for $0\le b\le0.85$.
+1.09, and at most 2.1, for $0\le b\le0.85$.
 
 Figure~\ref{fig:lc} shows the residuals and Table~\ref{tab:lc} the largest
 deviations. The hybrid5 law reproduces every light curve to 0.4--2.2\ppm, and
 the four-term law to 0.2--5.4\ppm. The hybrid5 law is the better of the two in
 11 of the 15 cases; the four-term law wins in TESS for the mid and early M
-dwarfs, the K dwarf, and the solar analogue. The hybrid4 law (3.8--15\ppm) is
-worse than the four-term law except in two cases. Of the two-parameter laws,
+dwarfs, the K dwarf, and the solar analogue. The hybrid4 law (1.3--3.4\ppm)
+is better than the four-term law in 9 of the 15 cases, and better than hybrid5
+in TESS for the K dwarf and the solar analogue. Of the two-parameter laws,
 power-2 (0.9--15\ppm) is much more accurate than the quadratic law
 (25--113\ppm) and hybrid2 (28--97\ppm), but its M-dwarf fits are mostly
 unphysical (marked in Table~\ref{tab:lc}). The hybrid2 law beats the
@@ -657,7 +679,7 @@ profile error is kept only at $\mu<0.05$, the M-dwarf light-curve errors fall
 from 70--113\ppm{} to 8--13\ppm; refitted to $\mu\ge0.05$ alone, it still errs
 by 49--86\ppm. Two parameters cannot bend at the limb without being pulled away
 from the profile over the rest of the disc. The errors grow with planet size
-roughly as $p^{1.1}$--$p^{1.4}$ (Table~\ref{tab:geom}). For $p=0.03$ the median
+roughly as $p^{0.9}$--$p^{1.4}$ (Table~\ref{tab:geom}). For $p=0.03$ the median
 errors of hybrid5, the four-term law, and power-2 are below 1\ppm. Grazing
 transits ($b=1-p/2$) give smaller errors than full ones for every law, because
 the largest error occurs when the whole planet crosses the limb. Relative to
@@ -675,21 +697,21 @@ central transit of a planet with $p=0.1$.}
 \hline\hline
 Star & Passband & hybrid5 & hybrid4 & hybrid2 & Four-term & Power-2 & Quadratic\\
 \hline
-Late M & TESS & 1.3 & 15 & 89 & 1.6 & 12$^\dagger$ & 111\\
- & WFC3 G141 & 1.5 & 11 & 97 & 1.9 & 4.5$^\dagger$ & 113\\
- & NIRSpec PRISM & 0.8 & 8.5 & 80 & 3.2 & 2.0$^\dagger$ & 94\\
-Mid M & TESS & 1.4 & 11 & 85 & 0.5 & 3.0$^\dagger$ & 102\\
- & WFC3 G141 & 1.1 & 7.7 & 77 & 2.8 & 1.3$^\dagger$ & 89\\
- & NIRSpec PRISM & 0.6 & 6.5 & 66 & 3.4 & 1.3$^\dagger$ & 76\\
-Early M & TESS & 1.0 & 10 & 70 & 0.2 & 3.4 & 85\\
- & WFC3 G141 & 0.7 & 6.6 & 66 & 3.3 & 2.5 & 77\\
- & NIRSpec PRISM & 0.4 & 6.2 & 59 & 3.2 & 0.9 & 70\\
-K dwarf & TESS & 2.2 & 4.3 & 38 & 2.0 & 5.5 & 25\\
- & WFC3 G141 & 0.8 & 4.8 & 38 & 5.4 & 12 & 51\\
- & NIRSpec PRISM & 0.7 & 4.6 & 36 & 4.2 & 4.5 & 47\\
-Solar analogue & TESS & 2.1 & 4.4 & 33 & 2.0 & 13 & 27\\
- & WFC3 G141 & 0.8 & 4.1 & 34 & 4.6 & 15 & 45\\
- & NIRSpec PRISM & 0.8 & 3.8 & 28 & 3.8 & 8.9 & 38\\
+Late M & TESS & 1.3 & 2.0 & 89 & 1.6 & 12$^\dagger$ & 111\\
+ & WFC3 G141 & 1.5 & 3.4 & 97 & 1.9 & 4.5$^\dagger$ & 113\\
+ & NIRSpec PRISM & 0.8 & 3.1 & 80 & 3.2 & 2.0$^\dagger$ & 94\\
+Mid M & TESS & 1.4 & 2.1 & 85 & 0.5 & 3.0$^\dagger$ & 102\\
+ & WFC3 G141 & 1.1 & 3.3 & 77 & 2.8 & 1.3$^\dagger$ & 89\\
+ & NIRSpec PRISM & 0.6 & 2.8 & 66 & 3.4 & 1.3$^\dagger$ & 76\\
+Early M & TESS & 1.0 & 1.5 & 70 & 0.2 & 3.4 & 85\\
+ & WFC3 G141 & 0.7 & 2.9 & 66 & 3.3 & 2.5 & 77\\
+ & NIRSpec PRISM & 0.4 & 2.3 & 59 & 3.2 & 0.9 & 70\\
+K dwarf & TESS & 2.2 & 2.1 & 38 & 2.0 & 5.5 & 25\\
+ & WFC3 G141 & 0.8 & 1.5 & 38 & 5.4 & 12 & 51\\
+ & NIRSpec PRISM & 0.7 & 1.3 & 36 & 4.2 & 4.5 & 47\\
+Solar analogue & TESS & 2.1 & 1.8 & 33 & 2.0 & 13 & 27\\
+ & WFC3 G141 & 0.8 & 1.4 & 34 & 4.6 & 15 & 45\\
+ & NIRSpec PRISM & 0.8 & 1.3 & 28 & 3.8 & 8.9 & 38\\
 \hline
 \end{tabular}
 \tablefoot{Late, mid, and early M dwarfs: 2800, 3300, and 3800\,K, $\log g=5.0$;
@@ -710,15 +732,15 @@ light-curve error (ppm) for other planet sizes, for central ($b=0$) and grazing
 $p$ & hybrid5 & hybrid4 & Four-term & Power-2 & Quadratic\\
 \hline
 \multicolumn{6}{l}{$b=0$}\\
-0.03 & 0.30 (0.64) & 1.6 (3.7) & 0.55 (0.96) & 0.80 (2.6) & 10 (15)\\
-0.1 & 0.84 (2.2) & 6.5 (15) & 3.2 (5.4) & 4.5 (15) & 76 (113)\\
-0.2 & 2.6 (6.6) & 13 (28) & 7.5 (12) & 8.4 (35) & 146 (217)\\
-0.3 & 4.7 (12) & 20 (42) & 14 (22) & 15 (64) & 273 (404)\\
-rms, 0.1 & 0.50 & 2.8 & 1.5 & 1.7 & 30\\
+0.03 & 0.30 (0.64) & 1.1 (1.7) & 0.55 (0.96) & 0.80 (2.6) & 10 (15)\\
+0.1 & 0.84 (2.2) & 2.1 (3.4) & 3.2 (5.4) & 4.5 (15) & 76 (113)\\
+0.2 & 2.6 (6.6) & 5.3 (7.4) & 7.5 (12) & 8.4 (35) & 146 (217)\\
+0.3 & 4.7 (12) & 9.0 (12) & 14 (22) & 15 (64) & 273 (404)\\
+rms, 0.1 & 0.50 & 1.0 & 1.5 & 1.7 & 30\\
 \multicolumn{6}{l}{$b=1-p/2$}\\
-0.1 & 0.40 (0.87) & 3.4 (7.7) & 1.2 (2.0) & 3.4 (12) & 41 (60)\\
-0.2 & 0.58 (1.3) & 4.6 (11) & 3.2 (5.7) & 6.2 (26) & 113 (167)\\
-0.3 & 1.7 (3.5) & 9.5 (20) & 6.6 (11) & 8.0 (34) & 145 (214)\\
+0.1 & 0.40 (0.87) & 1.1 (1.9) & 1.2 (2.0) & 3.4 (12) & 41 (60)\\
+0.2 & 0.58 (1.3) & 1.5 (2.5) & 3.2 (5.7) & 6.2 (26) & 113 (167)\\
+0.3 & 1.7 (3.5) & 3.4 (4.9) & 6.6 (11) & 8.0 (34) & 145 (214)\\
 \hline
 \end{tabular}
 \end{table}
@@ -744,16 +766,16 @@ coefficients fixed at the tabulated values; free within its exact physical
 region (for power-2, $0\le c\le1$); and free but with a Gaussian prior of
 width 0.05 on each coefficient, centred on the tabulated values. The
 constraints never bind in the free hybrid fits. With fixed coefficients,
-hybrid5 and the four-term law bias the depth $p^2=10^4\ppm$ by at most 0.3 and
-1.1\ppm, and $b$ by less than $10^{-3}$. For the quadratic law the depth bias
+hybrid5, hybrid4, and the four-term law bias the depth $p^2=10^4\ppm$ by at
+most 0.3, 0.6, and 1.1\ppm, and $b$ by less than $10^{-3}$. For the quadratic law the depth bias
 reaches 97\ppm{} and the bias in $b$ 0.05, which matters for stellar densities;
 for hybrid2 it reaches 60\ppm, and for power-2 9\ppm. Freeing the coefficients
 reduces the residuals but not the bias, as \citet{howarth2011} and
 \citet{espinoza2016} found for two-parameter laws. A free quadratic law fits
 the M-dwarf light curves to a 5\ppm{} rms, yet biases their depths by up to
 113\ppm, because the depth trades against the limb darkening. The free hybrid4
-law trades in the same way, by up to 34\ppm, and the free hybrid5 law by up to
-7\ppm; the free four-term law stays within 2.2\ppm. A prior of 0.05 recovers
+and hybrid5 laws trade in the same way, by up to 12 and 7\ppm; the free
+four-term law stays within 2.2\ppm. A prior of 0.05 recovers
 most of the fixed-coefficient accuracy for hybrid5 (median 0.34\ppm). The bias
 differs between passbands, and this difference is what enters a transmission
 spectrum: across the three passbands of one star it is at most 0.5\ppm{} for
@@ -779,7 +801,7 @@ star.}
 Law & Fixed & Free & Prior & $|\Delta b|$ & Spread\\
 \hline
 hybrid5 & 0.08 / 0.3 & 1.4 / 7.2 & 0.34 / 1.7 & 0.0004 & 0.5 (2.9)\\
-hybrid4 & 0.49 / 1.4 & 6.0 / 34 & 1.6 / 11 & 0.002 & 0.9 (33)\\
+hybrid4 & 0.03 / 0.6 & 0.61 / 12 & 0.52 / 1.3 & 0.0005 & 0.7 (11)\\
 Four-term & 0.54 / 1.1 & 1.3 / 2.2 & 1.5 / 3.5 & 0.0003 & 1.3 (1.2)\\
 Power-2 & 2.1 / 8.9 & 8.3 / 58 & 2.7 / 62 & 0.005 & 10 (49)\\
 hybrid2 & 22 / 60 & 29 / 50 & 17 / 28 & 0.037 & 29 (32)\\
@@ -906,10 +928,10 @@ offsets, centred on zero.}
 \section{Error budget and recommendations}\label{sec:budget}
 %======================================================================
 Table~\ref{tab:budget} orders the error sources of a transit model that uses
-tabulated coefficients. For $p=0.1$ the law errors of hybrid5 and the
-four-term law (1--3\ppm) are comparable to the errors from the limb definition
-and from interpolation at the native grid spacing. Those of hybrid4 and power-2
-are 5--8\ppm. All of these are an order of magnitude below the differences
+tabulated coefficients. For $p=0.1$ the law errors of hybrid5, hybrid4, and
+the four-term law (1--3\ppm) are comparable to the errors from the limb
+definition and from interpolation at the native grid spacing. Those of power-2
+are 7--8\ppm. All of these are an order of magnitude below the differences
 between model grids, the size of the magnetic correction, and the offsets
 between models and observations. Two conventions, the limb rescaling and the
 photon or energy weighting of the passband, have effects of the same order as
@@ -927,8 +949,8 @@ flux: medians (90th percentiles), or ranges over cases.}
 Source & ppm\\
 \hline
 \multicolumn{2}{l}{Uncertainties}\\
-Law, hybrid5 / four-term & 1--3\\
-Law, hybrid4 / power-2 & 5--8\\
+Law, hybrid5 / hybrid4 / four-term & 1--3\\
+Law, power-2 & 7--8\\
 Law, hybrid2 / quadratic & 41--51\\
 Limb definition and $\mu$ sampling & 1--4 (2--8)\\
 Interpolation, native spacing (estimate) & 1.3 (12)\\
@@ -972,16 +994,17 @@ lies in the combinations the data do not constrain.
 
 We recommend the following.
 \begin{itemize}
-\item Law, fixed coefficients. hybrid5 or the four-term law, which are
+\item Law, fixed coefficients. hybrid5, hybrid4, or the four-term law, which are
 equivalent within the model uncertainties; for PHOENIX, the four-term law
 improves to the accuracy of hybrid5 when the fit ignores $\mu<0.02$, which our
-code offers. The hybrid4 law costs a few ppm. Power-2 is more accurate than
+code offers. Of the four-parameter laws, hybrid4 also has the elementary light
+curve. Power-2 is more accurate than
 hybrid2, but most of its PHOENIX fits below 3500\,K are unphysical, and
 constrained to $c\le1$ they err by 17\ppm{} in the median.
 \item Law, free coefficients. The four-term law is the least biased (at most
-2.2\ppm{} in depth), then hybrid5 (7\ppm). The hybrid4 law (34\ppm) and the
-two-parameter laws (up to 113\ppm) should be fitted with priors from the
-tables; a prior of 0.05 per coefficient removes most of the bias.
+2.2\ppm{} in depth), then hybrid5 (7\ppm) and hybrid4 (12\ppm). These and,
+above all, the two-parameter laws (up to 113\ppm) should be fitted with priors
+from the tables; a prior of 0.05 per coefficient removes most of the bias.
 \item MIRI LRS. Limb darkening is weak at 5--12\,$\mu$m: on MPS-ATLAS the
 median errors are 0.3\ppm{} for hybrid5 and 1.7\ppm{} for power-2, so a
 two-parameter law suffices for FGK hosts. No coefficients exist below 3500\,K.
@@ -1079,13 +1102,13 @@ The same construction would work for the four-term law. For any bandpass with bi
 S_k$, $w_j=\sum_k\bar S_k a_{kj}/\sum_k\bar S_k I_k(1)$ reproduces the direct
 fit with the same settings to $10^{-9}$, so coefficients for any spectroscopic
 bin follow by summation. The summed coefficients differ from the passband
-tables by a median of 1--2\ppm{} in light-curve terms for hybrid4 and hybrid5
-(90th percentile 3--4\ppm) and 10\ppm{} for hybrid2.
+tables by a median of 2\ppm{} in light-curve terms for hybrid4 and hybrid5
+(90th percentile 4--6\ppm) and 10\ppm{} for hybrid2.
 
 Single $R=3000$ bins inside strong lines can be unphysical. The summed
 coefficients are unphysical for 3.6\% of hybrid5 bins at $R=100$--1000 in M
 dwarfs (0.8\% in K dwarfs, none in FG stars), all between 0.6 and 1.8\,$\mu$m,
-where molecular bands dominate. For hybrid4 the fraction is 0.5--0.6\%, and
+where molecular bands dominate. For hybrid4 the fraction is 0.25--0.33\%, and
 for hybrid2 0.25\%. The code flags such bins; they should be merged with a
 neighbour or fitted directly with the constraint. The NIRSpec G395H resolution is
 close to $R=3000$, so bins should span several resolution elements. MPS-ATLAS
@@ -1157,14 +1180,15 @@ of any elliptical outline. Our main conclusions are as follows.
 \begin{itemize}
 \item Fitting uniformly in projected radius, the weighted-$r$ method of
 \citet{morello2020}, reduces the median light-curve error of every law by
-factors of 1.7--9 relative to fitting uniformly in $\mu$, at the cost of the
+factors of 1.7--15 relative to fitting uniformly in $\mu$, at the cost of the
 limb intensities. The least-squares integral must resolve the steep limb of
 spherical models.
-\item Against 1D model profiles, hybrid5 and the four-term law are equally
-accurate within the model uncertainties (1--3\ppm{} for $p=0.1$); the
+\item Against 1D model profiles, hybrid5, hybrid4, and the four-term law are
+equally accurate within the model uncertainties (1--3\ppm{} for $p=0.1$); the
 remaining PHOENIX advantage of hybrid5 comes from the outermost $\mu<0.02$.
-The hybrid4 law, the four-parameter law with an elementary light curve, costs
-a few ppm with its analytic poles. The poles reduce the error of an even
+With its ladder parameter tuned for transits ($\alpha=25/16$), hybrid4, the
+four-parameter law with an elementary light curve, is as accurate as the
+four-term law. The poles reduce the error of an even
 polynomial by factors of 5--30. All hybrid coefficients are physical by
 construction, and linear interpolation preserves this.
 \item These law errors are comparable to the interpolation error and an order

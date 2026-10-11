@@ -11,7 +11,10 @@ from squishierplanet.laws import ladder
 #: hybrid2's pole, re-tuned over 7,524 model-bands (P2c; was 0.208, J band)
 HYBRID2_EPS = 0.36
 #: hybrid4 / hybrid5 poles: the analytic ladder, alpha_eff = 1 (unchanged)
-HYBRID4_EPS = tuple(float(e) for e in ladder(2))      # 0.011762, 0.30408
+#: hybrid4: the analytic ladder with alpha_eff = 25/16 (ln eps scaled by 0.8),
+#: adopted 2026-10-11 after studies/rev3 (was alpha_eff = 1: 0.011762, 0.30408)
+HYBRID4_ALPHA = 25.0 / 16.0
+HYBRID4_EPS = tuple(float(e) for e in ladder(2, HYBRID4_ALPHA))  # 0.028601, 0.38582
 HYBRID5_EPS = tuple(float(e) for e in ladder(3))      # 0.0015966, 0.041275, 0.38743
 
 # --- headline fitting method (P2a, P2b) -------------------------------------
@@ -38,5 +41,5 @@ LIMB_SPECTRA = "per model"        # one r_c per model (photon-bolometric profile
 MIRI_TEFF_MIN = 3500
 
 # guard against any change to squishierplanet's ladder
-assert np.allclose(HYBRID4_EPS, (0.01176198, 0.30407926), rtol=1e-6)
+assert np.allclose(HYBRID4_EPS, (0.02860121, 0.38582418), rtol=1e-6)
 assert np.allclose(HYBRID5_EPS, (0.00159655, 0.04127504, 0.38743472), rtol=1e-6)

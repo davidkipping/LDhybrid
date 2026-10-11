@@ -10,7 +10,7 @@ control laws computed identically. All products live in `data/products/`.
 | law | T_j | poles ε |
 |---|---|---|
 | hybrid2 | 1 − μ², Π_ε | 0.36 |
-| hybrid4 | 1 − μ⁴, (1 − μ²)², Π_ε0, Π_ε1 | 0.011762, 0.30408 |
+| hybrid4 | 1 − μ⁴, (1 − μ²)², Π_ε0, Π_ε1 | 0.028601, 0.38582 (ladder α = 25/16) |
 | hybrid5 | 1 − μ⁴, (1 − μ²)², Π_ε0, Π_ε1, Π_ε2 | 0.0015966, 0.041275, 0.38743 |
 
 with Π_ε(μ) = [(μ²+ε)⁻² − (1+ε)⁻²] / [ε⁻² − (1+ε)⁻²]. Each w_j is the share of

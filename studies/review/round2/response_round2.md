@@ -123,9 +123,14 @@ made the changes below.
     error under chord sampling;
   - lightning approximation citations added (Gopal & Trefethen 2019;
     Herremans et al. 2023), with α = 1 stated;
-  - ladder sensitivity: hybrid5 is near-optimal. For hybrid4, a factor of 0.8
-    on ln ε would lower the median error from 5.0 to 1.9 ppm. We report this
-    but keep the analytic ladder shared with the companion;
+  - ladder sensitivity: hybrid5 is near-optimal at α = 1. For hybrid4 the
+    test showed that α = 1 was far from optimal. We therefore adopted
+    α = 25/16 for hybrid4 (ln ε scaled by 0.8; ε = 0.0286, 0.386), tested out
+    of sample (held out by grid, random half-splits, and 8100 further
+    model–passband combinations), and rebuilt all hybrid4 products. Grid
+    medians fall from 4.6/6.8 to 2.1/1.5 ppm (PHOENIX/MPS-ATLAS), so hybrid4
+    now matches the four-term law. Its free-coefficient depth bias falls from
+    34 to 12 ppm. Sect. 2 explains the choice;
   - the list of four-term wins in TESS is corrected;
   - the MPS-ATLAS < 4600 K remark is added;
   - the Fig. 2 range is limited to the grid;
@@ -249,5 +254,5 @@ made the changes below.
 - Author list, affiliations, acknowledgements.
 - Companion arXiv identifier.
 - Zenodo DOI and licence.
-- Whether to re-tune the hybrid4 ladder. This would change the law's
-  definition, which is shared with the companion paper.
+- Propagate the new hybrid4 poles (α = 25/16) to SquishierPlanet and Elómë
+  (docs/upstream/hybrid4_ladder_alpha.md) and to the companion paper.

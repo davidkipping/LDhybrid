@@ -9,7 +9,7 @@ def test_frozen_poles():
     assert v1.HYBRID2_EPS == 0.36
     assert laws.get("hybrid2").shapes[1].eps.tolist() == [0.36]
     assert np.allclose(laws.get("hybrid4").shapes[2].eps.tolist() + laws.get("hybrid4").shapes[3].eps.tolist(),
-                       [0.01176198, 0.30407926], rtol=1e-6)
+                       [0.02860121, 0.38582418], rtol=1e-6)
     eps5 = [s.eps[0] for s in laws.get("hybrid5").shapes[2:]]
     assert np.allclose(eps5, [0.00159655, 0.04127504, 0.38743472], rtol=1e-6)
 

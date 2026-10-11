@@ -61,7 +61,7 @@ COEFFS = {"hybrid2": ("w1", "w2"), "hybrid4": ("w1", "w2", "w3", "w4"),
           "claret4": ("a1", "a2", "a3", "a4"), "power2": ("c", "alpha")}
 LAWS = tuple(COEFFS)
 #: v1.0 pole positions (frozen; ldhybrid/v1.py)
-POLES = {"hybrid2": (0.36,), "hybrid4": (0.01176198, 0.30407926),
+POLES = {"hybrid2": (0.36,), "hybrid4": (0.02860121, 0.38582418),
          "hybrid5": (0.00159655, 0.04127504, 0.38743472)}
 SCALE = np.array([100.0, 0.5, 0.5])
 #: layout of the parsed-table cache (<table>.npz); bump when the parser changes
