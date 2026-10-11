@@ -25,9 +25,9 @@
 %%   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %%   Right brace   \}     Tilde         \~}
 %%
-\def\filedate{2025/10/06}
+\def\filedate{2025/11/27}
 \let\aafiledate\filedate
-\def\fileversion{9.3}
+\def\fileversion{9.4}
 \let\aafileversion\fileversion
 \NeedsTeXFormat{LaTeX2e}[1995/06/01]
 \ProvidesClass{aa}
@@ -755,6 +755,7 @@
     \renewcommand*\thanks[1]{\unskip}%
     \renewcommand*\email[1]{\unskip}%
     \renewcommand*\fnmsep{\unskip}%
+    \renewcommand*\textsuperscript[1]{\unskip}%
       \ifx\orcid\undefined\relax\else%
     \renewcommand*\orcid[1]{\unskip}%
       \fi
@@ -788,6 +789,7 @@
     \renewcommand*\inst[1]{}%
     \renewcommand*\thanks[1]{}%
     \renewcommand*\email[1]{}%
+    \renewcommand*\textsuperscript[1]{}
     \let\@@protect\protect
     \let\protect\@unexpandable@protect
     \global\aa@nbinstitutes \z@
@@ -807,6 +809,7 @@
 \newcommand*\inst[1]{\unskip\hbox{\@textsuperscript{\normalfont$#1$}}}
 \newcommand*\fnmsep{\unskip\hbox{\@textsuperscript{\normalfont,}}}
 \newcommand*\email[1]{e-mail: {\aa@emailfont #1}}
+\newcommand*{\corrauth}[1]{\thanks{Corresponding author: {\aa@emailfont #1}}}
 \let\endabstract\relax
 \renewcommand\abstract[1]{%
   \renewcommand\aa@abstract@i{#1}%
@@ -964,7 +967,8 @@
       }
     \fi
     \aa@cnta \@ne
-    {\aa@authorfont\centering\aa@author\par}
+    {\renewcommand*\email[1]{\unskip}
+    \aa@authorfont\centering\aa@author\par}
     \addvspace{\aa@afterauthorskip}    
 \endgroup}
 \newcommand*\mail[1]{\renewcommand*\aa@mail{#1}}
@@ -1105,11 +1109,13 @@
        \aa@longauthopen\aa@appauthaffname\aa@longauthclose\par}
     \addvspace{\aa@afterauthorskip}
       \else
-    {\aa@authorfont \aa@author\par}
+    {\renewcommand*\email[1]{\unskip}
+    \aa@authorfont \aa@author\par}
     \addvspace{\aa@afterauthorskip}
       \fi
     \else
-    {\aa@authorfont \aa@author\par}
+    {\renewcommand*\email[1]{\unskip}
+    \aa@authorfont \aa@author\par}
     \addvspace{\aa@afterauthorskip}
     \fi
   \endgroup
@@ -1172,6 +1178,8 @@
   \renewcommand*\inst[1]{}%
   \renewcommand*\fnmsep{}%
   \renewcommand*\and{, }%
+  \renewcommand*\email[1]{}%
+  \renewcommand*\textsuperscript[1]{}
       \ifx\orcid\undefined\relax\else%
     \renewcommand*\orcid[1]{\unskip}%
       \fi
