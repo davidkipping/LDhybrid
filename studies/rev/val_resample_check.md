@@ -1,0 +1,25 @@
+case | law | n=2000 | n=8000 | n=30000 | n=100000
+2600 4.0 JWST_NIRCam_F444W | hybrid5 | 2.6 | 0.8 | 0.6 | 0.6
+2600 4.0 JWST_NIRCam_F444W | claret4 | 8.4 | 6.5 | 6.8 | 7.1
+2600 4.0 JWST_NIRCam_F444W | power2 | 17.1 | 12.5 | 7.4 | 4.0
+3300 5.0 TESS | hybrid5 | 1.3 | 1.3 | 1.4 | 1.4
+3300 5.0 TESS | claret4 | 4.4 | 2.3 | 0.8 | 0.4
+3300 5.0 TESS | power2 | 18.6 | 8.7 | 4.6 | 3.4
+3300 5.0 JWST_NIRSpec_PRISM | hybrid5 | 1.9 | 0.5 | 0.6 | 0.6
+3300 5.0 JWST_NIRSpec_PRISM | claret4 | 4.6 | 3.2 | 3.1 | 3.3
+3300 5.0 JWST_NIRSpec_PRISM | power2 | 15.1 | 9.7 | 4.6 | 1.9
+4600 4.5 HST_WFC3_G141 | hybrid5 | 3.0 | 1.1 | 0.8 | 0.8
+4600 4.5 HST_WFC3_G141 | claret4 | 9.7 | 6.4 | 5.5 | 5.4
+4600 4.5 HST_WFC3_G141 | power2 | 12.8 | 12.0 | 11.9 | 11.9
+5800 4.5 TESS | hybrid5 | 1.8 | 1.8 | 2.0 | 2.1
+5800 4.5 TESS | claret4 | 4.7 | 2.8 | 2.1 | 2.0
+5800 4.5 TESS | power2 | 13.3 | 12.7 | 12.7 | 12.6
+5800 4.5 JWST_NIRSpec_PRISM | hybrid5 | 2.8 | 0.8 | 0.8 | 0.8
+5800 4.5 JWST_NIRSpec_PRISM | claret4 | 8.9 | 5.4 | 4.1 | 3.8
+5800 4.5 JWST_NIRSpec_PRISM | power2 | 11.0 | 9.0 | 8.9 | 8.9
+6500 4.0 Kepler | hybrid5 | 2.5 | 3.0 | 3.2 | 3.2
+6500 4.0 Kepler | claret4 | 8.0 | 5.9 | 5.4 | 5.4
+6500 4.0 Kepler | power2 | 28.2 | 28.3 | 28.3 | 28.3
+2800 5.0 HST_WFC3_G141 | hybrid5 | 1.2 | 1.2 | 1.5 | 1.5
+2800 5.0 HST_WFC3_G141 | claret4 | 3.3 | 1.5 | 1.1 | 1.7
+2800 5.0 HST_WFC3_G141 | power2 | 34.9 | 22.0 | 12.7 | 7.7

@@ -1,0 +1,1047 @@
+phoenix: 1682 models, 43 chunks, 43 to do, 40 bands
+  1/43 chunks  2.2 min  eta 90 min
+  2/43 chunks  2.2 min  eta 45 min
+  3/43 chunks  2.2 min  eta 29 min
+  4/43 chunks  2.2 min  eta 22 min
+  5/43 chunks  2.2 min  eta 17 min
+  6/43 chunks  3.8 min  eta 23 min
+  7/43 chunks  3.8 min  eta 19 min
+  8/43 chunks  3.8 min  eta 17 min
+  9/43 chunks  3.8 min  eta 14 min
+  10/43 chunks  3.8 min  eta 13 min
+  11/43 chunks  5.3 min  eta 15 min
+  12/43 chunks  5.3 min  eta 14 min
+  13/43 chunks  5.4 min  eta 12 min
+  14/43 chunks  5.4 min  eta 11 min
+  15/43 chunks  5.4 min  eta 10 min
+  16/43 chunks  6.8 min  eta 11 min
+  17/43 chunks  6.8 min  eta 10 min
+  18/43 chunks  6.8 min  eta 9 min
+  19/43 chunks  6.8 min  eta 9 min
+  20/43 chunks  6.8 min  eta 8 min
+  21/43 chunks  8.2 min  eta 9 min
+  22/43 chunks  8.2 min  eta 8 min
+  23/43 chunks  8.2 min  eta 7 min
+  24/43 chunks  8.2 min  eta 7 min
+  25/43 chunks  8.3 min  eta 6 min
+  26/43 chunks  9.5 min  eta 6 min
+  27/43 chunks  9.5 min  eta 6 min
+  28/43 chunks  9.5 min  eta 5 min
+  29/43 chunks  9.5 min  eta 5 min
+  30/43 chunks  9.5 min  eta 4 min
+  31/43 chunks  10.5 min  eta 4 min
+  32/43 chunks  10.5 min  eta 4 min
+  33/43 chunks  10.5 min  eta 3 min
+  34/43 chunks  10.5 min  eta 3 min
+  35/43 chunks  10.5 min  eta 2 min
+  36/43 chunks  11.4 min  eta 2 min
+  37/43 chunks  11.4 min  eta 2 min
+  38/43 chunks  11.5 min  eta 2 min
+  39/43 chunks  11.5 min  eta 1 min
+  40/43 chunks  11.5 min  eta 1 min
+  41/43 chunks  11.5 min  eta 1 min
+  42/43 chunks  12.5 min  eta 0 min
+  43/43 chunks  12.6 min  eta 0 min
+done
+mps1: 16974 models, 425 chunks, 425 to do, 41 bands
+  1/425 chunks  1.9 min  eta 803 min
+  2/425 chunks  1.9 min  eta 402 min
+  3/425 chunks  1.9 min  eta 270 min
+  4/425 chunks  1.9 min  eta 204 min
+  5/425 chunks  2.0 min  eta 169 min
+  6/425 chunks  3.2 min  eta 225 min
+  7/425 chunks  3.2 min  eta 193 min
+  8/425 chunks  3.3 min  eta 172 min
+  9/425 chunks  3.3 min  eta 154 min
+  10/425 chunks  3.4 min  eta 143 min
+  11/425 chunks  4.6 min  eta 172 min
+  12/425 chunks  4.6 min  eta 157 min
+  13/425 chunks  4.6 min  eta 146 min
+  14/425 chunks  4.6 min  eta 136 min
+  15/425 chunks  4.8 min  eta 132 min
+  16/425 chunks  6.1 min  eta 156 min
+  17/425 chunks  6.1 min  eta 147 min
+  18/425 chunks  6.1 min  eta 138 min
+  19/425 chunks  6.1 min  eta 131 min
+  20/425 chunks  6.3 min  eta 127 min
+  21/425 chunks  7.4 min  eta 142 min
+  22/425 chunks  7.5 min  eta 137 min
+  23/425 chunks  7.5 min  eta 131 min
+  24/425 chunks  7.5 min  eta 125 min
+  25/425 chunks  7.7 min  eta 123 min
+  26/425 chunks  8.6 min  eta 133 min
+  27/425 chunks  8.7 min  eta 129 min
+  28/425 chunks  8.7 min  eta 124 min
+  29/425 chunks  8.8 min  eta 120 min
+  30/425 chunks  8.8 min  eta 116 min
+  31/425 chunks  9.8 min  eta 125 min
+  32/425 chunks  9.8 min  eta 121 min
+  33/425 chunks  9.9 min  eta 117 min
+  34/425 chunks  9.9 min  eta 114 min
+  35/425 chunks  10.0 min  eta 111 min
+  36/425 chunks  10.9 min  eta 118 min
+  37/425 chunks  10.9 min  eta 114 min
+  38/425 chunks  10.9 min  eta 111 min
+  39/425 chunks  11.0 min  eta 109 min
+  40/425 chunks  11.0 min  eta 106 min
+  41/425 chunks  12.4 min  eta 116 min
+  42/425 chunks  12.4 min  eta 113 min
+  43/425 chunks  12.4 min  eta 111 min
+  44/425 chunks  12.5 min  eta 108 min
+  45/425 chunks  12.6 min  eta 107 min
+  46/425 chunks  13.6 min  eta 112 min
+  47/425 chunks  13.7 min  eta 110 min
+  48/425 chunks  13.9 min  eta 109 min
+  49/425 chunks  14.0 min  eta 107 min
+  50/425 chunks  14.2 min  eta 106 min
+  51/425 chunks  15.0 min  eta 110 min
+  52/425 chunks  15.1 min  eta 109 min
+  53/425 chunks  15.3 min  eta 107 min
+  54/425 chunks  15.4 min  eta 106 min
+  55/425 chunks  15.6 min  eta 105 min
+  56/425 chunks  16.3 min  eta 107 min
+  57/425 chunks  16.6 min  eta 107 min
+  58/425 chunks  16.6 min  eta 105 min
+  59/425 chunks  16.9 min  eta 105 min
+  60/425 chunks  17.1 min  eta 104 min
+  61/425 chunks  17.6 min  eta 105 min
+  62/425 chunks  18.0 min  eta 105 min
+  63/425 chunks  18.0 min  eta 103 min
+  64/425 chunks  18.2 min  eta 102 min
+  65/425 chunks  18.5 min  eta 102 min
+  66/425 chunks  19.0 min  eta 103 min
+  67/425 chunks  19.3 min  eta 103 min
+  68/425 chunks  19.4 min  eta 102 min
+  69/425 chunks  19.5 min  eta 101 min
+  70/425 chunks  19.8 min  eta 100 min
+  71/425 chunks  20.3 min  eta 101 min
+  72/425 chunks  20.6 min  eta 101 min
+  73/425 chunks  20.7 min  eta 100 min
+  74/425 chunks  20.8 min  eta 99 min
+  75/425 chunks  21.1 min  eta 98 min
+  76/425 chunks  21.6 min  eta 99 min
+  77/425 chunks  21.7 min  eta 98 min
+  78/425 chunks  22.1 min  eta 98 min
+  79/425 chunks  22.2 min  eta 97 min
+  80/425 chunks  22.4 min  eta 97 min
+  81/425 chunks  22.9 min  eta 97 min
+  82/425 chunks  23.1 min  eta 96 min
+  83/425 chunks  23.4 min  eta 97 min
+  84/425 chunks  23.6 min  eta 96 min
+  85/425 chunks  23.8 min  eta 95 min
+  86/425 chunks  24.3 min  eta 96 min
+  87/425 chunks  24.6 min  eta 95 min
+  88/425 chunks  24.9 min  eta 95 min
+  89/425 chunks  25.0 min  eta 94 min
+  90/425 chunks  25.2 min  eta 94 min
+  91/425 chunks  25.7 min  eta 94 min
+  92/425 chunks  25.9 min  eta 94 min
+  93/425 chunks  26.3 min  eta 94 min
+  94/425 chunks  26.3 min  eta 93 min
+  95/425 chunks  26.5 min  eta 92 min
+  96/425 chunks  27.0 min  eta 93 min
+  97/425 chunks  27.2 min  eta 92 min
+  98/425 chunks  27.5 min  eta 92 min
+  99/425 chunks  27.6 min  eta 91 min
+  100/425 chunks  27.8 min  eta 90 min
+  101/425 chunks  28.3 min  eta 91 min
+  102/425 chunks  28.6 min  eta 90 min
+  103/425 chunks  28.9 min  eta 90 min
+  104/425 chunks  28.9 min  eta 89 min
+  105/425 chunks  29.2 min  eta 89 min
+  106/425 chunks  29.6 min  eta 89 min
+  107/425 chunks  29.8 min  eta 88 min
+  108/425 chunks  29.9 min  eta 88 min
+  109/425 chunks  29.9 min  eta 87 min
+  110/425 chunks  30.1 min  eta 86 min
+  111/425 chunks  30.5 min  eta 86 min
+  112/425 chunks  30.6 min  eta 86 min
+  113/425 chunks  30.8 min  eta 85 min
+  114/425 chunks  30.8 min  eta 84 min
+  115/425 chunks  31.0 min  eta 84 min
+  116/425 chunks  31.4 min  eta 84 min
+  117/425 chunks  31.5 min  eta 83 min
+  118/425 chunks  31.6 min  eta 82 min
+  119/425 chunks  31.7 min  eta 81 min
+  120/425 chunks  31.9 min  eta 81 min
+  121/425 chunks  32.3 min  eta 81 min
+  122/425 chunks  32.4 min  eta 80 min
+  123/425 chunks  32.5 min  eta 80 min
+  124/425 chunks  32.7 min  eta 79 min
+  125/425 chunks  33.0 min  eta 79 min
+  126/425 chunks  33.6 min  eta 80 min
+  127/425 chunks  33.7 min  eta 79 min
+  128/425 chunks  33.8 min  eta 79 min
+  129/425 chunks  34.0 min  eta 78 min
+  130/425 chunks  34.2 min  eta 78 min
+  131/425 chunks  34.8 min  eta 78 min
+  132/425 chunks  34.9 min  eta 77 min
+  133/425 chunks  35.1 min  eta 77 min
+  134/425 chunks  35.3 min  eta 77 min
+  135/425 chunks  35.4 min  eta 76 min
+  136/425 chunks  35.7 min  eta 76 min
+  137/425 chunks  36.2 min  eta 76 min
+  138/425 chunks  36.4 min  eta 76 min
+  139/425 chunks  36.4 min  eta 75 min
+  140/425 chunks  36.6 min  eta 75 min
+  141/425 chunks  36.6 min  eta 74 min
+  142/425 chunks  37.3 min  eta 74 min
+  143/425 chunks  37.5 min  eta 74 min
+  144/425 chunks  37.5 min  eta 73 min
+  145/425 chunks  37.7 min  eta 73 min
+  146/425 chunks  37.9 min  eta 72 min
+  147/425 chunks  38.4 min  eta 73 min
+  148/425 chunks  38.7 min  eta 72 min
+  149/425 chunks  38.7 min  eta 72 min
+  150/425 chunks  38.9 min  eta 71 min
+  151/425 chunks  39.0 min  eta 71 min
+  152/425 chunks  39.6 min  eta 71 min
+  153/425 chunks  39.9 min  eta 71 min
+  154/425 chunks  39.9 min  eta 70 min
+  155/425 chunks  40.0 min  eta 70 min
+  156/425 chunks  40.2 min  eta 69 min
+  157/425 chunks  40.8 min  eta 70 min
+  158/425 chunks  41.1 min  eta 69 min
+  159/425 chunks  41.1 min  eta 69 min
+  160/425 chunks  41.3 min  eta 68 min
+  161/425 chunks  41.4 min  eta 68 min
+  162/425 chunks  42.0 min  eta 68 min
+  163/425 chunks  42.4 min  eta 68 min
+  164/425 chunks  42.4 min  eta 67 min
+  165/425 chunks  42.5 min  eta 67 min
+  166/425 chunks  42.6 min  eta 66 min
+  167/425 chunks  43.3 min  eta 67 min
+  168/425 chunks  43.6 min  eta 67 min
+  169/425 chunks  43.6 min  eta 66 min
+  170/425 chunks  43.6 min  eta 65 min
+  171/425 chunks  43.7 min  eta 65 min
+  172/425 chunks  44.4 min  eta 65 min
+  173/425 chunks  44.7 min  eta 65 min
+  174/425 chunks  44.7 min  eta 65 min
+  175/425 chunks  44.8 min  eta 64 min
+  176/425 chunks  44.9 min  eta 63 min
+  177/425 chunks  45.6 min  eta 64 min
+  178/425 chunks  46.0 min  eta 64 min
+  179/425 chunks  46.0 min  eta 63 min
+  180/425 chunks  46.0 min  eta 63 min
+  181/425 chunks  46.2 min  eta 62 min
+  182/425 chunks  46.9 min  eta 63 min
+  183/425 chunks  47.2 min  eta 62 min
+  184/425 chunks  47.2 min  eta 62 min
+  185/425 chunks  47.3 min  eta 61 min
+  186/425 chunks  47.5 min  eta 61 min
+  187/425 chunks  48.6 min  eta 62 min
+  188/425 chunks  48.9 min  eta 62 min
+  189/425 chunks  48.9 min  eta 61 min
+  190/425 chunks  49.0 min  eta 61 min
+  191/425 chunks  49.1 min  eta 60 min
+  192/425 chunks  49.8 min  eta 60 min
+  193/425 chunks  50.0 min  eta 60 min
+  194/425 chunks  50.0 min  eta 60 min
+  195/425 chunks  50.1 min  eta 59 min
+  196/425 chunks  50.2 min  eta 59 min
+  197/425 chunks  51.0 min  eta 59 min
+  198/425 chunks  51.3 min  eta 59 min
+  199/425 chunks  51.3 min  eta 58 min
+  200/425 chunks  51.4 min  eta 58 min
+  201/425 chunks  51.5 min  eta 57 min
+  202/425 chunks  52.1 min  eta 58 min
+  203/425 chunks  52.6 min  eta 57 min
+  204/425 chunks  52.8 min  eta 57 min
+  205/425 chunks  52.9 min  eta 57 min
+  206/425 chunks  53.0 min  eta 56 min
+  207/425 chunks  54.0 min  eta 57 min
+  208/425 chunks  54.5 min  eta 57 min
+  209/425 chunks  54.7 min  eta 57 min
+  210/425 chunks  54.8 min  eta 56 min
+  211/425 chunks  54.9 min  eta 56 min
+  212/425 chunks  55.9 min  eta 56 min
+  213/425 chunks  56.4 min  eta 56 min
+  214/425 chunks  56.6 min  eta 56 min
+  215/425 chunks  56.7 min  eta 55 min
+  216/425 chunks  56.8 min  eta 55 min
+  217/425 chunks  57.9 min  eta 55 min
+  218/425 chunks  58.3 min  eta 55 min
+  219/425 chunks  58.5 min  eta 55 min
+  220/425 chunks  58.6 min  eta 55 min
+  221/425 chunks  58.7 min  eta 54 min
+  222/425 chunks  59.9 min  eta 55 min
+  223/425 chunks  60.3 min  eta 55 min
+  224/425 chunks  60.4 min  eta 54 min
+  225/425 chunks  60.5 min  eta 54 min
+  226/425 chunks  60.5 min  eta 53 min
+  227/425 chunks  61.3 min  eta 53 min
+  228/425 chunks  61.6 min  eta 53 min
+  229/425 chunks  61.7 min  eta 53 min
+  230/425 chunks  61.9 min  eta 52 min
+  231/425 chunks  61.9 min  eta 52 min
+  232/425 chunks  62.7 min  eta 52 min
+  233/425 chunks  63.1 min  eta 52 min
+  234/425 chunks  63.1 min  eta 51 min
+  235/425 chunks  63.3 min  eta 51 min
+  236/425 chunks  63.3 min  eta 51 min
+  237/425 chunks  64.1 min  eta 51 min
+  238/425 chunks  64.4 min  eta 51 min
+  239/425 chunks  64.4 min  eta 50 min
+  240/425 chunks  64.6 min  eta 50 min
+  241/425 chunks  64.7 min  eta 49 min
+  242/425 chunks  65.5 min  eta 50 min
+  243/425 chunks  65.8 min  eta 49 min
+  244/425 chunks  65.8 min  eta 49 min
+  245/425 chunks  66.0 min  eta 48 min
+  246/425 chunks  66.1 min  eta 48 min
+  247/425 chunks  66.9 min  eta 48 min
+  248/425 chunks  67.1 min  eta 48 min
+  249/425 chunks  67.2 min  eta 47 min
+  250/425 chunks  67.4 min  eta 47 min
+  251/425 chunks  67.4 min  eta 47 min
+  252/425 chunks  68.2 min  eta 47 min
+  253/425 chunks  68.5 min  eta 47 min
+  254/425 chunks  68.5 min  eta 46 min
+  255/425 chunks  68.8 min  eta 46 min
+  256/425 chunks  68.8 min  eta 45 min
+  257/425 chunks  69.6 min  eta 46 min
+  258/425 chunks  69.8 min  eta 45 min
+  259/425 chunks  69.9 min  eta 45 min
+  260/425 chunks  70.1 min  eta 45 min
+  261/425 chunks  70.2 min  eta 44 min
+  262/425 chunks  71.0 min  eta 44 min
+  263/425 chunks  71.3 min  eta 44 min
+  264/425 chunks  71.3 min  eta 43 min
+  265/425 chunks  71.6 min  eta 43 min
+  266/425 chunks  71.6 min  eta 43 min
+  267/425 chunks  72.4 min  eta 43 min
+  268/425 chunks  72.7 min  eta 43 min
+  269/425 chunks  72.7 min  eta 42 min
+  270/425 chunks  73.0 min  eta 42 min
+  271/425 chunks  73.0 min  eta 41 min
+  272/425 chunks  73.8 min  eta 42 min
+  273/425 chunks  74.0 min  eta 41 min
+  274/425 chunks  74.1 min  eta 41 min
+  275/425 chunks  74.3 min  eta 41 min
+  276/425 chunks  74.3 min  eta 40 min
+  277/425 chunks  75.2 min  eta 40 min
+  278/425 chunks  75.4 min  eta 40 min
+  279/425 chunks  75.4 min  eta 39 min
+  280/425 chunks  75.7 min  eta 39 min
+  281/425 chunks  75.8 min  eta 39 min
+  282/425 chunks  76.6 min  eta 39 min
+  283/425 chunks  76.8 min  eta 39 min
+  284/425 chunks  76.8 min  eta 38 min
+  285/425 chunks  77.1 min  eta 38 min
+  286/425 chunks  77.1 min  eta 37 min
+  287/425 chunks  78.0 min  eta 37 min
+  288/425 chunks  78.2 min  eta 37 min
+  289/425 chunks  78.2 min  eta 37 min
+  290/425 chunks  78.5 min  eta 37 min
+  291/425 chunks  78.6 min  eta 36 min
+  292/425 chunks  79.4 min  eta 36 min
+  293/425 chunks  79.6 min  eta 36 min
+  294/425 chunks  79.6 min  eta 35 min
+  295/425 chunks  79.9 min  eta 35 min
+  296/425 chunks  79.9 min  eta 35 min
+  297/425 chunks  80.8 min  eta 35 min
+  298/425 chunks  81.0 min  eta 35 min
+  299/425 chunks  81.0 min  eta 34 min
+  300/425 chunks  81.3 min  eta 34 min
+  301/425 chunks  81.4 min  eta 34 min
+  302/425 chunks  82.2 min  eta 33 min
+  303/425 chunks  82.4 min  eta 33 min
+  304/425 chunks  82.4 min  eta 33 min
+  305/425 chunks  82.8 min  eta 33 min
+  306/425 chunks  82.8 min  eta 32 min
+  307/425 chunks  83.6 min  eta 32 min
+  308/425 chunks  83.8 min  eta 32 min
+  309/425 chunks  83.9 min  eta 31 min
+  310/425 chunks  84.2 min  eta 31 min
+  311/425 chunks  84.3 min  eta 31 min
+  312/425 chunks  85.1 min  eta 31 min
+  313/425 chunks  85.2 min  eta 30 min
+  314/425 chunks  85.3 min  eta 30 min
+  315/425 chunks  85.6 min  eta 30 min
+  316/425 chunks  85.7 min  eta 30 min
+  317/425 chunks  86.5 min  eta 29 min
+  318/425 chunks  86.6 min  eta 29 min
+  319/425 chunks  86.8 min  eta 29 min
+  320/425 chunks  87.1 min  eta 29 min
+  321/425 chunks  87.2 min  eta 28 min
+  322/425 chunks  88.0 min  eta 28 min
+  323/425 chunks  88.1 min  eta 28 min
+  324/425 chunks  88.2 min  eta 27 min
+  325/425 chunks  88.5 min  eta 27 min
+  326/425 chunks  88.6 min  eta 27 min
+  327/425 chunks  89.4 min  eta 27 min
+  328/425 chunks  89.5 min  eta 26 min
+  329/425 chunks  89.6 min  eta 26 min
+  330/425 chunks  89.9 min  eta 26 min
+  331/425 chunks  90.1 min  eta 26 min
+  332/425 chunks  90.9 min  eta 25 min
+  333/425 chunks  91.0 min  eta 25 min
+  334/425 chunks  91.1 min  eta 25 min
+  335/425 chunks  91.5 min  eta 25 min
+  336/425 chunks  91.6 min  eta 24 min
+  337/425 chunks  92.4 min  eta 24 min
+  338/425 chunks  92.5 min  eta 24 min
+  339/425 chunks  92.6 min  eta 23 min
+  340/425 chunks  92.9 min  eta 23 min
+  341/425 chunks  93.1 min  eta 23 min
+  342/425 chunks  93.8 min  eta 23 min
+  343/425 chunks  93.9 min  eta 22 min
+  344/425 chunks  94.0 min  eta 22 min
+  345/425 chunks  94.3 min  eta 22 min
+  346/425 chunks  94.5 min  eta 22 min
+  347/425 chunks  95.2 min  eta 21 min
+  348/425 chunks  95.2 min  eta 21 min
+  349/425 chunks  95.4 min  eta 21 min
+  350/425 chunks  95.7 min  eta 20 min
+  351/425 chunks  95.8 min  eta 20 min
+  352/425 chunks  96.5 min  eta 20 min
+  353/425 chunks  96.6 min  eta 20 min
+  354/425 chunks  96.7 min  eta 19 min
+  355/425 chunks  97.0 min  eta 19 min
+  356/425 chunks  97.2 min  eta 19 min
+  357/425 chunks  97.9 min  eta 19 min
+  358/425 chunks  98.0 min  eta 18 min
+  359/425 chunks  98.1 min  eta 18 min
+  360/425 chunks  98.4 min  eta 18 min
+  361/425 chunks  98.6 min  eta 17 min
+  362/425 chunks  99.3 min  eta 17 min
+  363/425 chunks  99.3 min  eta 17 min
+  364/425 chunks  99.5 min  eta 17 min
+  365/425 chunks  99.7 min  eta 16 min
+  366/425 chunks  100.0 min  eta 16 min
+  367/425 chunks  100.7 min  eta 16 min
+  368/425 chunks  100.7 min  eta 16 min
+  369/425 chunks  100.9 min  eta 15 min
+  370/425 chunks  101.1 min  eta 15 min
+  371/425 chunks  101.4 min  eta 15 min
+  372/425 chunks  102.1 min  eta 15 min
+  373/425 chunks  102.1 min  eta 14 min
+  374/425 chunks  102.2 min  eta 14 min
+  375/425 chunks  102.5 min  eta 14 min
+  376/425 chunks  102.7 min  eta 13 min
+  377/425 chunks  103.0 min  eta 13 min
+  378/425 chunks  103.0 min  eta 13 min
+  379/425 chunks  103.2 min  eta 13 min
+  380/425 chunks  103.3 min  eta 12 min
+  381/425 chunks  103.5 min  eta 12 min
+  382/425 chunks  103.9 min  eta 12 min
+  383/425 chunks  103.9 min  eta 11 min
+  384/425 chunks  104.1 min  eta 11 min
+  385/425 chunks  104.2 min  eta 11 min
+  386/425 chunks  104.4 min  eta 11 min
+  387/425 chunks  105.0 min  eta 10 min
+  388/425 chunks  105.0 min  eta 10 min
+  389/425 chunks  105.1 min  eta 10 min
+  390/425 chunks  105.5 min  eta 9 min
+  391/425 chunks  105.8 min  eta 9 min
+  392/425 chunks  106.4 min  eta 9 min
+  393/425 chunks  106.4 min  eta 9 min
+  394/425 chunks  106.6 min  eta 8 min
+  395/425 chunks  106.9 min  eta 8 min
+  396/425 chunks  107.3 min  eta 8 min
+  397/425 chunks  107.9 min  eta 8 min
+  398/425 chunks  108.0 min  eta 7 min
+  399/425 chunks  108.0 min  eta 7 min
+  400/425 chunks  108.4 min  eta 7 min
+  401/425 chunks  108.8 min  eta 7 min
+  402/425 chunks  109.4 min  eta 6 min
+  403/425 chunks  109.5 min  eta 6 min
+  404/425 chunks  109.6 min  eta 6 min
+  405/425 chunks  110.0 min  eta 5 min
+  406/425 chunks  110.3 min  eta 5 min
+  407/425 chunks  110.7 min  eta 5 min
+  408/425 chunks  110.7 min  eta 5 min
+  409/425 chunks  110.8 min  eta 4 min
+  410/425 chunks  111.0 min  eta 4 min
+  411/425 chunks  111.2 min  eta 4 min
+  412/425 chunks  111.5 min  eta 4 min
+  413/425 chunks  111.6 min  eta 3 min
+  414/425 chunks  111.6 min  eta 3 min
+  415/425 chunks  111.8 min  eta 3 min
+  416/425 chunks  112.1 min  eta 2 min
+  417/425 chunks  112.4 min  eta 2 min
+  418/425 chunks  112.4 min  eta 2 min
+  419/425 chunks  112.5 min  eta 2 min
+  420/425 chunks  112.7 min  eta 1 min
+  421/425 chunks  112.9 min  eta 1 min
+  422/425 chunks  113.0 min  eta 1 min
+  423/425 chunks  113.2 min  eta 1 min
+  424/425 chunks  113.3 min  eta 0 min
+  425/425 chunks  113.3 min  eta 0 min
+done
+mps2: 16974 models, 425 chunks, 425 to do, 41 bands
+  1/425 chunks  1.2 min  eta 514 min
+  2/425 chunks  1.2 min  eta 261 min
+  3/425 chunks  1.2 min  eta 174 min
+  4/425 chunks  1.3 min  eta 132 min
+  5/425 chunks  1.3 min  eta 109 min
+  6/425 chunks  2.2 min  eta 153 min
+  7/425 chunks  2.2 min  eta 133 min
+  8/425 chunks  2.2 min  eta 117 min
+  9/425 chunks  2.3 min  eta 105 min
+  10/425 chunks  2.3 min  eta 94 min
+  11/425 chunks  3.1 min  eta 117 min
+  12/425 chunks  3.1 min  eta 107 min
+  13/425 chunks  3.2 min  eta 102 min
+  14/425 chunks  3.2 min  eta 95 min
+  15/425 chunks  3.3 min  eta 89 min
+  16/425 chunks  4.1 min  eta 105 min
+  17/425 chunks  4.2 min  eta 100 min
+  18/425 chunks  4.2 min  eta 95 min
+  19/425 chunks  4.2 min  eta 90 min
+  20/425 chunks  4.2 min  eta 86 min
+  21/425 chunks  5.0 min  eta 97 min
+  22/425 chunks  5.2 min  eta 94 min
+  23/425 chunks  5.2 min  eta 90 min
+  24/425 chunks  5.2 min  eta 87 min
+  25/425 chunks  5.2 min  eta 84 min
+  26/425 chunks  6.0 min  eta 93 min
+  27/425 chunks  6.1 min  eta 90 min
+  28/425 chunks  6.1 min  eta 87 min
+  29/425 chunks  6.1 min  eta 84 min
+  30/425 chunks  6.2 min  eta 81 min
+  31/425 chunks  7.0 min  eta 89 min
+  32/425 chunks  7.1 min  eta 87 min
+  33/425 chunks  7.1 min  eta 84 min
+  34/425 chunks  7.1 min  eta 82 min
+  35/425 chunks  7.2 min  eta 80 min
+  36/425 chunks  8.0 min  eta 87 min
+  37/425 chunks  8.0 min  eta 84 min
+  38/425 chunks  8.1 min  eta 82 min
+  39/425 chunks  8.1 min  eta 80 min
+  40/425 chunks  8.1 min  eta 78 min
+  41/425 chunks  9.0 min  eta 84 min
+  42/425 chunks  9.0 min  eta 82 min
+  43/425 chunks  9.1 min  eta 81 min
+  44/425 chunks  9.1 min  eta 79 min
+  45/425 chunks  9.2 min  eta 78 min
+  46/425 chunks  10.0 min  eta 82 min
+  47/425 chunks  10.0 min  eta 80 min
+  48/425 chunks  10.0 min  eta 79 min
+  49/425 chunks  10.1 min  eta 77 min
+  50/425 chunks  10.2 min  eta 77 min
+  51/425 chunks  10.9 min  eta 80 min
+  52/425 chunks  10.9 min  eta 78 min
+  53/425 chunks  11.0 min  eta 77 min
+  54/425 chunks  11.0 min  eta 76 min
+  55/425 chunks  11.2 min  eta 75 min
+  56/425 chunks  11.8 min  eta 78 min
+  57/425 chunks  11.9 min  eta 77 min
+  58/425 chunks  11.9 min  eta 75 min
+  59/425 chunks  12.0 min  eta 75 min
+  60/425 chunks  12.2 min  eta 74 min
+  61/425 chunks  12.8 min  eta 76 min
+  62/425 chunks  12.8 min  eta 75 min
+  63/425 chunks  12.8 min  eta 74 min
+  64/425 chunks  13.0 min  eta 73 min
+  65/425 chunks  13.1 min  eta 73 min
+  66/425 chunks  13.7 min  eta 74 min
+  67/425 chunks  13.7 min  eta 73 min
+  68/425 chunks  13.8 min  eta 72 min
+  69/425 chunks  14.0 min  eta 72 min
+  70/425 chunks  14.1 min  eta 71 min
+  71/425 chunks  14.6 min  eta 73 min
+  72/425 chunks  14.7 min  eta 72 min
+  73/425 chunks  14.7 min  eta 71 min
+  74/425 chunks  14.9 min  eta 71 min
+  75/425 chunks  15.0 min  eta 70 min
+  76/425 chunks  15.5 min  eta 71 min
+  77/425 chunks  15.6 min  eta 71 min
+  78/425 chunks  15.7 min  eta 70 min
+  79/425 chunks  15.9 min  eta 70 min
+  80/425 chunks  16.0 min  eta 69 min
+  81/425 chunks  16.5 min  eta 70 min
+  82/425 chunks  16.6 min  eta 70 min
+  83/425 chunks  16.6 min  eta 69 min
+  84/425 chunks  16.9 min  eta 69 min
+  85/425 chunks  17.0 min  eta 68 min
+  86/425 chunks  17.4 min  eta 68 min
+  87/425 chunks  17.6 min  eta 68 min
+  88/425 chunks  17.6 min  eta 68 min
+  89/425 chunks  17.9 min  eta 68 min
+  90/425 chunks  17.9 min  eta 67 min
+  91/425 chunks  18.3 min  eta 67 min
+  92/425 chunks  18.5 min  eta 67 min
+  93/425 chunks  18.5 min  eta 66 min
+  94/425 chunks  18.8 min  eta 66 min
+  95/425 chunks  18.8 min  eta 65 min
+  96/425 chunks  19.2 min  eta 66 min
+  97/425 chunks  19.4 min  eta 66 min
+  98/425 chunks  19.5 min  eta 65 min
+  99/425 chunks  19.7 min  eta 65 min
+  100/425 chunks  19.7 min  eta 64 min
+  101/425 chunks  20.1 min  eta 64 min
+  102/425 chunks  20.4 min  eta 65 min
+  103/425 chunks  20.4 min  eta 64 min
+  104/425 chunks  20.6 min  eta 64 min
+  105/425 chunks  20.6 min  eta 63 min
+  106/425 chunks  21.0 min  eta 63 min
+  107/425 chunks  21.3 min  eta 63 min
+  108/425 chunks  21.4 min  eta 63 min
+  109/425 chunks  21.5 min  eta 62 min
+  110/425 chunks  21.5 min  eta 62 min
+  111/425 chunks  21.9 min  eta 62 min
+  112/425 chunks  22.2 min  eta 62 min
+  113/425 chunks  22.2 min  eta 61 min
+  114/425 chunks  22.4 min  eta 61 min
+  115/425 chunks  22.5 min  eta 61 min
+  116/425 chunks  22.8 min  eta 61 min
+  117/425 chunks  23.1 min  eta 61 min
+  118/425 chunks  23.2 min  eta 60 min
+  119/425 chunks  23.3 min  eta 60 min
+  120/425 chunks  23.4 min  eta 59 min
+  121/425 chunks  23.7 min  eta 60 min
+  122/425 chunks  24.0 min  eta 60 min
+  123/425 chunks  24.1 min  eta 59 min
+  124/425 chunks  24.2 min  eta 59 min
+  125/425 chunks  24.3 min  eta 58 min
+  126/425 chunks  24.7 min  eta 59 min
+  127/425 chunks  24.9 min  eta 59 min
+  128/425 chunks  25.0 min  eta 58 min
+  129/425 chunks  25.2 min  eta 58 min
+  130/425 chunks  25.3 min  eta 57 min
+  131/425 chunks  25.6 min  eta 57 min
+  132/425 chunks  25.9 min  eta 57 min
+  133/425 chunks  25.9 min  eta 57 min
+  134/425 chunks  26.2 min  eta 57 min
+  135/425 chunks  26.2 min  eta 56 min
+  136/425 chunks  26.5 min  eta 56 min
+  137/425 chunks  26.8 min  eta 56 min
+  138/425 chunks  26.8 min  eta 56 min
+  139/425 chunks  27.2 min  eta 56 min
+  140/425 chunks  27.2 min  eta 55 min
+  141/425 chunks  27.4 min  eta 55 min
+  142/425 chunks  27.7 min  eta 55 min
+  143/425 chunks  27.8 min  eta 55 min
+  144/425 chunks  28.1 min  eta 55 min
+  145/425 chunks  28.1 min  eta 54 min
+  146/425 chunks  28.3 min  eta 54 min
+  147/425 chunks  28.6 min  eta 54 min
+  148/425 chunks  28.7 min  eta 54 min
+  149/425 chunks  29.0 min  eta 54 min
+  150/425 chunks  29.0 min  eta 53 min
+  151/425 chunks  29.2 min  eta 53 min
+  152/425 chunks  29.6 min  eta 53 min
+  153/425 chunks  29.6 min  eta 53 min
+  154/425 chunks  29.9 min  eta 53 min
+  155/425 chunks  29.9 min  eta 52 min
+  156/425 chunks  30.1 min  eta 52 min
+  157/425 chunks  30.5 min  eta 52 min
+  158/425 chunks  30.5 min  eta 52 min
+  159/425 chunks  30.8 min  eta 51 min
+  160/425 chunks  30.8 min  eta 51 min
+  161/425 chunks  30.9 min  eta 51 min
+  162/425 chunks  31.4 min  eta 51 min
+  163/425 chunks  31.4 min  eta 51 min
+  164/425 chunks  31.7 min  eta 50 min
+  165/425 chunks  31.8 min  eta 50 min
+  166/425 chunks  31.9 min  eta 50 min
+  167/425 chunks  32.3 min  eta 50 min
+  168/425 chunks  32.4 min  eta 50 min
+  169/425 chunks  32.6 min  eta 49 min
+  170/425 chunks  32.7 min  eta 49 min
+  171/425 chunks  32.8 min  eta 49 min
+  172/425 chunks  33.2 min  eta 49 min
+  173/425 chunks  33.3 min  eta 48 min
+  174/425 chunks  33.6 min  eta 48 min
+  175/425 chunks  33.6 min  eta 48 min
+  176/425 chunks  33.7 min  eta 48 min
+  177/425 chunks  34.2 min  eta 48 min
+  178/425 chunks  34.2 min  eta 47 min
+  179/425 chunks  34.5 min  eta 47 min
+  180/425 chunks  34.6 min  eta 47 min
+  181/425 chunks  34.6 min  eta 47 min
+  182/425 chunks  35.0 min  eta 47 min
+  183/425 chunks  35.1 min  eta 46 min
+  184/425 chunks  35.4 min  eta 46 min
+  185/425 chunks  35.5 min  eta 46 min
+  186/425 chunks  35.6 min  eta 46 min
+  187/425 chunks  36.0 min  eta 46 min
+  188/425 chunks  36.0 min  eta 45 min
+  189/425 chunks  36.3 min  eta 45 min
+  190/425 chunks  36.4 min  eta 45 min
+  191/425 chunks  36.5 min  eta 45 min
+  192/425 chunks  36.9 min  eta 45 min
+  193/425 chunks  36.9 min  eta 44 min
+  194/425 chunks  37.3 min  eta 44 min
+  195/425 chunks  37.4 min  eta 44 min
+  196/425 chunks  37.4 min  eta 44 min
+  197/425 chunks  37.8 min  eta 44 min
+  198/425 chunks  37.9 min  eta 43 min
+  199/425 chunks  38.2 min  eta 43 min
+  200/425 chunks  38.3 min  eta 43 min
+  201/425 chunks  38.4 min  eta 43 min
+  202/425 chunks  38.7 min  eta 43 min
+  203/425 chunks  38.8 min  eta 42 min
+  204/425 chunks  39.2 min  eta 42 min
+  205/425 chunks  39.3 min  eta 42 min
+  206/425 chunks  39.3 min  eta 42 min
+  207/425 chunks  39.6 min  eta 42 min
+  208/425 chunks  39.7 min  eta 41 min
+  209/425 chunks  40.1 min  eta 41 min
+  210/425 chunks  40.2 min  eta 41 min
+  211/425 chunks  40.2 min  eta 41 min
+  212/425 chunks  40.6 min  eta 41 min
+  213/425 chunks  40.7 min  eta 40 min
+  214/425 chunks  41.0 min  eta 40 min
+  215/425 chunks  41.1 min  eta 40 min
+  216/425 chunks  41.1 min  eta 40 min
+  217/425 chunks  41.4 min  eta 40 min
+  218/425 chunks  41.5 min  eta 39 min
+  219/425 chunks  41.9 min  eta 39 min
+  220/425 chunks  42.0 min  eta 39 min
+  221/425 chunks  42.0 min  eta 39 min
+  222/425 chunks  42.3 min  eta 39 min
+  223/425 chunks  42.4 min  eta 38 min
+  224/425 chunks  42.8 min  eta 38 min
+  225/425 chunks  42.9 min  eta 38 min
+  226/425 chunks  42.9 min  eta 38 min
+  227/425 chunks  43.2 min  eta 38 min
+  228/425 chunks  43.3 min  eta 37 min
+  229/425 chunks  43.8 min  eta 37 min
+  230/425 chunks  43.8 min  eta 37 min
+  231/425 chunks  43.8 min  eta 37 min
+  232/425 chunks  44.1 min  eta 37 min
+  233/425 chunks  44.3 min  eta 36 min
+  234/425 chunks  44.7 min  eta 36 min
+  235/425 chunks  44.7 min  eta 36 min
+  236/425 chunks  44.7 min  eta 36 min
+  237/425 chunks  45.1 min  eta 36 min
+  238/425 chunks  45.2 min  eta 36 min
+  239/425 chunks  45.6 min  eta 35 min
+  240/425 chunks  45.6 min  eta 35 min
+  241/425 chunks  45.7 min  eta 35 min
+  242/425 chunks  46.0 min  eta 35 min
+  243/425 chunks  46.1 min  eta 35 min
+  244/425 chunks  46.5 min  eta 34 min
+  245/425 chunks  46.5 min  eta 34 min
+  246/425 chunks  46.6 min  eta 34 min
+  247/425 chunks  46.9 min  eta 34 min
+  248/425 chunks  47.0 min  eta 34 min
+  249/425 chunks  47.4 min  eta 34 min
+  250/425 chunks  47.5 min  eta 33 min
+  251/425 chunks  47.5 min  eta 33 min
+  252/425 chunks  47.8 min  eta 33 min
+  253/425 chunks  47.9 min  eta 33 min
+  254/425 chunks  48.3 min  eta 33 min
+  255/425 chunks  48.4 min  eta 32 min
+  256/425 chunks  48.5 min  eta 32 min
+  257/425 chunks  48.8 min  eta 32 min
+  258/425 chunks  48.9 min  eta 32 min
+  259/425 chunks  49.3 min  eta 32 min
+  260/425 chunks  49.3 min  eta 31 min
+  261/425 chunks  49.4 min  eta 31 min
+  262/425 chunks  49.7 min  eta 31 min
+  263/425 chunks  49.8 min  eta 31 min
+  264/425 chunks  50.2 min  eta 31 min
+  265/425 chunks  50.3 min  eta 30 min
+  266/425 chunks  50.3 min  eta 30 min
+  267/425 chunks  50.6 min  eta 30 min
+  268/425 chunks  50.7 min  eta 30 min
+  269/425 chunks  51.1 min  eta 30 min
+  270/425 chunks  51.2 min  eta 29 min
+  271/425 chunks  51.2 min  eta 29 min
+  272/425 chunks  51.5 min  eta 29 min
+  273/425 chunks  51.7 min  eta 29 min
+  274/425 chunks  52.0 min  eta 29 min
+  275/425 chunks  52.1 min  eta 28 min
+  276/425 chunks  52.1 min  eta 28 min
+  277/425 chunks  52.4 min  eta 28 min
+  278/425 chunks  52.6 min  eta 28 min
+  279/425 chunks  53.0 min  eta 28 min
+  280/425 chunks  53.0 min  eta 27 min
+  281/425 chunks  53.1 min  eta 27 min
+  282/425 chunks  53.3 min  eta 27 min
+  283/425 chunks  53.5 min  eta 27 min
+  284/425 chunks  53.9 min  eta 27 min
+  285/425 chunks  54.0 min  eta 27 min
+  286/425 chunks  54.0 min  eta 26 min
+  287/425 chunks  54.2 min  eta 26 min
+  288/425 chunks  54.4 min  eta 26 min
+  289/425 chunks  54.8 min  eta 26 min
+  290/425 chunks  54.9 min  eta 26 min
+  291/425 chunks  54.9 min  eta 25 min
+  292/425 chunks  55.1 min  eta 25 min
+  293/425 chunks  55.3 min  eta 25 min
+  294/425 chunks  55.7 min  eta 25 min
+  295/425 chunks  55.8 min  eta 25 min
+  296/425 chunks  55.9 min  eta 24 min
+  297/425 chunks  56.0 min  eta 24 min
+  298/425 chunks  56.3 min  eta 24 min
+  299/425 chunks  56.6 min  eta 24 min
+  300/425 chunks  56.7 min  eta 24 min
+  301/425 chunks  56.8 min  eta 23 min
+  302/425 chunks  56.9 min  eta 23 min
+  303/425 chunks  57.2 min  eta 23 min
+  304/425 chunks  57.5 min  eta 23 min
+  305/425 chunks  57.6 min  eta 23 min
+  306/425 chunks  57.7 min  eta 22 min
+  307/425 chunks  57.8 min  eta 22 min
+  308/425 chunks  58.1 min  eta 22 min
+  309/425 chunks  58.4 min  eta 22 min
+  310/425 chunks  58.5 min  eta 22 min
+  311/425 chunks  58.6 min  eta 21 min
+  312/425 chunks  58.7 min  eta 21 min
+  313/425 chunks  59.0 min  eta 21 min
+  314/425 chunks  59.3 min  eta 21 min
+  315/425 chunks  59.5 min  eta 21 min
+  316/425 chunks  59.5 min  eta 21 min
+  317/425 chunks  59.6 min  eta 20 min
+  318/425 chunks  59.9 min  eta 20 min
+  319/425 chunks  60.2 min  eta 20 min
+  320/425 chunks  60.4 min  eta 20 min
+  321/425 chunks  60.4 min  eta 20 min
+  322/425 chunks  60.5 min  eta 19 min
+  323/425 chunks  60.8 min  eta 19 min
+  324/425 chunks  61.1 min  eta 19 min
+  325/425 chunks  61.3 min  eta 19 min
+  326/425 chunks  61.3 min  eta 19 min
+  327/425 chunks  61.4 min  eta 18 min
+  328/425 chunks  61.6 min  eta 18 min
+  329/425 chunks  61.9 min  eta 18 min
+  330/425 chunks  62.1 min  eta 18 min
+  331/425 chunks  62.2 min  eta 18 min
+  332/425 chunks  62.3 min  eta 17 min
+  333/425 chunks  62.5 min  eta 17 min
+  334/425 chunks  62.8 min  eta 17 min
+  335/425 chunks  63.1 min  eta 17 min
+  336/425 chunks  63.1 min  eta 17 min
+  337/425 chunks  63.2 min  eta 16 min
+  338/425 chunks  63.4 min  eta 16 min
+  339/425 chunks  63.8 min  eta 16 min
+  340/425 chunks  64.0 min  eta 16 min
+  341/425 chunks  64.0 min  eta 16 min
+  342/425 chunks  64.1 min  eta 16 min
+  343/425 chunks  64.4 min  eta 15 min
+  344/425 chunks  64.7 min  eta 15 min
+  345/425 chunks  64.9 min  eta 15 min
+  346/425 chunks  65.0 min  eta 15 min
+  347/425 chunks  65.1 min  eta 15 min
+  348/425 chunks  65.3 min  eta 14 min
+  349/425 chunks  65.6 min  eta 14 min
+  350/425 chunks  65.8 min  eta 14 min
+  351/425 chunks  65.9 min  eta 14 min
+  352/425 chunks  65.9 min  eta 14 min
+  353/425 chunks  66.2 min  eta 14 min
+  354/425 chunks  66.5 min  eta 13 min
+  355/425 chunks  66.7 min  eta 13 min
+  356/425 chunks  66.7 min  eta 13 min
+  357/425 chunks  66.8 min  eta 13 min
+  358/425 chunks  67.0 min  eta 13 min
+  359/425 chunks  67.3 min  eta 12 min
+  360/425 chunks  67.6 min  eta 12 min
+  361/425 chunks  67.6 min  eta 12 min
+  362/425 chunks  67.6 min  eta 12 min
+  363/425 chunks  67.9 min  eta 12 min
+  364/425 chunks  68.2 min  eta 11 min
+  365/425 chunks  68.4 min  eta 11 min
+  366/425 chunks  68.5 min  eta 11 min
+  367/425 chunks  68.5 min  eta 11 min
+  368/425 chunks  68.7 min  eta 11 min
+  369/425 chunks  69.1 min  eta 10 min
+  370/425 chunks  69.3 min  eta 10 min
+  371/425 chunks  69.3 min  eta 10 min
+  372/425 chunks  69.4 min  eta 10 min
+  373/425 chunks  69.6 min  eta 10 min
+  374/425 chunks  69.9 min  eta 10 min
+  375/425 chunks  70.1 min  eta 9 min
+  376/425 chunks  70.2 min  eta 9 min
+  377/425 chunks  70.2 min  eta 9 min
+  378/425 chunks  70.5 min  eta 9 min
+  379/425 chunks  70.8 min  eta 9 min
+  380/425 chunks  71.0 min  eta 8 min
+  381/425 chunks  71.1 min  eta 8 min
+  382/425 chunks  71.1 min  eta 8 min
+  383/425 chunks  71.3 min  eta 8 min
+  384/425 chunks  71.7 min  eta 8 min
+  385/425 chunks  71.9 min  eta 7 min
+  386/425 chunks  71.9 min  eta 7 min
+  387/425 chunks  72.0 min  eta 7 min
+  388/425 chunks  72.2 min  eta 7 min
+  389/425 chunks  72.5 min  eta 7 min
+  390/425 chunks  72.7 min  eta 7 min
+  391/425 chunks  72.8 min  eta 6 min
+  392/425 chunks  72.9 min  eta 6 min
+  393/425 chunks  73.1 min  eta 6 min
+  394/425 chunks  73.4 min  eta 6 min
+  395/425 chunks  73.6 min  eta 6 min
+  396/425 chunks  73.6 min  eta 5 min
+  397/425 chunks  73.8 min  eta 5 min
+  398/425 chunks  73.9 min  eta 5 min
+  399/425 chunks  74.3 min  eta 5 min
+  400/425 chunks  74.5 min  eta 5 min
+  401/425 chunks  74.5 min  eta 4 min
+  402/425 chunks  74.7 min  eta 4 min
+  403/425 chunks  74.8 min  eta 4 min
+  404/425 chunks  75.1 min  eta 4 min
+  405/425 chunks  75.4 min  eta 4 min
+  406/425 chunks  75.4 min  eta 4 min
+  407/425 chunks  75.6 min  eta 3 min
+  408/425 chunks  75.7 min  eta 3 min
+  409/425 chunks  76.0 min  eta 3 min
+  410/425 chunks  76.3 min  eta 3 min
+  411/425 chunks  76.3 min  eta 3 min
+  412/425 chunks  76.5 min  eta 2 min
+  413/425 chunks  76.6 min  eta 2 min
+  414/425 chunks  76.9 min  eta 2 min
+  415/425 chunks  77.2 min  eta 2 min
+  416/425 chunks  77.2 min  eta 2 min
+  417/425 chunks  77.5 min  eta 1 min
+  418/425 chunks  77.6 min  eta 1 min
+  419/425 chunks  77.8 min  eta 1 min
+  420/425 chunks  78.2 min  eta 1 min
+  421/425 chunks  78.2 min  eta 1 min
+  422/425 chunks  78.4 min  eta 1 min
+  423/425 chunks  78.5 min  eta 0 min
+  424/425 chunks  78.5 min  eta 0 min
+  425/425 chunks  78.7 min  eta 0 min
+done
+mps2: 425 chunks, target 41 bands
+  10/425  0.1 min  eta 4 min
+  20/425  0.2 min  eta 4 min
+  30/425  0.3 min  eta 3 min
+  40/425  0.3 min  eta 3 min
+  50/425  0.4 min  eta 3 min
+  60/425  0.5 min  eta 3 min
+  70/425  0.6 min  eta 3 min
+  80/425  0.6 min  eta 3 min
+  90/425  0.7 min  eta 3 min
+  100/425  0.8 min  eta 3 min
+  110/425  0.9 min  eta 3 min
+  120/425  0.9 min  eta 2 min
+  130/425  1.0 min  eta 2 min
+  140/425  1.1 min  eta 2 min
+  150/425  1.2 min  eta 2 min
+  160/425  1.2 min  eta 2 min
+  170/425  1.3 min  eta 2 min
+  180/425  1.4 min  eta 2 min
+  190/425  1.4 min  eta 2 min
+  200/425  1.5 min  eta 2 min
+  210/425  1.6 min  eta 2 min
+  220/425  1.7 min  eta 2 min
+  230/425  1.7 min  eta 1 min
+  240/425  1.8 min  eta 1 min
+  250/425  1.9 min  eta 1 min
+  260/425  1.9 min  eta 1 min
+  270/425  2.0 min  eta 1 min
+  280/425  2.1 min  eta 1 min
+  290/425  2.1 min  eta 1 min
+  300/425  2.2 min  eta 1 min
+  310/425  2.3 min  eta 1 min
+  320/425  2.3 min  eta 1 min
+  330/425  2.4 min  eta 1 min
+  340/425  2.5 min  eta 1 min
+  350/425  2.5 min  eta 1 min
+  360/425  2.6 min  eta 0 min
+  370/425  2.7 min  eta 0 min
+  380/425  2.7 min  eta 0 min
+  390/425  2.8 min  eta 0 min
+  400/425  2.9 min  eta 0 min
+  410/425  2.9 min  eta 0 min
+  420/425  3.0 min  eta 0 min
+  425/425  3.0 min  eta 0 min
+mps2: profiles 16974 models × 41 bands, n_mu ≤ 24
+done
+F3_MH_00 1D partner (0.0, 6800, 4.0)
+G2_MH_00 1D partner (0.0, 5800, 4.4)
+G2_MH_m10 1D partner (-1.0, 5700, 4.4)
+G2_MH_p05 1D partner (0.5, 5800, 4.4)
+K0_MH_00 1D partner (0.0, 5200, 4.6)
+K4_MH_00 1D partner (0.0, 4500, 4.6)
+M0_MH_00 1D partner (0.0, 3700, 4.7)
+M2_MH_00 1D partner (0.0, 3500, 5.0)
+M4_MH_00 1D partner none
+Stagger/Kurucz -1.0 5000 4.0
+Stagger/Kurucz -1.0 5000 4.5
+Stagger/Kurucz -1.0 5000 5.0
+Stagger/Kurucz -1.0 5500 4.0
+Stagger/Kurucz -1.0 5500 4.5
+Stagger/Kurucz -1.0 5500 5.0
+Stagger/Kurucz -1.0 6000 4.0
+Stagger/Kurucz -1.0 6000 4.5
+Stagger/Kurucz -1.0 6500 4.0
+Stagger/Kurucz -1.0 6500 4.5
+Stagger/Kurucz -2.0 5000 4.0
+Stagger/Kurucz -2.0 5000 4.5
+Stagger/Kurucz -2.0 5000 5.0
+Stagger/Kurucz -2.0 5500 4.0
+Stagger/Kurucz -2.0 5500 4.5
+Stagger/Kurucz -2.0 5500 5.0
+Stagger/Kurucz -2.0 6000 4.0
+Stagger/Kurucz -2.0 6000 4.5
+Stagger/Kurucz -2.0 6500 4.0
+Stagger/Kurucz -2.0 6500 4.5
+Stagger/Kurucz 0.0 4500 4.0
+Stagger/Kurucz 0.0 4500 4.5
+Stagger/Kurucz 0.0 4500 5.0
+Stagger/Kurucz 0.0 5000 4.0
+Stagger/Kurucz 0.0 5000 4.5
+Stagger/Kurucz 0.0 5000 5.0
+Stagger/Kurucz 0.0 5500 4.0
+Stagger/Kurucz 0.0 5500 4.5
+Stagger/Kurucz 0.0 5500 5.0
+Stagger/Kurucz 0.0 6000 4.0
+Stagger/Kurucz 0.0 6000 4.5
+Stagger/Kurucz 0.0 6500 4.0
+Stagger/Kurucz 0.0 6500 4.5
+8976 rows -> /Users/dkipping/Storage1/Work/Documents/Transit_Work/CODES/LDhybrid/data/products/corrections.csv
+phoenix 1682 models 40 bands
+   tables/phoenix/hybrid2_r.csv.gz
+   tables/phoenix/hybrid2_mu.csv.gz
+   tables/phoenix/hybrid4_r.csv.gz
+   tables/phoenix/hybrid4_mu.csv.gz
+   tables/phoenix/hybrid5_r.csv.gz
+   tables/phoenix/hybrid5_mu.csv.gz
+   tables/phoenix/quadratic_r.csv.gz
+   tables/phoenix/quadratic_mu.csv.gz
+   tables/phoenix/claret4_r.csv.gz
+   tables/phoenix/claret4_mu.csv.gz
+   tables/phoenix/power2_r.csv.gz
+   tables/phoenix/power2_mu.csv.gz
+mps1 16974 models 41 bands
+   tables/mps1/hybrid2_r.csv.gz
+   tables/mps1/hybrid2_mu.csv.gz
+   tables/mps1/hybrid4_r.csv.gz
+   tables/mps1/hybrid4_mu.csv.gz
+   tables/mps1/hybrid5_r.csv.gz
+   tables/mps1/hybrid5_mu.csv.gz
+   tables/mps1/quadratic_r.csv.gz
+   tables/mps1/quadratic_mu.csv.gz
+   tables/mps1/claret4_r.csv.gz
+   tables/mps1/claret4_mu.csv.gz
+   tables/mps1/power2_r.csv.gz
+   tables/mps1/power2_mu.csv.gz
+mps2 16974 models 41 bands
+   tables/mps2/hybrid2_r.csv.gz
+   tables/mps2/hybrid2_mu.csv.gz
+   tables/mps2/hybrid4_r.csv.gz
+   tables/mps2/hybrid4_mu.csv.gz
+   tables/mps2/hybrid5_r.csv.gz
+   tables/mps2/hybrid5_mu.csv.gz
+   tables/mps2/quadratic_r.csv.gz
+   tables/mps2/quadratic_mu.csv.gz
+   tables/mps2/claret4_r.csv.gz
+   tables/mps2/claret4_mu.csv.gz
+   tables/mps2/power2_r.csv.gz
+   tables/mps2/power2_mu.csv.gz
+phoenix_hybrid2.dat          Lrecl 120  134560 records
+phoenix_hybrid4.dat          Lrecl 142  134560 records
+phoenix_hybrid5.dat          Lrecl 153  134560 records
+phoenix_quadratic.dat        Lrecl 120  134560 records
+phoenix_claret4.dat          Lrecl 142  134560 records
+phoenix_power2.dat           Lrecl 120  134560 records
+mps1_hybrid2.dat             Lrecl 120  1391868 records
+mps1_hybrid4.dat             Lrecl 142  1391868 records
+mps1_hybrid5.dat             Lrecl 153  1391868 records
+mps1_quadratic.dat           Lrecl 120  1391868 records
+mps1_claret4.dat             Lrecl 142  1391868 records
+mps1_power2.dat              Lrecl 120  1391868 records
+mps2_hybrid2.dat             Lrecl 120  1391868 records
+mps2_hybrid4.dat             Lrecl 142  1391868 records
+mps2_hybrid5.dat             Lrecl 153  1391868 records
+mps2_quadratic.dat           Lrecl 120  1391868 records
+mps2_claret4.dat             Lrecl 142  1391868 records
+mps2_power2.dat              Lrecl 120  1391868 records
+ReadMe written
+ALL DONE

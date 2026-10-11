@@ -67,7 +67,7 @@ def _diagnostics(law_eval, profile, mu_q, y_q, q):
 
 
 def fit_linear(law: LinearLaw, profile: Profile, measure: str = "r",
-               resample: int | None = 2000, constraint: str = "none",
+               resample: int | str | None = "exact", constraint: str = "none",
                fcm: bool = False, mu_min: float = 0.0) -> Fit:
     mu_q, y_q, q = quadrature(profile, measure, resample, mu_min)
     A = law.T(mu_q)
@@ -186,7 +186,7 @@ def _active(law, w, constraint):
     return act
 
 
-def fit_power2(profile: Profile, measure: str = "r", resample: int | None = 2000,
+def fit_power2(profile: Profile, measure: str = "r", resample: int | str | None = "exact",
                x0=(0.7, 0.6), mu_min: float = 0.0) -> Fit:
     """Power-2 law by weighted Levenberg–Marquardt (as Claret & Southworth
     2022/2023), with the same quadrature as the linear laws."""

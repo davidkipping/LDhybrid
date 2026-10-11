@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
 
-from ldhybrid import bands, fit, laws
+from ldhybrid import bands, fit, laws, v1
 from ldhybrid.grids import phoenix
 from ldhybrid.paths import DATA
 from ldhybrid.products import constraint_for
@@ -91,7 +91,7 @@ def clean_x_grid(a):
 def fig_profiles():
     cases = [((5800, 4.5, "-0.0"), "TESS", "5800 K dwarf · TESS"),
              ((3000, 5.0, "-0.0"), "JWST_NIRSpec_G395H", "3000 K dwarf · NIRSpec G395H")]
-    show = ["quadratic", "claret4", "hybrid4", "hybrid5"]
+    show = ["quadratic", "power2", "hybrid2", "claret4", "hybrid4", "hybrid5"]
     fig, ax = plt.subplots(2, 2, figsize=(PAGE, 3.5), sharex=True,
                            gridspec_kw=dict(height_ratios=[1.6, 1], hspace=0.12, wspace=0.16))
     for c, (key, band, title) in enumerate(cases):
@@ -105,12 +105,16 @@ def fig_profiles():
         ins.plot(mu, y, color=AXIS, lw=3.0)
         ins.plot(pr.mu, pr.y, "o", ms=2.4, mfc="white", mec=INK2, mew=0.6, zorder=4)
         for n in show:
-            L = laws.get(n)
-            w = fit.fit_linear(L, pr, "r", 2000, constraint_for(n)).w
+            if n == "power2":
+                c_, a_ = fit.fit_power2(pr, "r", v1.RESAMPLE).w
+                Im = laws.power2(c_, a_, mu)
+            else:
+                L = laws.get(n)
+                Im = L.intensity(fit.fit_linear(L, pr, "r", v1.RESAMPLE, constraint_for(n)).w, mu)
             col, ls, lw, _ = STYLE[n]
-            top.plot(mu, L.intensity(w, mu), color=col, ls=ls, lw=lw * 0.8, zorder=3)
-            ins.plot(mu, L.intensity(w, mu), color=col, ls=ls, lw=lw, zorder=3)
-            bot.plot(mu, (L.intensity(w, mu) - y) * 1e3, color=col, ls=ls, lw=lw)
+            top.plot(mu, Im, color=col, ls=ls, lw=lw * 0.8, zorder=3)
+            ins.plot(mu, Im, color=col, ls=ls, lw=lw, zorder=3)
+            bot.plot(mu, (Im - y) * 1e3, color=col, ls=ls, lw=lw)
         ins.set_xlim(0, 0.12)
         ins.set_ylim(y[0] - 0.04, y[np.searchsorted(mu, 0.12)] + 0.03)
         ins.tick_params(labelsize=5.5)
@@ -131,7 +135,8 @@ def fig_profiles():
     ax[1, 0].set_ylabel(r"law − model  ($10^{-3}$)")
     nodes = Line2D([], [], ls="", marker="o", ms=3, mfc="white", mec=INK2, mew=0.6,
                    label="PHOENIX nodes")
-    top_legend(fig, [nodes] + [law_handle(n) for n in show[::-1]], y=0.945)
+    interp = Line2D([], [], color=AXIS, lw=3.0, label="model (interpolated)")
+    top_legend(fig, [nodes, interp] + [law_handle(n) for n in LAW_ORDER], y=0.945)
     save(fig, "fig_profiles")
 
 
@@ -160,9 +165,6 @@ def fig_quality():
     ax[0].set_ylabel("light-curve error (ppm)")
     ax[0].yaxis.set_major_formatter(mpl.ticker.FuncFormatter(lambda v, _: f"{v:g}"))
     top_legend(fig, [law_handle(n) for n in LAW_ORDER], y=0.95)
-    fig.text(0.995, -0.02, "lines: median over passbands, gravities and metallicities;"
-             " bands: 16th–84th percentile (hybrid laws)", ha="right", va="top",
-             fontsize=6, color=MUTED)
     save(fig, "fig_quality")
 
 
@@ -170,6 +172,8 @@ def fig_coefficients():
     bset = [("Kepler", "Kepler", 250), ("TESS", "TESS", 350),
             ("HST_WFC3_G141", "WFC3 G141", 450), ("JWST_NIRISS_SOSS_o1", "NIRISS SOSS", 550),
             ("JWST_NIRSpec_G395H", "NIRSpec G395H", 650)]
+    dash = {250: (0, (1, 1.3)), 350: (0, (4, 1.5)), 450: "-", 550: (0, (6, 1.5, 1, 1.5)), 650: "-"}
+    width = {250: 1.3, 350: 1.2, 450: 1.0, 550: 1.2, 650: 1.9}
     fig, ax = plt.subplots(2, 5, figsize=(PAGE, 3.3), sharex=True, sharey="col",
                            gridspec_kw=dict(hspace=0.12, wspace=0.32))
     for r, (grid, label) in enumerate((("phoenix", "PHOENIX v3.0"), ("mps2", "MPS-ATLAS Set 2"))):
@@ -181,7 +185,8 @@ def fig_coefficients():
         W = h["hybrid5|r|w"][()][sel][o]
         for b, lab, step in bset:
             for j in range(5):
-                ax[r, j].plot(T[o], W[:, B.index(b), j], color=RAMP[step], lw=1.3)
+                ax[r, j].plot(T[o], W[:, B.index(b), j], color=RAMP[step], ls=dash[step],
+                              lw=width[step])
         ax[r, 0].annotate(label, xy=(-0.42, 0.5), xycoords="axes fraction", rotation=90,
                           ha="center", va="center", fontsize=7.5, fontweight="bold", color=INK)
     for j in range(5):
@@ -189,33 +194,33 @@ def fig_coefficients():
         ax[1, j].set_xlabel(r"$T_{\rm eff}$ (K)")
         ax[1, j].set_xlim(2300, 7500)
         ax[1, j].xaxis.set_major_locator(mpl.ticker.MultipleLocator(2000))
-    handles = [Line2D([], [], color=RAMP[s], lw=1.6, label=lab) for _, lab, s in bset]
+    handles = [Line2D([], [], color=RAMP[s], ls=dash[s], lw=width[s] + 0.3, label=lab)
+               for _, lab, s in bset]
     top_legend(fig, handles, y=0.955)
-    fig.text(0.995, -0.015, r"hybrid5, $\log g = 4.5$, [M/H] = 0; passbands ordered by wavelength",
-             ha="right", va="top", fontsize=6, color=MUTED)
     save(fig, "fig_coefficients")
 
 
 def fig_validation():
+    import csv
     mx = json.loads((ROOT / "studies" / "p4" / "p4b_maxted.json").read_text())
-    sg = json.loads((ROOT / "studies" / "p4" / "p4d_sing.json").read_text())
-    fig, ax = plt.subplots(1, 3, figsize=(PAGE, 2.5),
+    pts = list(csv.DictReader(open(ROOT / "studies" / "rev" / "val_sing_points.csv")))
+    fig, ax = plt.subplots(1, 3, figsize=(PAGE, 2.6),
                            gridspec_kw=dict(width_ratios=[1, 1, 1.15], wspace=0.42))
     cases = [("phoenix", "none", "PHOENIX"), ("mps2", "none", "MPS-ATLAS 2"),
-             ("mps2", "ssd", "+ small-scale dynamo"), ("mps2", "B100G", "+ 100 G"),
+             ("mps2", "ssd", "+ small-scale\ndynamo"), ("mps2", "B100G", "+ 100 G"),
              ("mps2", "B200G", "+ 200 G")]
-    bandmk = (("Kepler", INK2), ("TESS", "white"))           # filled / open markers
+    bandmk = (("Kepler", "o"), ("TESS", "s"))              # marker shape = passband
     for a, key, lab, scat in ((ax[0], "dh1", r"$\Delta h'_1$", 0.006),
                               (ax[1], "dh2", r"$\Delta h'_2$", 0.013)):
         a.axvspan(-scat, scat, color=WASH, lw=0, zorder=0)
         a.axvline(0, color=INK2, lw=0.6, zorder=1)
-        for k, (band, face) in enumerate(bandmk):
-            for i, (g, s, _) in enumerate(cases):
-                r = [x for x in mx if x["band"] == band and x["grid"] == g and x["state"] == s
+        for k, (band, mk) in enumerate(bandmk):
+            for i, (g, s_, _) in enumerate(cases):
+                r = [x for x in mx if x["band"] == band and x["grid"] == g and x["state"] == s_
                      and x["law"] == "hybrid5"][0]
-                col = BLUE if (g, s) == ("mps2", "B100G") else INK2
-                a.errorbar(r[key][0], i + (k - 0.5) * 0.3, xerr=r[key][1], fmt="o", ms=3.6,
-                           color=col, mfc=col if face != "white" else "white", mec=col, mew=0.9,
+                col = BLUE if (g, s_) == ("mps2", "B100G") else INK2
+                a.errorbar(r[key][0], i + (k - 0.5) * 0.3, xerr=r[key][1], fmt=mk, ms=3.4,
+                           color=col, mfc="white" if band == "TESS" else col, mec=col, mew=0.9,
                            elinewidth=1.0, capsize=0, zorder=3)
         a.set_yticks(range(len(cases)))
         a.set_yticklabels([c[2] for c in cases] if a is ax[0] else [])
@@ -225,28 +230,73 @@ def fig_validation():
     ax[0].set_title("Kepler & TESS hosts · Maxted (2023)")
     jw = [("phoenix|hybrid5", "PHOENIX", MUTED), ("mps2|hybrid5", "MPS-ATLAS 2", INK2),
           ("mps2|hybrid5+B100G", "MPS-ATLAS 2 + 100 G (recommended)", BLUE)]
-    stars = [s for s, _, _ in sg["mps2|hybrid5"]["per_star"]]
-    ax[2].axvspan(-0.03, 0.03, color=WASH, lw=0, zorder=0)
+    stars = [r["star"] for r in pts if r["case"] == "mps2|hybrid5"]
+    ax[2].axvspan(-0.031, 0.031, color=WASH, lw=0, zorder=0)
     ax[2].axvline(0, color=INK2, lw=0.6, zorder=1)
     for k, (case, name, col) in enumerate(jw):
-        per = {s: v for s, v, _ in sg[case]["per_star"]}
-        ax[2].plot([per[s] for s in stars], np.arange(len(stars)) + (k - 1) * 0.24, "o", ms=3.6,
-                   color=col, mec="white", mew=0.5, zorder=3)
+        per = {r["star"]: (float(r["dl"]), float(r["dl_err"])) for r in pts if r["case"] == case}
+        ax[2].errorbar([per[s_][0] for s_ in stars], np.arange(len(stars)) + (k - 1) * 0.24,
+                       xerr=[per[s_][1] for s_ in stars], fmt="D", ms=3.2, color=col,
+                       mec="white", mew=0.4, elinewidth=1.0, capsize=0, zorder=3)
     ax[2].set_yticks(range(len(stars)))
     ax[2].set_yticklabels(stars)
     ax[2].set_ylim(len(stars) - 0.5, -0.5)
     ax[2].set_xlabel(r"$\Delta\ell$  (observed − model)")
     ax[2].set_title("JWST hosts · Sing et al. (2026)")
     clean_x_grid(ax[2])
-    h1 = [Line2D([], [], ls="", marker="o", ms=4, color=INK2, mfc=f if f == "white" else INK2,
-                 mew=0.9, label=b) for b, f in bandmk]
-    h2 = [Line2D([], [], ls="", marker="o", ms=4, color=c, label=n) for _, n, c in jw]
+    h1 = [Line2D([], [], ls="", marker=m, ms=4, color=INK2, mfc="white" if b == "TESS" else INK2,
+                 mew=0.9, label=b) for b, m in bandmk]
+    h2 = [Line2D([], [], ls="", marker="D", ms=4, color=c, label=n) for _, n, c in jw]
     patch = mpl.patches.Patch(color=WASH, label="star-to-star scatter")
     top_legend(fig, h1 + h2 + [patch], y=0.95)
     save(fig, "fig_validation")
 
 
+def fig_lightcurves():
+    """Residual light curves (law − exact model light curve), central transit."""
+    d = json.loads((ROOT / "studies" / "lc" / "lc_section.json").read_text())
+    p = d["p"]
+    t = np.array(d["x"]) / (1 + p)                         # time from mid-transit / (T14/2)
+    stars, bnames = d["stars"], d["bands"]
+    fig, ax = plt.subplots(len(stars), len(bnames), figsize=(PAGE, 7.0), sharex=True, sharey=True,
+                           gridspec_kw=dict(hspace=0.34, wspace=0.06))
+    for i, st in enumerate(stars):
+        for j, bn in enumerate(bnames):
+            a = ax[i, j]
+            for c in ((1 - p) / (1 + p), 1.0):              # second/third and first/fourth contacts
+                for sgn in (-1, 1):
+                    a.axvline(sgn * c, color=GRID, lw=0.6, zorder=0)
+            a.axhline(0, color=AXIS, lw=0.6, zorder=1)
+            for n in ["quadratic", "power2", "hybrid2", "claret4", "hybrid4", "hybrid5"]:
+                col, ls, lw, _ = STYLE[n]
+                hyb = n.startswith("hybrid")
+                a.plot(t, d["resid"][f"{st}|{bn}|{n}"], color=col, ls=ls,
+                       lw=1.05 if hyb else 0.75, zorder=4 if n == "hybrid5" else (3 if hyb else 2))
+            a.set_yscale("symlog", linthresh=1, linscale=0.5)
+            a.set_ylim(-300, 300)
+            a.set_yticks([-100, -10, -1, 0, 1, 10, 100])
+            a.set_yticklabels(["−100", "−10", "−1", "0", "1", "10", "100"])
+            a.set_xlim(-1.08, 1.08)
+            w5 = d["worst"][f"{st}|{bn}|hybrid5"]
+            wq = d["worst"][f"{st}|{bn}|quadratic"]
+            a.text(1.0, 1.03, f"max |Δ|: hybrid5 {w5:.1f}, quadratic {wq:.0f} ppm",
+                   transform=a.transAxes, fontsize=5.6, color=MUTED, va="bottom", ha="right")
+            if i == 0:
+                a.text(0.0, 1.22, bn, transform=a.transAxes, fontsize=7.5, fontweight="bold",
+                       color=INK, va="bottom")
+            if j == 0:
+                a.set_ylabel(st, fontsize=7.2, fontweight="bold", color=INK)
+            if i == len(stars) - 1:
+                a.set_xlabel(r"time from mid-transit  /  ($T_{14}/2$)")
+    fig.subplots_adjust(left=0.1, top=0.9)
+    top_legend(fig, [law_handle(n) for n in LAW_ORDER], y=0.94)
+    fig.text(0.005, 0.5, r"law − model  (ppm)", rotation=90, va="center", ha="left",
+             fontsize=7.5, color=INK2)
+    save(fig, "fig_lightcurves")
+
+
 if __name__ == "__main__":
+    fig_lightcurves()
     fig_profiles()
     fig_quality()
     fig_coefficients()

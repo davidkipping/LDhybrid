@@ -1,0 +1,53 @@
+phoenix: 43 chunks, target 40 bands
+  10/43  0.6 min  eta 2 min
+  20/43  0.9 min  eta 1 min
+  30/43  1.6 min  eta 1 min
+  40/43  2.4 min  eta 0 min
+  43/43  2.6 min  eta 0 min
+phoenix: profiles 1682 models × 40 bands, n_mu ≤ 58
+mps1: 425 chunks, target 41 bands
+  10/425  1.0 min  eta 41 min
+  20/425  1.5 min  eta 31 min
+  30/425  1.9 min  eta 25 min
+  40/425  2.2 min  eta 21 min
+  50/425  2.5 min  eta 19 min
+  60/425  2.8 min  eta 17 min
+  70/425  3.1 min  eta 15 min
+  80/425  3.6 min  eta 15 min
+  90/425  4.0 min  eta 15 min
+  100/425  4.4 min  eta 14 min
+  110/425  4.9 min  eta 14 min
+  120/425  5.3 min  eta 13 min
+  130/425  5.7 min  eta 13 min
+  140/425  6.1 min  eta 12 min
+  150/425  6.6 min  eta 12 min
+  160/425  7.0 min  eta 12 min
+  170/425  7.5 min  eta 11 min
+  180/425  7.9 min  eta 11 min
+  190/425  8.3 min  eta 10 min
+  200/425  8.7 min  eta 10 min
+  210/425  9.1 min  eta 9 min
+  220/425  9.5 min  eta 9 min
+  230/425  9.9 min  eta 8 min
+  240/425  10.3 min  eta 8 min
+  250/425  10.7 min  eta 8 min
+  260/425  11.1 min  eta 7 min
+  270/425  11.5 min  eta 7 min
+  280/425  11.9 min  eta 6 min
+  290/425  12.3 min  eta 6 min
+  300/425  12.7 min  eta 5 min
+  310/425  13.1 min  eta 5 min
+  320/425  13.4 min  eta 4 min
+  330/425  13.7 min  eta 4 min
+  340/425  14.0 min  eta 3 min
+  350/425  14.3 min  eta 3 min
+  360/425  14.6 min  eta 3 min
+  370/425  14.9 min  eta 2 min
+  380/425  15.2 min  eta 2 min
+  390/425  15.5 min  eta 1 min
+  400/425  15.8 min  eta 1 min
+  410/425  16.1 min  eta 1 min
+  420/425  16.4 min  eta 0 min
+  425/425  16.5 min  eta 0 min
+mps1: profiles 16974 models × 41 bands, n_mu ≤ 24
+mps2: 425 chunks, target 41 bands

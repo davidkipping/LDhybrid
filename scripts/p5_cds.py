@@ -21,8 +21,7 @@ SRC = DATA / "products"
 OUT = DATA / "release" / "cds"
 GRIDS = {"phoenix": "PHOENIX-ACES-AGSS-COND SpecInt v3.0 (Husser et al. 2013), spherical",
          "mps1": "MPS-ATLAS Set 1 (Kostogryz et al. 2022), plane-parallel",
-         "mps2": "MPS-ATLAS Set 2 (Kostogryz et al. 2022), plane-parallel",
-         "kurucz": "ATLAS9 (Kurucz; ExoTiC-LD subset), plane-parallel, JWST MIRI LRS only"}
+         "mps2": "MPS-ATLAS Set 2 (Kostogryz et al. 2022), plane-parallel"}
 COEF = {"hybrid2": ["w1", "w2"], "hybrid4": ["w1", "w2", "w3", "w4"],
         "hybrid5": ["w1", "w2", "w3", "w4", "w5"], "quadratic": ["u1", "u2"],
         "claret4": ["a1", "a2", "a3", "a4"], "power2": ["c", "alpha"]}
@@ -131,7 +130,7 @@ def latex_to_text(s):
     import re
     s = s.split("\\thanks")[0]
     for a, b in (("\\ppm{}", " ppm"), ("\\ppm", " ppm"), ("\\varepsilon", "epsilon"),
-                 ("\\mu", "mu"), ("\\teff", "Teff"), ("\\,", " "), ("--", "-"), ("~", " "),
+                 ("\\mu", "mu"), ("\\star", "*"), ("_{\\rm p}", "_p"), ("\\teff", "Teff"), ("\\,", " "), ("--", "-"), ("~", " "),
                  ("^{-2}", "^-2")):
         s = s.replace(a, b)
     s = s.replace("$", "")
@@ -170,11 +169,11 @@ def readme(entries):
     a("")
     a("Description:")
     a("    Coefficients fitted to photon-weighted specific-intensity profiles of")
-    a("    spherical PHOENIX and plane-parallel MPS-ATLAS (Sets 1 and 2) and ATLAS9")
-    a("    models, for passbands used in transit observations (Kepler, TESS,")
-    a("    CHEOPS, NGTS, Spitzer/IRAC, Johnson-Cousins, Sloan, 2MASS, HST WFC3 and")
-    a("    STIS, JWST NIRISS, NIRSpec, NIRCam and MIRI). The hybrid laws give")
-    a("    elementary transit light curves for planets of any elliptical outline.")
+    a("    spherical PHOENIX and plane-parallel MPS-ATLAS (Sets 1 and 2) models,")
+    a("    for passbands used in transit observations (Kepler, TESS, CHEOPS, NGTS,")
+    a("    Spitzer/IRAC, Johnson-Cousins, Sloan, 2MASS, HST WFC3 and STIS, JWST")
+    a("    NIRISS, NIRSpec, NIRCam and MIRI). The hybrid laws give elementary")
+    a("    transit light curves for planets of any elliptical outline.")
     a("    Fits are least squares uniform in projected radius r (Meth = r) and")
     a("    uniform in mu (Meth = mu); the hybrid laws are constrained to their")
     a("    physical regions, the quadratic and 4-term laws to positive monotonic")
@@ -199,6 +198,13 @@ def readme(entries):
         for k, ln in enumerate(textwrap.wrap(d, 66)):
             a(f"    {g if k == 0 else '':7s} {ln}")
     a("")
+    for g in GRIDS:
+        with h5py.File(SRC / f"{g}.h5") as h:
+            bl = [b.decode() for b in h["bands"][()]]
+        a(f"Passbands of {g} ({len(bl)}):")
+        for ln in textwrap.wrap(", ".join(bl), 74):
+            a("    " + ln)
+    a("")
     for law in LAWS:
         a(f"Byte-by-byte Description of file: *_{law}.dat")
         a("-" * 80)
@@ -213,6 +219,9 @@ def readme(entries):
     a("Note (1): passband transmission curves: SVO Filter Profile Service")
     a("    (photometric), Spitzer Science Center (IRAC, subarray unless _full),")
     a("    ExoTiC-LD v3.1.2 (HST and JWST modes). Integration is photon-weighted.")
+    a("    JWST_NIRSpec_G395H_NRS1/NRS2: the G395H curve restricted to the NRS1")
+    a("    (2.87-3.72 um) and NRS2 (3.82-5.18 um) detector ranges (JDox, BOTS).")
+    a("    PHOENIX spectra stop at 5.5 um, so MIRI LRS is given for MPS-ATLAS only.")
     a("Note (2): r = least squares uniform in projected radius (recommended);")
     a("    mu = uniform in mu (as Claret's LSM).")
     a("Note (3): spherical models only: the stellar edge r_c is at the node of")
@@ -232,6 +241,8 @@ def readme(entries):
 if __name__ == "__main__":
     import sys
     OUT.mkdir(parents=True, exist_ok=True)
+    for stale in OUT.glob("kurucz_*.dat.gz"):          # ATLAS9 dropped from the release
+        stale.unlink()
     entries = []
     if "--readme-only" in sys.argv:
         for grid in GRIDS:

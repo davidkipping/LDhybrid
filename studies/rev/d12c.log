@@ -1,0 +1,9 @@
+/Users/dkipping/Storage1/Work/Documents/Transit_Work/CODES/LDhybrid/ldhybrid/fit.py:151: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  prob.solve(solver=cp.CLARABEL, tol_gap_abs=1e-12, tol_gap_rel=1e-12,
+  20/50
+/Users/dkipping/Storage1/Work/Documents/Transit_Work/CODES/LDhybrid/ldhybrid/fit.py:151: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  prob.solve(solver=cp.CLARABEL, tol_gap_abs=1e-12, tol_gap_rel=1e-12,
+/Users/dkipping/Storage1/Work/Documents/Transit_Work/CODES/LDhybrid/ldhybrid/fit.py:151: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  prob.solve(solver=cp.CLARABEL, tol_gap_abs=1e-12, tol_gap_rel=1e-12,
+  40/50
+done

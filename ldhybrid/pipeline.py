@@ -35,7 +35,7 @@ def _row(spec, band, profile, name, f, law_eval, lc_metrics):
 
 
 def fit_model(spec, band: str, laws=HYBRIDS + CONTROL, limb: str = "M1",
-              measure: str = "r", resample: int | None = 2000,
+              measure: str = "r", resample: int | str | None = "exact",
               constraint: str = "simplex", fcm: bool = False, mu_min: float = 0.0,
               lc_metrics: bool = True, r_c: float | None = None) -> list[dict]:
     lam, S = bands.response(band)

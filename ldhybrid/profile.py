@@ -124,7 +124,35 @@ def measure_coordinate(mu, measure):
     raise ValueError(f"unknown measure {measure!r}")
 
 
-def quadrature(profile: Profile, measure: str = "r", resample: int | None = 2000,
+N_EXACT = 12          # Gauss–Legendre points per interval between profile nodes
+
+
+def _exact_quadrature(profile: Profile, measure: str):
+    """Gauss–Legendre on every interval between the profile's nodes, so that
+    ∫ (·)² dx over the PCHIP profile is integrated to rounding however steep
+    the limb (the PCHIP is cubic in μ on each interval). For x = r the
+    variable is μ (dr = μ/r dμ) on intervals with μ ≤ 0.5, where r → 1, and r
+    on the others, where μ → 1; for x = μ and x = r² it is μ throughout."""
+    t, wt = np.polynomial.legendre.leggauss(N_EXACT)
+    nodes = profile.mu
+    mus, qs = [], []
+    for a, b in zip(nodes[:-1], nodes[1:]):
+        if measure == "r" and a >= 0.5:
+            ra, rb = np.sqrt(1 - b * b), np.sqrt(1 - a * a)        # r increasing
+            r = 0.5 * (rb - ra) * t + 0.5 * (ra + rb)
+            mus.append(np.sqrt(np.clip(1 - r * r, 0.0, None)))
+            qs.append(0.5 * (rb - ra) * wt)
+            continue
+        mu = 0.5 * (b - a) * t + 0.5 * (a + b)
+        jac = {"mu": np.ones_like(mu), "area": 2.0 * mu,
+               "r": mu / np.sqrt(np.clip(1 - mu * mu, 1e-300, None))}[measure]
+        mus.append(mu)
+        qs.append(0.5 * (b - a) * wt * jac)
+    mu = np.concatenate(mus)
+    return mu, profile.interpolant()(mu), np.concatenate(qs)
+
+
+def quadrature(profile: Profile, measure: str = "r", resample: int | str | None = 2000,
                mu_min: float = 0.0):
     """Nodes μ_i, targets y_i and weights q_i for ∫ (·)² dx, x ∈ {μ, r, r²},
     over the tabulated μ range.
@@ -139,6 +167,8 @@ def quadrature(profile: Profile, measure: str = "r", resample: int | None = 2000
         profile = Profile(profile.mu[keep], profile.y[keep], profile.meta)
     if measure == "nodes":
         return profile.mu, profile.y, np.ones_like(profile.mu)
+    if resample == "exact":
+        return _exact_quadrature(profile, measure)
     if resample is None:
         mu, y = profile.mu, profile.y
         x = measure_coordinate(mu, measure)

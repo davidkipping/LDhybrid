@@ -89,7 +89,16 @@ EXOTICLD = {
     "JWST_MIRI_LRS": "JWST_MIRI_LRS",
 }
 
-BANDS = sorted(SVO) + sorted(IRAC) + sorted(EXOTICLD)
+# name: (parent band, (λ_min, λ_max) in Å). NIRSpec G395H falls on two
+# detectors; transit spectroscopy treats NRS1 and NRS2 as separate light
+# curves. Windows are the JDox detector ranges for BOTS (S1600A1 slit):
+# NRS1 2.87–3.72 µm, NRS2 3.82–5.18 µm.
+DERIVED = {
+    "JWST_NIRSpec_G395H_NRS1": ("JWST_NIRSpec_G395H", (2.87e4, 3.72e4)),
+    "JWST_NIRSpec_G395H_NRS2": ("JWST_NIRSpec_G395H", (3.82e4, 5.18e4)),
+}
+
+BANDS = sorted(SVO) + sorted(IRAC) + sorted(EXOTICLD) + sorted(DERIVED)
 
 
 def svo_path(name):
@@ -109,6 +118,14 @@ def _parse_svo(path):
 @lru_cache(maxsize=None)
 def response(name: str) -> tuple[np.ndarray, np.ndarray]:
     """(λ [Å], photon response) for a registered band, sorted in λ, S >= 0."""
+    if name in DERIVED:
+        parent, (lo, hi) = DERIVED[name]
+        lam, S = response(parent)
+        lo, hi = max(lo, lam[0]), min(hi, lam[-1])
+        inside = (lam > lo) & (lam < hi)
+        edges = np.interp([lo, hi], lam, S)
+        return (np.concatenate([[lo], lam[inside], [hi]]),
+                np.concatenate([[edges[0]], S[inside], [edges[1]]]))
     if name in SVO:
         lam, S, params = _parse_svo(svo_path(name))
         if params.get("WavelengthUnit", "Angstrom") != "Angstrom":

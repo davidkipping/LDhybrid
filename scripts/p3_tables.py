@@ -1,6 +1,6 @@
 """P3: compute band-table products for a grid, in resumable chunks.
 
-    .venv/bin/python scripts/p3_tables.py phoenix|mps1|mps2|kurucz [--workers N]
+    .venv/bin/python scripts/p3_tables.py phoenix|mps1|mps2 [--workers N]
 
 Writes data/products/bands/<grid>/chunk_NNNN.npz (arrays over models × bands);
 assemble with scripts/p3_assemble.py.
@@ -20,11 +20,11 @@ from ldhybrid.paths import DATA, REDUCED
 
 OUT = DATA / "products" / "bands"
 CHUNK = 40
-#: MIRI LRS only from Kurucz (v1.0 scope: FGK, 3500–6500 K)
+#: PHOENIX stops at 5.5 µm, so no MIRI LRS; MPS-ATLAS (ODF to 160 µm) covers it.
+#: The ATLAS9/Kurucz grid (MIRI only in v1.0 drafts) is no longer released.
 BANDS = {"phoenix": [b for b in bands.BANDS if b != "JWST_MIRI_LRS"],
-         "mps1": [b for b in bands.BANDS if b != "JWST_MIRI_LRS"],
-         "mps2": [b for b in bands.BANDS if b != "JWST_MIRI_LRS"],
-         "kurucz": ["JWST_MIRI_LRS"]}
+         "mps1": list(bands.BANDS),
+         "mps2": list(bands.BANDS)}
 SCOPE = dict(teff=(2300, 7500), logg=(3.5, 5.5), mh=(-2.0, 1.0))
 
 

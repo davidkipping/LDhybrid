@@ -46,7 +46,11 @@ r["coeffs"], r["physical"], r["lc_ppm"]
 python -m ldhybrid.interpolate hybrid5 5600 4.4 0.1 TESS --grid mps2 --tables path/to/cds
 ```
 
-Products are described in [`docs/products.md`](docs/products.md); the CDS
+Products are described in [`docs/products.md`](docs/products.md): band
+tables for PHOENIX (40 passbands) and MPS-ATLAS Sets 1 and 2 (41, including
+MIRI LRS and the G395H NRS1/NRS2 windows; added to existing production with
+`scripts/p3_extend.py`, which also exports the band profiles to
+`data/products/profiles/<grid>.h5`). The CDS
 release (fixed-width tables + ReadMe) is built by `scripts/p5_cds.py`, the
 paper draft is `paper/ldhybrid.tex` (figures: `paper/make_figures.py`;
 compile with `tectonic`).

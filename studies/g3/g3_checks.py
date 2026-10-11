@@ -47,7 +47,7 @@ def load(grid):
 
 def physicality(report):
     report["physical"] = {}
-    for grid in ("phoenix", "mps1", "mps2", "kurucz"):
+    for grid in ("phoenix", "mps1", "mps2"):
         if not (P / f"{grid}.h5").exists():
             continue
         h, _, _ = load(grid)

@@ -24,6 +24,10 @@ tabulated profile, production grid (p = 0.1, b ∈ {0, 0.3, 0.6, 0.9}):
 | | quadratic | 51.4 | 99.6 | 131 |
 | Kurucz, MIRI LRS (507) | hybrid5 | 1.4 | 2.1 | 2.2 |
 
+*Revision (2026-10-10):* passbands extended to G395H NRS1/NRS2 (all grids)
+and MIRI LRS from MPS-ATLAS; the Kurucz table is no longer released. Updated
+statistics: `studies/rev/production_stats.md`.
+
 ## Checks
 
 1. **Physicality.** Every hybrid row is physical in every grid and method
@@ -33,7 +37,7 @@ tabulated profile, production grid (p = 0.1, b ∈ {0, 0.3, 0.6, 0.9}):
    (PHOENIX) and 3.4% (MPS-ATLAS Set 2) of rows, mostly c > 1 in cool stars.
 2. **Interpolation** (leave-one-out, linear across a doubled gap; PHOENIX,
    hybrids, ~4,000 trials per axis): median / 90th percentile light-curve
-   error 4.7 / 30 ppm across 200 K in Teff, 15 / 67 ppm across 1.0 dex in
+   error 4.2 / 28 ppm across 200 K in Teff, 15 / 65 ppm across 1.0 dex in
    log g, 13 / 61 ppm across 1.0 dex in [M/H]. At the real grid spacing the
    errors are smaller (≈ ¼ for curvature-dominated error).
 3. **Coefficient-spectra closure.** Band weights from the spectra equal the
@@ -43,10 +47,10 @@ tabulated profile, production grid (p = 0.1, b ∈ {0, 0.3, 0.6, 0.9}):
 4. **Systematic spread** (`systematics.csv.gz`; 1,020 grid points shared by
    PHOENIX, MPS-ATLAS Set 1 and Set 2, 116,280 rows): the largest pairwise
    light-curve difference between the three grids' coefficients is a median
-   93 ppm, 90th percentile 285 ppm, identical for all three hybrids.
+   87 ppm, 90th percentile 279 ppm, identical for all three hybrids (exact-quadrature rerun; was 93 / 285).
 
 **Gate:** interpolation error (median 5–15 ppm, 90th 30–67) is well below the
-systematic spread between grids (median 93, 90th 285), and every hybrid row
+systematic spread between grids (median 87, 90th 279), and every hybrid row
 is physical. Passed.
 
 ## Notes

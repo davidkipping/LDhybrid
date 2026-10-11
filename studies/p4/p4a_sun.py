@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import PchipInterpolator
 
-from ldhybrid import fit, laws
+from ldhybrid import fit, laws, v1
 from ldhybrid import lightcurve as lc
 from ldhybrid.grids import mpsatlas, muram, phoenix
 from ldhybrid.paths import RAW
@@ -45,11 +45,11 @@ def tophat(lam_nm, width_nm=1.0):
 
 def law_fit_error(name, pr):
     if name == "power2":
-        c, a = fit.fit_power2(pr, "r", 2000).w
+        c, a = fit.fit_power2(pr, "r", v1.RESAMPLE).w
         model = G.columns(lambda m: laws.power2(c, a, m))
     else:
         L = laws.get(name)
-        w = fit.fit_linear(L, pr, "r", 2000, constraint_for(name)).w
+        w = fit.fit_linear(L, pr, "r", v1.RESAMPLE, constraint_for(name)).w
         model = G.combine(*G.linear_columns(L), w) if name not in _C else G.combine(*_C[name], w)
     return G.errors(*model, *G.columns(pr))["max_ppm"]
 

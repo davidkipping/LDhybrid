@@ -49,10 +49,14 @@ power-2 (c, α, I/I(1) = 1 − c(1 − μ^α)).
 
 | grid | models | coverage | bands |
 |---|---|---|---|
-| `phoenix` | 1,682 | PHOENIX-ACES v3.0, 2300–7400 K, log g 3.5–5.5, [M/H] −2 … +1 | 38 |
-| `mps2` | 16,974 | MPS-ATLAS Set 2, 3500–7500 K, log g 3.5–5.0, [M/H] −2 … +1 | 38 |
-| `mps1` | 16,974 | MPS-ATLAS Set 1, same grid | 38 |
-| `kurucz` | 507 | ATLAS9 (ExoTiC-LD subset), 3500–6500 K | MIRI LRS only |
+| `phoenix` | 1,682 | PHOENIX-ACES v3.0, 2300–7400 K, log g 3.5–5.5, [M/H] −2 … +1 | 40 (all but MIRI LRS; spectra stop at 5.5 µm) |
+| `mps2` | 16,974 | MPS-ATLAS Set 2, 3500–7500 K, log g 3.5–5.0, [M/H] −2 … +1 | 41 |
+| `mps1` | 16,974 | MPS-ATLAS Set 1, same grid | 41 |
+
+The registry has 41 passbands: 39 curves plus the NIRSpec G395H detector
+windows NRS1 (2.87–3.72 µm) and NRS2 (3.82–5.18 µm). The ATLAS9/Kurucz MIRI
+table of earlier drafts (`kurucz`) is no longer released; MIRI LRS now comes
+from MPS-ATLAS.
 
 Columns:
 
@@ -72,6 +76,13 @@ Columns:
 | bound | 1 if a physical constraint is active at the optimum |
 
 `<grid>.h5` holds the same quantities as arrays [model, band(, parameter)].
+
+## Band profiles: `profiles/<grid>.h5`
+
+The post-limb-cut band-integrated profiles that every fit uses
+(`scripts/p3_extend.py`): `teff`, `logg`, `mh` (model), `bands`, `mu` and `y`
+[model, band, node] (μ′ ascending to 1, y = I/I(1), float32, NaN-padded) and
+`r_c` [model, band]. Users can refit any law or weighting from them.
 
 The CDS release (`release/cds/`) carries the same tables in fixed-width
 form; `ldhybrid/interpolate.py` is a self-contained interpolator for them

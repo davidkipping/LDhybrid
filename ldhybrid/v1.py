@@ -16,7 +16,11 @@ HYBRID5_EPS = tuple(float(e) for e in ladder(3))      # 0.0015966, 0.041275, 0.3
 
 # --- headline fitting method (P2a, P2b) -------------------------------------
 MEASURE = "r"              # least squares uniform in projected radius
-RESAMPLE = 2000            # PCHIP resample of the profile, nodes uniform in r
+#: quadrature of the weighted least squares: Gauss–Legendre on every interval
+#: between profile nodes (exact for the PCHIP profile). Was 2000 points uniform
+#: in r until 2026-10-10, which under-resolved the steep limb of spherical
+#: models (studies/rev/val_resample_check.md).
+RESAMPLE = "exact"
 CONSTRAINT = {"hybrid2": "physical",     # exact triangle
               "hybrid4": "simplex", "hybrid5": "simplex"}
 FCM = False                # flux conservation not imposed (flux error tabulated)
