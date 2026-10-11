@@ -59,7 +59,7 @@ Proposed grid scope (confirm): Teff 2300–7500 K, log g 3.5–5.5,
 ### P0 — Set-up and data
 
 * Package skeleton `ldhybrid/` (pyproject, tests, `.venv`); depend on
-  `squishierplanet` (laws, oracle) and `metalplanet ≥ 0.10.7` (fast
+  `squishierplanet` (laws, oracle) and `elome` (formerly `metalplanet`; ≥ 0.10.7) (fast
   circular-planet hybrid light curves) as editable installs. `data/` is
   git-ignored.
 * **Intensity grids** (download scripts, checksums, provenance log):
@@ -232,7 +232,7 @@ changed afterwards); method frozen and written up as an internal note.
   * table interpolation;
   * coefficient-spectrum integration;
   * priors in q-space;
-  * hand-off to squishierplanet and MetalPlanet.
+  * hand-off to squishierplanet and Elómë (`elome`, formerly MetalPlanet).
 * **Upstream:** offer the hybrid laws to ExoTiC-LD.
 
 ## Risks

@@ -50,7 +50,7 @@ beats quadratic at every percentile and in 73% of model-bands; it remains
 well behind power-2 (which is not elementary for an ellipse). Above ε ≈ 0.45
 its advantage collapses (41% at 0.46). **Recommend ε = 0.36.** Note: this
 changes a constant shared with squishierplanet (`HYBRID2_EPS = 0.208`) and
-MetalPlanet v0.10.x.
+MetalPlanet v0.10.x (since v0.14.0 named Elómë, package `elome`).
 
 hybrid4/5's analytic ladder (α_eff = 1) needs no change: hybrid5 matches or
 beats Claret 4-term everywhere tested.
@@ -110,7 +110,7 @@ combinations, which argues for publishing the systematic spread σ_w (P3).
 
 Adopted as recommended below, except item 4: MIRI M dwarfs are dropped from
 v1.0 (MIRI for FGK via Kurucz only). Frozen in `ldhybrid/v1.py`; upstream
-note for squishierplanet/MetalPlanet in `docs/upstream/hybrid2_pole_036.md`.
+note for squishierplanet/Elómë (`elome`, formerly MetalPlanet) in `docs/upstream/hybrid2_pole_036.md`.
 
 ### Recommendations
 

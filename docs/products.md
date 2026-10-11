@@ -16,7 +16,7 @@ control laws computed identically. All products live in `data/products/`.
 with Π_ε(μ) = [(μ²+ε)⁻² − (1+ε)⁻²] / [ε⁻² − (1+ε)⁻²]. Each w_j is the share of
 the centre-to-limb drop carried by its term, and I(0)/I(1) = 1 − Σ w. The
 equivalent expanded form, used by the closed-form light curves of
-SquishierPlanet and MetalPlanet, is
+SquishierPlanet and Elómë (`elome`, formerly MetalPlanet), is
 
     I(μ)/I(1) = c0 + c2 μ² + c4 μ⁴ + Σ_k d_k (μ² + ε_k)⁻² .
 
@@ -26,8 +26,9 @@ columns map these regions to the unit hypercube (uniform priors):
 `squishierplanet.laws.hybrid2_from_q` and `simplex_from_q` invert them.
 
 > **Note:** hybrid2 uses ε = 0.36 from v1.0 on, as do SquishierPlanet
-> (`HYBRID2_EPS`; the old 0.208 is `HYBRID2_EPS_V0`) and MetalPlanet ≥ v0.12.0.
-> Do not use these coefficients with MetalPlanet ≤ v0.11 (ε = 0.208).
+> (`HYBRID2_EPS`; the old 0.208 is `HYBRID2_EPS_V0`) and Elómë (`elome`;
+> MetalPlanet ≥ v0.12.0 before its rename in v0.14.0). Do not use these
+> coefficients with MetalPlanet ≤ v0.11 (ε = 0.208).
 
 Controls: quadratic (u1, u2), Claret 4-term (a1…a4, I/I(1) = 1 − Σ a_k (1 − μ^{k/2})),
 power-2 (c, α, I/I(1) = 1 − c(1 − μ^α)).

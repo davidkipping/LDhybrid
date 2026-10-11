@@ -28,4 +28,4 @@ def test_hybrid2_triangle_vertices_are_the_physical_boundary():
 
 
 def test_method_constants():
-    assert (v1.MEASURE, v1.RESAMPLE, v1.FCM, v1.LIMB) == ("r", 2000, False, "M1")
+    assert (v1.MEASURE, v1.RESAMPLE, v1.FCM, v1.LIMB) == ("r", "exact", False, "M1")

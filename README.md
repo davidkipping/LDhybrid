@@ -4,7 +4,7 @@ Theoretical limb-darkening coefficient tables for the rational **hybrid2,
 hybrid4 and hybrid5** laws of [SquishierPlanet](../squishierplanet), regressed
 against simulated stellar specific intensities, with positivity and
 monotonicity imposed by construction. A sibling of SquishierPlanet and
-MetalPlanet. The plan of work is in [`docs/plan.md`](docs/plan.md).
+Elómë (`elome`, formerly MetalPlanet). The plan of work is in [`docs/plan.md`](docs/plan.md).
 
 ## Status
 

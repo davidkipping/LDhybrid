@@ -2,7 +2,8 @@
 
 **Status (2026-10-10): applied upstream** — SquishierPlanet `56d02d6`
 (`HYBRID2_EPS = 0.36`, legacy `HYBRID2_EPS_V0 = 0.208`) and MetalPlanet
-v0.12.0 (`4d0564e`). LDhybrid's definition is in `ldhybrid/v1.py`.
+v0.12.0 (`4d0564e`), renamed Elómë (`elome`) in v0.14.0 (`elome/hybrid.py`:
+`HYBRID2_EPS = 0.36`). LDhybrid's definition is in `ldhybrid/v1.py`.
 
 ## Why
 
@@ -45,7 +46,8 @@ The exact physical region is still the triangle O–V_c–V_ℓ, and
   "Pi_0.208"); tests import the constant (no hard-coded value);
   `docs/notes/squishierplanet_notes.tex` (eq. h2, the triangle theorem's
   g0, g1, N_ε and vertices, Table jband/phys rows for hybrid2).
-* MetalPlanet: `metalplanet/hybrid.py` (`HYBRID2_EPS = 0.208`, docstring);
+* MetalPlanet (now Elómë, `elome`): `metalplanet/hybrid.py`, now
+  `elome/hybrid.py` (`HYBRID2_EPS = 0.208` at the time, docstring);
   `tests/test_hybrid.py:130` asserts `HYBRID2.eps == (0.208,)`; `README.md`.
 
 Suggested: bump both as a breaking change to the hybrid2 definition (or keep
