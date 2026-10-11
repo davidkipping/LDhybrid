@@ -1,7 +1,8 @@
 """Interpolate the LDhybrid v1.0 coefficient tables (the CDS release).
 
 Self-contained: needs only numpy and scipy, so this file can be copied and
-used on its own with the downloaded tables (`<grid>_<law>.dat[.gz]`).
+used on its own with the downloaded tables (`<grid>_<law>.dat[.gz]`, and for
+corrections and offsets `corrections.dat`, `offsets.dat`).
 
     from ldhybrid.interpolate import LDTables
     t = LDTables("path/to/cds")                      # directory with the tables
@@ -11,16 +12,27 @@ used on its own with the downloaded tables (`<grid>_<law>.dat[.gz]`).
     r["physical"]        # positive and monotonic?
     t.intensity("hybrid5", r["coeffs"], mu)          # I(mu)/I(1)
 
-Priors and empirical offsets:
+The recommended FGK prior (MPS-ATLAS Set 2 + MURaM 100 G), and an empirical
+offset measured in the SAME correction state (never apply an offset measured
+against uncorrected predictions to a corrected prior: that counts the
+correction twice):
 
-    p = t.prior("hybrid5", 5600, 100, 4.4, 0.1, 0.1, 0.1, "TESS", systematic=True)
-    observables("hybrid5")["h1"]                     # (const, grad): h'1 = const + grad·w
-    m, C = condition(p["mean"], p["cov"], "hybrid5", "h1", delta, sigma)
+    p = t.prior("hybrid5", 5600, 100, 4.4, 0.1, 0.1, 0.1, "Kepler",
+                correction="B100G", systematic=True)
+    m, C = t.apply_offsets(p, regime="Kepler")       # joint (h'1, h'2) update
+    # or by hand, one or several observables (linear in the weights):
+    m, C = condition(p["mean"], p["cov"], "hybrid5", ["h1", "h2"],
+                     [-0.0023, -0.0039], [0.0052, 0.0126], rho=0.04)
+
+Transit light curve of any tabulated law (circular planet; the same
+numerical quadrature as the paper's reference light curves):
+
+    F = light_curve("hybrid5", r["coeffs"], z, p=0.1)
 
 Refitting interpolated intensity profiles (needs the profile files and h5py):
 
     t = LDTables("path/to/cds", profiles="path/to/profiles")
-    r = t.coefficients("hybrid5", 5600, 4.4, 0.1, "TESS", refit=True)
+    r = t.coefficients("claret4", 5600, 4.4, 0.1, "TESS", refit=True, mu_min=0.02)
 
 Command line:
 
@@ -37,12 +49,13 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import warnings
 from pathlib import Path
 
 import numpy as np
 from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
 
-GRIDS = ("phoenix", "mps1", "mps2", "kurucz")
+GRIDS = ("phoenix", "mps1", "mps2")
 COEFFS = {"hybrid2": ("w1", "w2"), "hybrid4": ("w1", "w2", "w3", "w4"),
           "hybrid5": ("w1", "w2", "w3", "w4", "w5"), "quadratic": ("u1", "u2"),
           "claret4": ("a1", "a2", "a3", "a4"), "power2": ("c", "alpha")}
@@ -51,6 +64,20 @@ LAWS = tuple(COEFFS)
 POLES = {"hybrid2": (0.36,), "hybrid4": (0.01176198, 0.30407926),
          "hybrid5": (0.00159655, 0.04127504, 0.38743472)}
 SCALE = np.array([100.0, 0.5, 0.5])
+#: layout of the parsed-table cache (<table>.npz); bump when the parser changes
+TABLE_FORMAT = 2
+#: MURaM magnetic states in corrections.dat
+STATES = ("ssd", "B100G", "B200G", "B300G")
+#: fixed-width layouts of the auxiliary tables (field widths, single spaces between)
+_CORR_W = [("Source", 7), ("Kind", 8), ("State", 5), ("Star", 9), ("Teff", 5), ("logg", 5),
+           ("mh", 5), ("Band", 25), ("Law", 7), ("dw1", 9), ("dw2", 9), ("dw3", 9), ("dw4", 9),
+           ("dw5", 9), ("dLC", 7), ("Ext", 1), ("Base", 22)]
+_OFF_W = [("Regime", 15), ("Bands", 26), ("Grid", 7), ("Corr", 11), ("Route", 7), ("Stat", 5),
+          ("Offset", 7), ("e_Offset", 6), ("Scatter", 6), ("rho", 6), ("N", 2), ("Ref", 30)]
+#: offsets-table statistic -> observables() name
+_STAT = {"h1p": "h1", "h2p": "h2", "ell": "ell", "delta": "delta"}
+#: lowest Teff shared by PHOENIX and MPS-ATLAS (for the M-dwarf systematic floor)
+TEFF_SHARED = 3500.0
 
 
 # ----------------------------------------------------------------- the laws
@@ -149,22 +176,92 @@ def observables(law, coeffs=None):
     return {k: float(a + g @ c) for k, (a, g) in out.items()}
 
 
-def condition(mean, cov, law, observable, delta, sigma):
-    """Gaussian update of a coefficient prior N(mean, cov) by an empirical
-    offset in one observable (observed − model = delta, with scatter sigma,
-    e.g. a row of the empirical-offsets table). The observable is linear in
-    the coefficients (observables()), so the update is exact:
+def condition(mean, cov, law, observable, delta, sigma, rho=None):
+    """Gaussian update of a coefficient prior N(mean, cov) by empirical offsets
+    (observed − model) in one or several observables. Each observable is linear
+    in the coefficients (observables()), so the update is exact:
 
-        g = ∇obs,  K = C g / (gᵀ C g + σ²),  mean' = mean + K δ,  C' = C − K gᵀ C.
+        G = ∇obs (k × n),  S = G C Gᵀ + R,  K = C Gᵀ S⁻¹,
+        mean' = mean + K δ,  C' = C − K G C.
 
-    Apply once per observable (treating them as independent). Returns
-    (mean', cov'). The result is Gaussian: for the hybrid laws it can put
-    probability outside the physical region; truncate there if needed."""
+    observable: a name ("h1", "h2", "ell", "delta") or a list of names.
+    delta: the offset(s). sigma: their 1σ scatter (scalar or one per
+    observable), or a full k × k covariance R. rho: correlation between two
+    observables (e.g. the h'1–h'2 correlation in the offsets table), used when
+    sigma gives the standard deviations. Use offsets measured in the same
+    correction state as the prior. Offsets are relative to the prior mean, so
+    apply several observables jointly (a list); a sequential second update
+    would have to subtract the change of its observable from its delta.
+    Returns (mean', cov'). The result is
+    Gaussian: for the hybrid laws it can put probability outside the physical
+    region; truncate there if needed."""
     m = np.asarray(mean, float)
     C = np.asarray(cov, float)
-    g = observables(law)[observable][1]
-    K = C @ g / (g @ C @ g + sigma ** 2)
-    return m + K * delta, C - np.outer(K, g @ C)
+    names = [observable] if isinstance(observable, str) else list(observable)
+    obs = observables(law)
+    G = np.array([obs[k][1] for k in names])
+    d = np.atleast_1d(np.asarray(delta, float))
+    sig = np.asarray(sigma, float)
+    if sig.ndim == 2:
+        R = sig
+    else:
+        sd = np.broadcast_to(np.atleast_1d(sig), (len(names),)).astype(float)
+        R = np.diag(sd ** 2)
+        if rho is not None and len(names) == 2:
+            R[0, 1] = R[1, 0] = rho * sd[0] * sd[1]
+    S = G @ C @ G.T + R
+    K = np.linalg.solve(S.T, (C @ G.T).T).T
+    return m + K @ d, C - K @ G @ C
+
+
+# ----------------------------------------------------------------- light curves
+
+def _gl(n):
+    x, w = np.polynomial.legendre.leggauss(n)
+    return 0.5 * np.pi * (x + 1.0), 0.5 * np.pi * w
+
+
+def _star_flux(I_of_mu, n=4000):
+    th, wt = _gl(n)
+    mu = 0.5 * (1.0 - np.cos(th))
+    return float(2.0 * np.pi * np.sum(wt * 0.5 * np.sin(th) * I_of_mu(mu) * mu))
+
+
+def _blocked(I_of_r, z, p, n_sub=4, n_gl=48):
+    th, wt = _gl(n_gl)
+    z = np.atleast_1d(np.asarray(z, float))
+    lo = np.clip(z - p, 0.0, None)
+    hi = np.minimum(1.0, z + p)
+    bp = np.stack([lo, np.clip(p - z, 0.0, 1.0), np.clip(z - p, 0.0, 1.0),
+                   np.minimum(1.0, z + p), hi], axis=1)
+    bp = np.sort(np.clip(bp, lo[:, None], hi[:, None]), axis=1)
+    edges = [bp[:, :1]]
+    for j in range(bp.shape[1] - 1):
+        a, b = bp[:, j:j + 1], bp[:, j + 1:j + 2]
+        edges.append(a + (b - a) * np.arange(1, n_sub + 1) / n_sub)
+    E = np.concatenate(edges, axis=1)
+    a, b = E[:, :-1, None], E[:, 1:, None]
+    r = a + (b - a) * 0.5 * (1.0 - np.cos(th))
+    dr = (b - a) * 0.5 * np.sin(th) * wt
+    zz = z[:, None, None]
+    with np.errstate(divide="ignore", invalid="ignore"):
+        cosk = (r * r + zz * zz - p * p) / (2.0 * r * zz)
+    kap = np.where(zz == 0, np.where(r < p, np.pi, 0.0),
+                   np.arccos(np.clip(np.nan_to_num(cosk, nan=-1.0), -1.0, 1.0)))
+    return np.sum(I_of_r(r) * 2.0 * r * kap * dr, axis=(1, 2))
+
+
+def light_curve(law, coeffs, z, p):
+    """Normalised flux F(z) = 1 − ΔF/F★ of a circular planet of radius p
+    (stellar radii) at sky separations z, for any tabulated law. Numerical
+    quadrature, identical to the reference light curves of the paper
+    (ldhybrid.lightcurve): Gauss–Legendre with endpoint substitutions on each
+    segment between the chord breakpoints (agrees with the closed-form hybrid5
+    light curve to ~1e-8 ppm). For speed and differentiability in a fitting
+    code, use a dedicated transit code with the same law."""
+    I_mu = lambda mu: intensity(law, coeffs, mu)
+    I_r = lambda r: I_mu(np.sqrt(np.clip(1.0 - r * r, 0.0, None)))
+    return 1.0 - _blocked(I_r, z, p) / _star_flux(I_mu)
 
 
 # ----------------------------------------------------------------- refitting
@@ -281,8 +378,9 @@ class LDTables:
         npz = path.with_name(path.name.split(".")[0] + ".npz")
         if self.cache and npz.exists() and npz.stat().st_mtime >= path.stat().st_mtime:
             with np.load(npz) as z:
-                self._data[key] = {k: z[k] for k in z.files}
-            return self._data[key]
+                if "_format" in z.files and int(z["_format"]) == TABLE_FORMAT:
+                    self._data[key] = {k: z[k] for k in z.files if k != "_format"}
+                    return self._data[key]
         op = gzip.open if path.suffix == ".gz" else open
         with op(path, "rt") as f:
             rows = [ln.split() for ln in f if ln.strip()]
@@ -292,12 +390,16 @@ class LDTables:
                  mh=a[:, 2].astype(float), band=a[:, 3].astype(str),
                  method=a[:, 4].astype(str), mucri=a[:, 5].astype(float),
                  coeffs=a[:, 6:6 + n].astype(float))
+        extra = a.shape[1] - (6 + n + 6)          # hybrid tables: q and expanded form
+        if extra > 0:
+            d["q"] = a[:, 6 + n:6 + 2 * n].astype(float)
+            d["expanded"] = a[:, 6 + 2 * n:6 + n + extra].astype(float)
         for k, name in enumerate(("sigma", "dImax", "dFlux", "LCppm", "Phys", "Bound")):
-            d[name] = a[:, 6 + n + k].astype(float)
+            d[name] = a[:, 6 + n + extra + k].astype(float)
         self._data[key] = d
         if self.cache:
             try:
-                np.savez(npz, **d)
+                np.savez(npz, _format=TABLE_FORMAT, **d)
             except OSError:
                 pass
         return self._data[key]
@@ -320,35 +422,128 @@ class LDTables:
         return self._interp[key]
 
     def coefficients(self, law, teff, logg, mh, band, grid="mps2", method="r",
-                     extrapolate=None, refit=False):
+                     extrapolate=None, refit=False, correction=None, mu_min=0.0):
         """Interpolated coefficients of `law` at (Teff, log g, [M/H]) in `band`.
 
-        Returns dict(coeffs, physical, mucri, lc_ppm, inside, grid, method, band).
-        lc_ppm is the interpolated light-curve error of the tabulated fits.
-        refit=True interpolates the band profiles instead and refits (refit();
-        needs the profile files and h5py; r-weighted method only)."""
+        Returns dict(coeffs, physical, mucri, lc_ppm, inside, grid, method, band,
+        correction). lc_ppm is the interpolated light-curve error of the
+        tabulated fits. refit=True interpolates the band profiles instead and
+        refits (refit(); needs the profile files and h5py; r-weighted method
+        only; mu_min as in refit()). correction: None or a MURaM state
+        ("ssd", "B100G", "B200G", "B300G"; hybrid laws only), whose Δw from
+        corrections.dat is added (delta_w())."""
         if refit:
             if method != "r":
                 raise ValueError("refit reproduces the headline (r-weighted) method only")
-            return self.refit(law, teff, logg, mh, band, grid)
-        if law not in COEFFS:
-            raise ValueError(f"law must be one of {LAWS}")
-        if grid not in GRIDS:
-            raise ValueError(f"grid must be one of {GRIDS}")
-        f, g = self._interpolator(grid, law, band, method, extrapolate)
-        x = np.array([[teff, logg, mh]]) / SCALE
-        y = f(x)[0]
-        inside = bool(np.all(np.isfinite(y)))
-        if not inside:
-            if g is None:
-                raise ValueError(f"({teff}, {logg}, {mh}) is outside the {grid} grid for "
-                                 f"{band}; pass extrapolate='nearest' to use the nearest model")
-            y = g(x)[0]
-        n = len(COEFFS[law])
-        coeffs = dict(zip(COEFFS[law], (float(v) for v in y[:n])))
-        return dict(law=law, coeffs=coeffs, physical=is_physical(law, coeffs),
-                    mucri=float(y[n]), lc_ppm=float(y[n + 1]), inside=inside,
-                    grid=grid, method=method, band=band)
+            r = self.refit(law, teff, logg, mh, band, grid, mu_min=mu_min)
+        else:
+            if mu_min:
+                raise ValueError("mu_min applies to refit=True only")
+            if law not in COEFFS:
+                raise ValueError(f"law must be one of {LAWS}")
+            if grid not in GRIDS:
+                raise ValueError(f"grid must be one of {GRIDS}")
+            f, g = self._interpolator(grid, law, band, method, extrapolate)
+            x = np.array([[teff, logg, mh]]) / SCALE
+            y = f(x)[0]
+            inside = bool(np.all(np.isfinite(y)))
+            if not inside:
+                if g is None:
+                    raise ValueError(f"({teff}, {logg}, {mh}) is outside the {grid} grid for "
+                                     f"{band}; pass extrapolate='nearest' to use the nearest model")
+                y = g(x)[0]
+            n = len(COEFFS[law])
+            coeffs = dict(zip(COEFFS[law], (float(v) for v in y[:n])))
+            r = dict(law=law, coeffs=coeffs, mucri=float(y[n]), lc_ppm=float(y[n + 1]),
+                     inside=inside, grid=grid, method=method, band=band)
+        if correction:
+            dw = self.delta_w(law, band, teff, correction)
+            r["coeffs"] = dict(zip(COEFFS[law], (v + d for v, d in
+                                                  zip(r["coeffs"].values(), dw))))
+        r["correction"] = correction
+        r["physical"] = is_physical(law, r["coeffs"])
+        return r
+
+    # ---------------------------------------------------------- corrections, offsets
+
+    def _fixed(self, name, widths):
+        """Rows of a fixed-width auxiliary table as dicts of strings ('' = null)."""
+        path = self.dir / name
+        if not path.exists() and (self.dir / (name + ".gz")).exists():
+            path = self.dir / (name + ".gz")
+        op = gzip.open if path.suffix == ".gz" else open
+        out = []
+        with op(path, "rt") as f:
+            for ln in f:
+                if not ln.strip():
+                    continue
+                d, pos = {}, 0
+                for lab, w in widths:
+                    d[lab] = ln[pos:pos + w].strip()
+                    pos += w + 1
+                out.append(d)
+        return out
+
+    def corrections(self):
+        """corrections.dat as a list of dicts (cached)."""
+        if "_corr" not in self._data:
+            self._data["_corr"] = self._fixed("corrections.dat", _CORR_W)
+        return self._data["_corr"]
+
+    def delta_w(self, law, band, teff, state="B100G"):
+        """MURaM magnetic Δw for `state`, interpolated linearly in Teff between
+        the [M/H] = 0 MURaM stars and clamped outside them (as ldhybrid.predict).
+        MURaM exists only at these Teff, at one log g each and [M/H] = 0, and
+        has no intensities below μ = 0.1 (the ratio is held constant there):
+        applying Δw at other log g and [M/H] is an extrapolation. teff may be
+        an array."""
+        if not law.startswith("hybrid"):
+            raise ValueError("corrections are tabulated for the hybrid laws only")
+        if state not in STATES:
+            raise ValueError(f"state must be one of {STATES}")
+        rows = [r for r in self.corrections() if r["Source"] == "MURaM" and r["Kind"] == "magnetic"
+                and r["State"] == state and r["Law"] == law and r["Band"] == band
+                and float(r["mh"]) == 0.0]
+        if not rows:
+            raise ValueError(f"no {state} correction for {law} in {band}")
+        rows.sort(key=lambda r: float(r["Teff"]))
+        T = np.array([float(r["Teff"]) for r in rows])
+        D = np.array([[float(r[f"dw{k + 1}"]) for k in range(len(COEFFS[law]))] for r in rows])
+        t = np.asarray(teff, float)
+        if np.any((t < T[0]) | (t > T[-1])):
+            warnings.warn(f"Teff outside the MURaM range {T[0]:.0f}-{T[-1]:.0f} K: the {state} "
+                          "correction is clamped to the nearest MURaM star", stacklevel=2)
+        out = np.stack([np.interp(t, T, D[:, k]) for k in range(D.shape[1])], axis=-1)
+        return out
+
+    def offsets(self):
+        """offsets.dat as a list of dicts (cached)."""
+        if "_off" not in self._data:
+            self._data["_off"] = self._fixed("offsets.dat", _OFF_W)
+        return self._data["_off"]
+
+    def apply_offsets(self, prior, regime, statistics=None, route="hybrid5"):
+        """Condition a prior (from prior()) on the tabulated empirical offsets
+        for `regime` ("Kepler", "TESS", "JWST_0.86-5.5um"), measured against
+        predictions of the same grid and correction state as the prior (an
+        offset row in another state is never used: that would count the
+        magnetic correction twice). Kepler/TESS h'1 and h'2 are applied jointly
+        with their tabulated correlation; the star-to-star scatter is the
+        width. route="hybrid5" uses the offsets of the hybrid5 fits' statistics
+        (exact for conditioning weights). Returns (mean', cov')."""
+        corr = {None: "none"}.get(prior.get("correction"), "MURaM_" + str(prior.get("correction")))
+        stats = statistics or (["ell"] if regime.startswith("JWST") else ["h1p", "h2p"])
+        rows = {r["Stat"]: r for r in self.offsets() if r["Regime"] == regime
+                and r["Grid"] == prior["grid"] and r["Corr"] == corr and r["Route"] == route}
+        miss = [k for k in stats if k not in rows]
+        if miss:
+            raise ValueError(f"no {route} offsets {miss} for {regime}, grid {prior['grid']}, "
+                             f"correction state {corr}")
+        delta = [float(rows[k]["Offset"]) for k in stats]
+        sd = [float(rows[k]["Scatter"]) for k in stats]
+        rho = rows[stats[0]]["rho"]
+        return condition(prior["mean"], prior["cov"], prior["law"], [_STAT[k] for k in stats],
+                         delta, sd, rho=float(rho) if (rho and len(stats) == 2) else None)
 
     intensity = staticmethod(intensity)
     observables = staticmethod(observables)
@@ -357,41 +552,77 @@ class LDTables:
     # ---------------------------------------------------------- priors
 
     def prior(self, law, teff, sig_teff, logg, sig_logg, mh, sig_mh, band, grid="mps2",
-              method="r", n=2000, systematic=False, seed=0):
+              method="r", n=2000, systematic=False, seed=0, correction=None,
+              m_dwarf_floor=True, cov_floor=None):
         """Monte-Carlo prior on the coefficients for uncertain stellar
         parameters: draws (Teff, log g, [M/H]) from independent Gaussians,
-        interpolates the table at each draw (draws outside the grid are
-        dropped) and returns dict(mean, cov, n_used, grids).
+        interpolates the table at each draw and returns dict(mean, cov, n_used,
+        dropped, grids, ...). Draws outside the grid are dropped (with a
+        warning: near a grid edge this biases the mean).
 
+        correction: MURaM state added as Δw(Teff) to each draw (hybrid laws).
         systematic=True adds the model systematic: the covariance, across the
         grids phoenix, mps1 and mps2 that cover the star in this band, of their
-        interpolated coefficients at the nominal parameters. With σ → 0 and no
-        systematic, mean equals coefficients() and cov → 0."""
+        interpolated coefficients at the nominal parameters. Where only one
+        grid covers the star (Teff < 3500 K: PHOENIX only) and m_dwarf_floor is
+        True, the spread at the nearest point shared by all three grids
+        (Teff = 3500 K, log g and [M/H] clipped to the MPS-ATLAS range) is used
+        instead, with a warning.
+        cov_floor: minimum variance (scalar, or one per coefficient) on the
+        diagonal, for the uncertainties the tables do not contain (limb
+        convention, μ sampling, model-observation offsets); the interpolated
+        covariance alone is nearly singular along directions the stellar
+        parameters do not move. With σ → 0, no systematic and no floor, mean
+        equals coefficients() and cov → 0."""
         rng = np.random.default_rng(seed)
         f, _ = self._interpolator(grid, law, band, method, None)
-        X = np.column_stack([rng.normal(teff, sig_teff, n), rng.normal(logg, sig_logg, n),
-                             rng.normal(mh, sig_mh, n)]) / SCALE
+        T = rng.normal(teff, sig_teff, n)
+        X = np.column_stack([T, rng.normal(logg, sig_logg, n), rng.normal(mh, sig_mh, n)]) / SCALE
         Y = f(X)[:, :len(COEFFS[law])]
-        Y = Y[np.all(np.isfinite(Y), axis=1)]
-        if len(Y) == 0:
+        ok = np.all(np.isfinite(Y), axis=1)
+        if not ok.any():
             raise ValueError("no draws inside the grid")
+        dropped = 1.0 - ok.mean()
+        if dropped > 0:
+            warnings.warn(f"{100 * dropped:.1f}% of the draws fall outside the {grid} grid and "
+                          "were dropped; the prior mean is biased towards the grid interior",
+                          stacklevel=2)
+        Y = Y[ok]
+        if correction:
+            Y = Y + self.delta_w(law, band, T[ok], correction)
         mean = Y.mean(0)
-        cov = np.cov(Y.T, ddof=1) if len(Y) > 1 else np.zeros((Y.shape[1],) * 2)
-        grids = [grid]
+        cov = np.atleast_2d(np.cov(Y.T, ddof=1)) if len(Y) > 1 else np.zeros((Y.shape[1],) * 2)
+        grids, floor_point = [grid], None
         if systematic:
-            W = []
-            for gname in ("phoenix", "mps1", "mps2"):
-                try:
-                    r = self.coefficients(law, teff, logg, mh, band, gname, method)
-                except (ValueError, FileNotFoundError):
-                    continue
-                W.append([r["coeffs"][k] for k in COEFFS[law]])
-                if gname != grid:
-                    grids.append(gname)
+            def spread(t, g, m, extrap=None):
+                W, names = [], []
+                for gname in ("phoenix", "mps1", "mps2"):
+                    try:
+                        r = self.coefficients(law, t, g, m, band, gname, method, extrap)
+                    except (ValueError, FileNotFoundError):
+                        continue
+                    W.append([r["coeffs"][k] for k in COEFFS[law]])
+                    names.append(gname)
+                return np.array(W), names
+            W, names = spread(teff, logg, mh)
+            grids = [grid] + [g_ for g_ in names if g_ != grid]
+            if len(W) < 2:
+                msg = f"only {names} cover this star in {band}: no grid-to-grid systematic"
+                if m_dwarf_floor:
+                    floor_point = (max(teff, TEFF_SHARED), float(np.clip(logg, 3.5, 5.0)),
+                                   float(np.clip(mh, -2.0, 1.0)))
+                    W, names = spread(*floor_point, extrap="nearest")
+                    msg += (f"; using the spread at the nearest shared point {floor_point} "
+                            f"({names})")
+                warnings.warn(msg, stacklevel=2)
             if len(W) > 1:
-                cov = cov + np.cov(np.array(W).T, ddof=1)
-        return dict(law=law, mean=mean, cov=np.atleast_2d(cov), n_used=len(Y), grids=grids,
-                    band=band, method=method)
+                cov = cov + np.atleast_2d(np.cov(W.T, ddof=1))
+        if cov_floor is not None:
+            fl = np.broadcast_to(np.asarray(cov_floor, float), (cov.shape[0],))
+            cov = cov + np.diag(np.clip(fl - np.diag(cov), 0.0, None))
+        return dict(law=law, mean=mean, cov=np.atleast_2d(cov), n_used=int(ok.sum()),
+                    dropped=float(dropped), grids=grids, grid=grid, band=band, method=method,
+                    correction=correction, floor_point=floor_point)
 
     # ---------------------------------------------------------- refitting
 
@@ -413,14 +644,17 @@ class LDTables:
                 return d
         raise FileNotFoundError(f"no profile file for {grid} in {cands}")
 
-    def refit(self, law, teff, logg, mh, band, grid="mps2"):
+    def refit(self, law, teff, logg, mh, band, grid="mps2", mu_min=0.0):
         """Coefficients from interpolated *intensity profiles* rather than
         interpolated coefficients: the profiles of the Delaunay corner models
         are combined (PCHIP in μ, as in production) on the union of their nodes,
         combined with the barycentric weights, and the law is refitted with
         the production weighting and constraint. Exact at the models (to the
         float32 storage of the profiles); between them it removes the part of
-        the interpolation error that comes from interpolating coefficients."""
+        the interpolation error that comes from interpolating coefficients.
+        mu_min > 0 leaves the profile at μ < mu_min out of the fit (e.g. 0.02,
+        roughly the outer pressure scale height, which the four-term and
+        power-2 laws cannot follow and which costs them accuracy elsewhere)."""
         from scipy.spatial import Delaunay
         P = self._profiles(grid)
         j = P["bands"].index(band)
@@ -445,14 +679,14 @@ class LDTables:
             nodes.append((P["mu"][k, j][m].astype(float), P["y"][k, j][m].astype(float)))
         from scipy.interpolate import PchipInterpolator
         used = [(l, mu, y) for l, (mu, y) in zip(lam, nodes) if l > 1e-14]
-        mu_min = max(mu[0] for _, mu, _ in used)
-        breaks = np.concatenate([mu[mu >= mu_min] for _, mu, _ in used] + [[mu_min]])
+        cut = max([mu[0] for _, mu, _ in used] + [float(mu_min)])
+        breaks = np.concatenate([mu[mu >= cut] for _, mu, _ in used] + [[cut]])
         mu_q, q = quadrature_r(breaks)
         y_q = sum(l * PchipInterpolator(mu, y)(mu_q) for l, mu, y in used)
         c = fit_profile(law, mu_q, y_q, q)
         coeffs = dict(zip(COEFFS[law], (float(v) for v in c)))
         return dict(law=law, coeffs=coeffs, physical=is_physical(law, coeffs), grid=grid,
-                    method="r", band=band, refit=True,
+                    method="r", band=band, refit=True, mu_min=float(mu_min),
                     corners=[(float(P["teff"][k]), float(P["logg"][k]), float(P["mh"][k]))
                              for k in corners], weights=lam.tolist())
 
@@ -468,12 +702,16 @@ def main(argv=None):
     p.add_argument("--method", default="r", choices=("r", "mu"))
     p.add_argument("--tables", default=".", help="directory with the CDS tables")
     p.add_argument("--nearest", action="store_true", help="nearest model outside the grid")
+    p.add_argument("--correction", default=None, choices=STATES,
+                   help="add a MURaM magnetic correction (hybrid laws)")
     a = p.parse_args(argv)
     r = LDTables(a.tables).coefficients(a.law, a.teff, a.logg, a.mh, a.band, a.grid,
-                                        a.method, "nearest" if a.nearest else None)
+                                        a.method, "nearest" if a.nearest else None,
+                                        correction=a.correction)
     print(" ".join(f"{k} = {v:.6f}" for k, v in r["coeffs"].items()))
     print(f"physical = {r['physical']}, mu_cri = {r['mucri']:.5f}, "
-          f"fit LC error ≈ {r['lc_ppm']:.2f} ppm, inside grid = {r['inside']}")
+          f"fit LC error ≈ {r['lc_ppm']:.2f} ppm, inside grid = {r['inside']}, "
+          f"correction = {r['correction']}")
 
 
 if __name__ == "__main__":

@@ -49,21 +49,25 @@ in the same way. Every fit is scored by the error of the transit light curve
 it produces.}
 {Fitting uniformly in radius rather than in $\mu$, as in the weighted-$r$
 method of Morello et al., reduces the median light-curve error by factors of
-3--9 for spherical and 1.7--3.5 for plane-parallel models. Over the full grids, the
-five-parameter hybrid5 law reproduces the light curves of the model profiles
-for $R_{\rm p}/R_\star=0.1$ to a median of 1.3\ppm{} (PHOENIX) and 0.85\ppm{}
-(MPS-ATLAS), within 5.6\ppm{} at the 99th percentile. The four-term law
-gives 3.4 and 1.1\ppm, the four-parameter hybrid4 law 4.6 and 6.8\ppm,
-and power-2 7.9 and 6.7\ppm. Even polynomials without the poles do 5--30
-times worse. With fixed coefficients, the transit depths that hybrid5 and the
-four-term law give are biased by at most 1\ppm{} in our test cases, against up
-to 97\ppm{} for the quadratic law; freeing the quadratic coefficients does not
-remove this bias. These law errors are smaller than the errors from
-interpolation, and much smaller than the differences between model grids
-(median 87\ppm) or between photon and energy weighting of the passbands.
-Against Kepler and TESS measurements, a 100\,G MURaM correction removes the
-known offset of the MPS-ATLAS predictions, as found before; against JWST it
-reduces the offset from $2.8\sigma$ to $2.0\sigma$.}
+3--9 for spherical and 1.7--3.5 for plane-parallel models. For a planet with
+$R_{\rm p}/R_\star=0.1$, hybrid5 and the four-term law reproduce the light
+curves of the model profiles to 1--3\ppm{} in the median (99th percentile below
+6\ppm), hybrid4 and power-2 to 5--8\ppm, and hybrid2 and the quadratic law to
+40--50\ppm; even polynomials without the poles do 5--30 times worse. The PHOENIX
+advantage of hybrid5 over the four-term law disappears when the latter ignores
+$\mu<0.02$. With fixed coefficients, the transit depths that hybrid5 and the
+four-term law give are biased by at most 1.1\ppm{} in our test cases, against up
+to 97\ppm{} for the quadratic law, and freeing the quadratic coefficients does
+not remove this bias. The law errors of the best laws are comparable to the
+errors from interpolation and much smaller than the differences between model
+grids (median 87\ppm). Two conventions matter as much as the model grids:
+rescaling the limb of spherical models linearly rather than geometrically
+changes the light curves by about 100\ppm{} and accounts for the reported
+agreement of PHOENIX with JWST limb darkening, and weighting a passband by
+energy instead of photons changes them by up to 260\ppm. Against Kepler and
+TESS measurements, a 100\,G MURaM correction removes the known offset of the
+MPS-ATLAS predictions; against JWST it reduces the offset from $3.4\sigma$ to
+$2.7\sigma$.}
 {The coefficients, coefficient spectra for arbitrary bandpasses, magnetic and
 3D corrections, and an interpolation code with a prior recipe are made
 available.}
@@ -77,7 +81,10 @@ techniques: photometric -- methods: numerical}
 \section{Introduction}
 %======================================================================
 Theoretical limb-darkening coefficients are a standard ingredient of transit
-and eclipse modelling. Since \citet{claret2000} introduced the four-term law and
+and eclipse modelling. They describe the specific intensity $I(\mu)$ across
+the stellar disc, where $\mu=\cos\theta$ is the cosine of the angle between
+the line of sight and the surface normal; at projected radius $r$ (in units of
+the stellar radius) $\mu^2=1-r^2$. Since \citet{claret2000} introduced the four-term law and
 fitted it across the ATLAS grid, tables of coefficients for successive laws,
 model atmospheres, and passbands have followed
 \citep{claretbloemen2011,claret2012,claret2013,claret2017,claret2018,claretsouthworth2022,claretsouthworth2023,claret2025}.
@@ -106,22 +113,29 @@ A companion paper (SquishierPlanet, submitted jointly with this one;
 outline. That is the projected shape of an oblate, rotating, or tidally
 deformed planet \citep{seagerhui2002,barnesfortney2003,carterwinn2010,zhu2014,akinsanmi2020},
 for which current tools integrate numerically
-\citep{cassese2024,liu2025}. The double poles restore the steep limb that an
+\citep{cassese2024,liu2025}. Rotational oblateness has so far given only upper
+limits \citep{zhu2014,liu2025}, and tidal deformation has been measured at
+about $3\sigma$ for two ultra-hot Jupiters
+\citep{barros2022,akinsanmi2024}. The double poles restore the steep limb that an
 even polynomial alone cannot follow \citep{squishier}.
 
 We have divided the problem into two papers. The companion paper derives the
 light-curve algorithm for circular and elliptical outlines and the placement
 of the poles, and it applies the laws to non-spherical planets. This paper
 treats the hybrid laws as limb-darkening laws and provides their coefficients.
-Since no oblate exoplanet has yet been detected, the main use of these tables
-will be circular planets, and every test in this paper uses a circular planet.
-For circular planets the hybrid laws offer more than an elementary light curve.
-They are linear in their coefficients, so constrained fits are convex.
-Their physical region contains a simplex, so interpolated coefficients and
-coefficient priors stay physical. Coefficients can be marginalised
-analytically under Gaussian priors, and coefficient spectra integrate exactly
-to any passband (Sect.~\ref{sec:laws}). Their five-parameter member is as accurate
-as the four-term law or more so.
+Since no rotationally oblate exoplanet has yet been detected, the main use of
+these tables will be circular planets, and every test in this paper uses a
+circular planet. For circular planets the hybrid laws share with the quadratic
+and four-term laws the advantages of linearity in the coefficients: convex
+constrained fits, analytic marginalisation under Gaussian priors, and
+coefficient spectra that integrate exactly to any passband. Two properties are
+specific to them. Their light curve is elementary, and every basis shape is
+monotonic, so a simplex is a sufficient physical region; the fits lie inside
+it, so interpolated coefficients and uniform priors stay physical. With
+tabulated coefficients, their five-parameter member is as accurate as the
+four-term law. For circular-planet users the broader value of this paper may
+lie in the uniform, transit-optimised tables of all six laws, the error budget,
+and the analysis of conventions that comes with them.
 
 This paper provides, for these laws, what Claret's papers provide for the
 standard ones: coefficients for a broad range of stellar parameters and for the
@@ -150,7 +164,8 @@ carried by term $j$, and $I(0)/I(1)=1-\sum_j w_j$. With the normalised pole term
 \Pi_\varepsilon(\mu)=\frac{(\mu^2+\varepsilon)^{-2}-(1+\varepsilon)^{-2}}{\varepsilon^{-2}-(1+\varepsilon)^{-2}},
 \end{equation}
 which has $\Pi_\varepsilon(0)=1$ and $\Pi_\varepsilon(1)=0$ and falls most
-steeply at $\mu\lesssim\sqrt\varepsilon$, the three laws are
+steeply near $\mu\approx\sqrt\varepsilon$ (Fig.~\ref{fig:basis}), the three laws
+are
 \begin{align}
 \text{hybrid2:}\ & T=\{1-\mu^2,\ \Pi_{0.36}\},\\
 \text{hybrid4:}\ & T=\{1-\mu^4,\ (1-\mu^2)^2,\ \Pi_{\varepsilon_0},\ \Pi_{\varepsilon_1}\},\\
@@ -159,40 +174,80 @@ steeply at $\mu\lesssim\sqrt\varepsilon$, the three laws are
 The polynomial pair spans the same space as $\{1-\mu^2,1-\mu^4\}$. We chose it
 because both shapes are monotonic, so that non-negative weights suffice for a
 monotonic profile. The poles of hybrid4 and hybrid5 lie on the ladder
-$\varepsilon_k=\exp[2\pi(\sqrt{k+1/2}-\sqrt K)]$, $k=0,\dots,K-1$. For $K=2$
-this gives $\varepsilon=0.011762$ and 0.30408, and for $K=3$ it gives
-0.0015966, 0.041275, and 0.38743. The ladder follows from discretising an
-exact representation of $\mu^{2\alpha}$ as a superposition of double poles in
-$\mu^2$ \citep{squishier}. Its poles cluster exponentially towards the limb,
-as do those of rational approximations to power functions, and $K$ is the
-number of poles. We stop at $K=3$. A transit constrains only one or two
-combinations of the weights (Sect.~\ref{sec:budget}), and more terms would add
-parameters that neither the data nor the tables can pin down. The single pole
+$\varepsilon_k=\exp[(2\pi/\sqrt\alpha)(\sqrt{k+1/2}-\sqrt K)]$, $k=0,\dots,K-1$,
+with $\alpha=1$. For $K=2$ this gives $\varepsilon=0.011762$ and 0.30408, and
+for $K=3$ it gives 0.0015966, 0.041275, and 0.38743. The ladder follows from
+discretising an exact representation of $\mu^{2\alpha}$ as a superposition of
+double poles in $\mu^2$ \citep{squishier}. Its poles cluster exponentially
+towards the limb with the tapered spacing of the ``lightning'' rational
+approximations of \citet{gopal2019} and \citet{herremans2023}, which likewise
+combine clustered poles with a low-degree polynomial, and $K$ is the number of
+poles. We stop at $K=3$, because hybrid5 already reproduces the model light
+curves to $\sim1\ppm$, the level of the ambiguity in the model profile itself
+(Sect.~\ref{sec:lcerr}), and a transit constrains only one or two combinations
+of the weights (Sect.~\ref{sec:budget}). The ladder is close to optimal for hybrid5: scaling all
+$\ln\varepsilon_k$ by a factor between 0.7 and 1.0 changes its median
+light-curve error on the method study by less than 0.1\ppm. It is not optimal
+for hybrid4: a factor of 0.8 ($\varepsilon=0.0286$ and 0.386) would lower its
+median error from 5.0 to 1.9\ppm, to the level of the four-term law. We keep the
+analytic ladder, which the companion paper derives and uses, and note this as a
+possible improvement of hybrid4. The single pole
 of hybrid2 has no analytic placement. We tuned it on 7524 model--passband
-combinations (198 PHOENIX and MPS-ATLAS models in all their passbands), which
+combinations (198 PHOENIX and MPS-ATLAS models in 38 passbands), which
 moved it from the value 0.208, tuned on J-band PHOENIX profiles by
 \citet{squishier}, to $\varepsilon=0.36$ (Sect.~\ref{sec:quality} tests this
 out of sample). All pole positions are fixed constants, so the laws are linear
 in their weights.
 
-Linearity has four consequences used below. Firstly, positivity and
-monotonicity are linear inequalities in $w$, so the physical region is convex
-and a constrained fit is a convex quadratic programme with a unique optimum.
-For hybrid2 the region is the triangle with vertices $(w_1,w_2)=(0,0)$,
-$(-0.1246,1.1246)$, and $(1.2010,-0.2010)$. Its three edges are zero limb
-intensity ($w_1+w_2=1$), zero slope at the disc centre, and zero slope at the
-limb. For hybrid4 and hybrid5 the simplex $w_j\ge0$, $\sum w_j\le1$ is a
-sufficient region; it contains every model fit in this work. Secondly,
-multilinear interpolation of tabulated weights between models forms convex
-combinations and so stays inside the physical region; higher-order (e.g.
-cubic) interpolation does not. Thirdly, an \emph{unconstrained} least-squares
-fit is a fixed linear map of the intensity data, so per-wavelength
-coefficients integrate exactly to band coefficients
-(Sect.~\ref{sec:spectra}). Fourthly, for a given transit geometry the light
-curve is linear in $w$, so with Gaussian priors the coefficients can be
-marginalised analytically, as for the polynomial laws of \citet{agol2020}. The
-physical constraints truncate such priors, but they rarely bind in practice
-(Sect.~\ref{sec:method}).
+\begin{figure}
+\centering
+\includegraphics[width=\hsize]{figures/fig_basis.pdf}
+\caption{Basis shapes $T_j(\mu)$ of hybrid5 and the pole of hybrid2. Each pole
+term falls most steeply near $\mu\approx\sqrt{\varepsilon}$, so the three
+poles of hybrid5 act at $\mu\approx0.04$, 0.2, and 0.6.}
+\label{fig:basis}
+\end{figure}
+
+Linearity, which the hybrid laws share with the quadratic and four-term
+laws, has three consequences used below. Firstly, positivity and monotonicity
+are linear inequalities in $w$, so the physical region is convex and a
+constrained fit is a convex quadratic programme with a unique optimum.
+Secondly, an unconstrained least-squares fit is a fixed linear map of the
+intensity data, so per-wavelength coefficients integrate exactly to band
+coefficients (Sect.~\ref{sec:spectra}). Thirdly, for a given transit geometry
+the light curve is linear in $w$, so with Gaussian priors the coefficients can
+be marginalised analytically, conditionally on the geometry, as for the
+polynomial laws of \citet{agol2020}.
+
+Two properties are specific to the hybrid laws. Every shape decreases
+monotonically, so non-negative weights with $\sum w_j\le1$ guarantee a
+positive, monotonic profile. For hybrid2 the exact physical region is the
+triangle with vertices $(w_1,w_2)=(0,0)$, $(-0.1246,1.1246)$, and
+$(1.2010,-0.2010)$; its three edges are zero limb intensity ($w_1+w_2=1$),
+zero slope at the disc centre, and zero slope at the limb. For hybrid4 and
+hybrid5 the simplex $w_j\ge0$, $\sum w_j\le1$ is a sufficient region; we
+restrict the fits to it, and it binds in fewer than 1\% of the $r$-weighted
+fits (Sect.~\ref{sec:fitting}). Linear (barycentric) interpolation of
+tabulated weights forms convex combinations and so stays inside the region;
+higher-order (e.g. cubic) interpolation does not. Four-term fits, by contrast,
+have coefficients of mixed sign, and their physical region has no simple form.
+
+The second specific property is the elementary light curve. For a circular
+star the flux blocked by an occulting region $A$ is, by Green's theorem in
+polar coordinates centred on the star,
+$\iint_A I\,r\,{\rm d}r\,{\rm d}\theta=\oint_{\partial A}G(r)\,{\rm d}\theta$
+with $G(r)=\int_0^rI(r')\,r'\,{\rm d}r'$. For $I\propto(1-r^2)^k$, $G$ is a
+polynomial in $r^2$; for a double pole $(\mu^2+\varepsilon)^{-2}=
+(1+\varepsilon-r^2)^{-2}$ it is rational in $r^2$. A circular or elliptical
+boundary arc has a rational parametrisation in which $r^2$ and ${\rm
+d}\theta$ are rational, so the integrand is rational and the integral
+elementary. An odd power of $\mu$ puts $(1-r^2)^{3/2}$ into $G$, and a simple
+pole a logarithm; along the arc these lead to elliptic integrals and
+non-elementary functions. The companion paper \citep{squishier} carries this
+through for elliptical outlines. Until its code is in use, the light curve of
+any tabulated law can be computed for a circular planet with our
+interpolation code or with any transit code that accepts a numerical radial
+profile.
 
 For sampling we map the physical region to the unit hypercube, in the manner
 of \citet{kipping2013}. For hybrid2,
@@ -202,15 +257,22 @@ of a flat Dirichlet distribution,
 $w_j=(1-q_j^{1/(n+1-j)})\prod_{i<j}q_i^{1/(n+1-i)}$. Both maps give uniform
 priors over the region. A uniform prior on the simplex is not uninformative
 about the profile. For hybrid5 it implies 90\% intervals of 0.58--0.93 for
-$h'_1=I(2/3)$, 0.08--0.32 for $h'_2=I(2/3)-I(1/3)$, and 0.01--0.45 for $I(0)$,
-which cover the values of FGKM dwarfs.
+$h'_1=I(2/3)$, 0.08--0.32 for $h'_2=I(2/3)-I(1/3)$, and 0.01--0.45 for $I(0)$.
+These cover the optical profiles of FGKM dwarfs, but not the flatter
+near-infrared ones: in NIRSpec G395H the tabulated hybrid5 fits have
+$h'_1\approx0.95$ and $I(0)=0.56$--0.72, and $P(I(0)>0.5)\approx3\%$ under the
+uniform prior. For free fits in the infrared a prior centred on the tables,
+with a covariance widened to the model uncertainties (Sect.~\ref{sec:budget}),
+is the better default.
 
 %======================================================================
 \section{Model atmospheres and passbands}\label{sec:models}
 %======================================================================
 We used two families of 1D models, restricted to dwarfs and subgiants. The
-first is PHOENIX-ACES-AGSS-COND SpecInt v3.0 \citep{husser2013}. These are the
-specific intensities of the \citet{husser2013} grid, extended to 5.5\,$\mu$m,
+first is PHOENIX-ACES-AGSS-COND SpecInt v3.0 \citep{husser2013}: models with
+the ACES equation of state, the abundances of \citet{asplund2009}, and dust
+condensation in which the condensed dust contributes no opacity (COND), whose specific intensities (SpecInt) are
+those of the \citet{husser2013} grid extended to 5.5\,$\mu$m,
 from spherical models with 78 $\mu$ points and 1\,\AA{} sampling. We used 1682
 models with $2300\le\teff\le7400$\,K, $3.5\le\log g\le5.5$, and
 $-2\le[{\rm M/H}]\le+1$. The PHOENIX-COND models used by
@@ -231,31 +293,35 @@ error below $1.2\times10^{-5}$ in $I/I(1)$ (0.1\ppm{} in light-curve terms).
 
 The passbands are the following.
 \begin{itemize}
-\item Photometric: Kepler, TESS, CHEOPS, and NGTS; Johnson $BV$ and Cousins
-$RI$; Sloan $g'r'i'z'$; 2MASS $JHK_{\rm s}$; Spitzer/IRAC channels 1 and 2,
-for the subarray and the full array.
+\item Photometric: Kepler, TESS, CHEOPS, and the Next Generation Transit Survey
+(NGTS); Johnson $BV$ and Cousins
+$RI$; Sloan $g'r'i'z'$; 2MASS $JHK_{\rm s}$; Spitzer Infrared Array Camera
+(IRAC) channels 1 and 2, for the subarray and the full array.
 \item HST: WFC3 G102, G141, and UVIS G280 orders $+1$ and $-1$; STIS G430L and
 G750L.
-\item JWST: NIRISS/SOSS orders 1 and 2; NIRSpec PRISM, G140M and G140H (each
+\item JWST: NIRISS single-object slitless spectroscopy (SOSS) orders 1 and 2;
+NIRSpec PRISM, G140M and G140H (each
 with F070LP and F100LP), G235M, G235H, G395M, and G395H, the last also split
 into its NRS1 (2.87--3.72\,$\mu$m) and NRS2 (3.82--5.18\,$\mu$m) detector
-ranges; NIRCam F322W2 and F444W; MIRI LRS.
+ranges; NIRCam F322W2 and F444W; MIRI low-resolution spectroscopy (LRS).
 \end{itemize}
 This makes 41 passbands. PHOENIX covers all of them except MIRI LRS (40), and
-MPS-ATLAS covers all 41.
+MPS-ATLAS covers all 41, so MIRI LRS coefficients exist only for
+$\teff\ge3500$\,K.
 The photometric curves are from the SVO Filter Profile Service, the IRAC curves
 from the Spitzer Science Center, and the HST and JWST throughputs from
 ExoTiC-LD \citep{grant2024}. Each curve is used as a photon-counting response
 except the Johnson--Cousins curves of \citet{bessell1990}, which are energy
 responses and were divided by $\lambda$. The SVO record flags the TESS and IRAC
 curves as energy counters, but they are the missions' photon-counting
-responses.
+responses \citep{vanderspek2018,irachandbook}.
 
-This convention matters more than any fitting choice. For our PHOENIX test
-stars of Sect.~\ref{sec:lc}, weighting the passbands by energy instead of
-photons changes the light curves of the model profiles by 44--69\ppm{} in
-TESS, 69--118\ppm{} in Kepler, and 122--258\ppm{} in NIRSpec PRISM. For WFC3
-G141 and 2MASS $J$ the change is 1--22\ppm.
+Getting this convention right matters more than any fitting choice. For a
+photon-counting detector there is a correct answer, and using an energy
+response instead is an error, not an uncertainty. For our PHOENIX test stars of
+Sect.~\ref{sec:lc} it changes the light curves of the model profiles by
+44--69\ppm{} in TESS, 69--118\ppm{} in Kepler, and 122--258\ppm{} in NIRSpec
+PRISM, and by 1--22\ppm{} in WFC3 G141 and 2MASS $J$.
 Curves for PLATO, Ariel, and Pandora were not publicly available in these
 services. For these, or any other response, the coefficient spectra
 (Sect.~\ref{sec:spectra}) give coefficients directly.
@@ -282,8 +348,8 @@ in Kepler, TESS, and CHEOPS, and with those of \citet{claret2025} in the JWST
 passbands to a median of 0.0012 (Appendix~\ref{app:validation}). A
 per-passband edge implies a slightly chromatic stellar radius. Across the JWST
 passbands $r_{\rm c}$ varies by a median of $1.2\times10^{-4}$ (90th
-percentile $3.9\times10^{-4}$), which corresponds to 2.4\ppm{} (7.8\ppm) in
-the depth of a 1\% transit; between NRS1 and NRS2 it varies by a median of $3.7\times10^{-5}$ (0.7\ppm). For
+percentile $3.9\times10^{-4}$, maximum $1.6\times10^{-3}$), which corresponds
+to 2.3\ppm{} (7.8 and 33\ppm) in the depth of a 1\% transit; between NRS1 and NRS2 it varies by a median of $3.7\times10^{-5}$ (0.7\ppm). For
 transmission spectroscopy we therefore recommend the coefficient spectra,
 which share one edge.
 
@@ -292,9 +358,14 @@ The laws were fitted to $I(\mu)/I(1)$, with $I(1)=1$ fixed, by least squares
 uniform in projected radius $r=\sqrt{1-\mu^2}$. Between the tabulated nodes
 the profile is the monotone cubic (PCHIP) interpolant in $\mu$. The integral
 $\int(\Delta I)^2\,{\rm d}r$ is evaluated by 12-point Gauss--Legendre
-quadrature on every interval between nodes, which is exact for this profile
-to rounding. Even 30\,000 points uniform in $r$ under-resolve the steep limb
-of spherical models.
+quadrature on every interval between nodes, which is converged (the fits are
+unchanged from 6 to 48 points). Even 30\,000 points uniform in $r$
+under-resolve the steep limb of spherical models. Because the monotone cubic
+slopes depend on the data, this fit is not strictly a linear map of the nodes;
+the departure is $\sim10^{-6}$ in the coefficients. Fixing $I(1)=1$ is an
+interpolation constraint at the disc centre, which carries negligible weight
+under $r$-weighting; the flux normalisation is therefore not imposed, and its
+error is tabulated.
 
 This is the weighted-$r$ fit of \citet{morello2020}. It descends from the
 quasi-spherical fits of \citet{claret2012}, and \citet{morello2017} showed that
@@ -358,6 +429,10 @@ imposed on a grid of 2001 values of the law's variable. Over the PHOENIX grid
 the constraints bind in 0.5\% (hybrid5), 0.3\% (hybrid4), and 0.06\%
 (hybrid2) of the $r$-weighted fits, and never for MPS-ATLAS. For the four-term
 law they bind more often: in 6.1\% of PHOENIX and 1.1--1.4\% of MPS-ATLAS fits.
+In the uniform-$\mu$ fits, which weight the limb more, they bind more often on
+PHOENIX: 10\% for hybrid5, 2.3\% for hybrid4, 13\% for the quadratic law, and
+6.0\% for the four-term law. A binding constraint breaks the exact summation of
+coefficient spectra, which is one reason we use unconstrained fits there.
 Published four-term tables are unconstrained. In the bound PHOENIX rows an
 unconstrained four-term fit would have a median light-curve error of 1.8\ppm{}
 instead of 4.6\ppm, but it would describe a profile that brightens somewhere
@@ -365,12 +440,20 @@ on the disc.
 
 Power-2 was fitted without constraints by the Levenberg--Marquardt method
 (start $c=0.7$, $\alpha=0.6$; tolerances $10^{-14}$), as in published tables.
-Its fits are unphysical ($c>1$) in 22\% of PHOENIX and 3.5--3.8\% of MPS-ATLAS
-rows. Refitted within $0\le c\le1$, all of these rows end at $c=1$, and their
-median light-curve error rises from 4.0 to 17\ppm{} on PHOENIX. We tabulate
-the unconstrained fits and flag the unphysical ones. Imposing flux
-conservation \citep{claretbloemen2011} changed the light-curve error by less
-than 0.5\ppm{}, so it was not adopted; the flux error is tabulated.
+Its fits are unphysical ($c>1$, a negative limb intensity) in 22\% of PHOENIX
+and 3.5--3.8\% of MPS-ATLAS rows (29\% of the uniform-$\mu$ PHOENIX fits). The
+unphysical rows are concentrated in cool stars: on PHOENIX they are 74\% of
+the rows at 2300--3000\,K, 69\% at 3000--3500\,K, 30\% at 3500--4000\,K, and
+1\% above. Among them $c$ has a median of 1.18 and exceeds 2 in 3\%, reaching
+76 as $\alpha\to0$. Refitted within $0\le c\le1$, all of these rows end at
+$c=1$, and their median light-curve error rises from 4.0 to 17\ppm. We
+tabulate the unconstrained fits, as published tables do, and flag the
+unphysical ones; codes that assume $0<c\le1$ should not use them. Imposing flux
+conservation \citep{claretbloemen2011} changes the hybrid4 and hybrid5 weights
+by less than $10^{-4}$ and the four-term coefficients by a median of 0.003,
+and the light-curve error by less than 0.2\ppm{} for these laws (and by 1--3\ppm{}
+for the two-parameter laws), so it was not adopted; the flux error is
+tabulated.
 
 \subsection{Light-curve error}\label{sec:lcerr}
 Besides the weighted rms residual $\sigma$ (Claret's merit function, here in
@@ -386,7 +469,7 @@ and the median hybrid5 error by at most 0.2\ppm. An interpolant linear in
 $\mu$ changes them by a median of 2.5\ppm. Sub-ppm differences between laws on
 MPS-ATLAS are therefore below this ambiguity. The light curves are computed by
 Gauss--Legendre quadrature with endpoint substitutions. This quadrature agrees
-with the closed-form hybrid5 solution of \citet{squishier} to $10^{-8}\ppm$
+with the closed-form hybrid light curves of \citet{squishier} to $2\times10^{-8}\ppm$
 (Appendix~\ref{app:validation}), and the model light curves use the same
 quadrature.
 
@@ -417,36 +500,46 @@ MPS-ATLAS. hybrid4 is the four-parameter law with an elementary light curve,
 and it costs a few ppm. The five-parameter hybrid5 is the most accurate law on
 both grids. On PHOENIX it beats the four-term law by a median of 2\ppm{}, and
 this advantage comes from the extreme limb: fitted only to $\mu\ge0.02$, the
-four-term law reaches the same median (1.3\ppm). On MPS-ATLAS hybrid5 beats
-the four-term law by only 0.25\ppm, within the interpolant ambiguity of
-Sect.~\ref{sec:lcerr}. Among two-parameter laws, power-2 is the most
-accurate. hybrid2 matches the quadratic law in median and improves on it in
-the tails.
+four-term law matches hybrid5 on the method study (median 1.3 against
+1.2\ppm). On MPS-ATLAS hybrid5 beats
+the four-term law by only 0.25\ppm{} in the grid median, within the
+interpolant ambiguity of Sect.~\ref{sec:lcerr}, and below 4600\,K the
+four-term law is the better of the two (Fig.~\ref{fig:quality}). Among
+two-parameter laws, power-2 is the most accurate, although most of its PHOENIX
+fits for M dwarfs are unphysical (Sect.~\ref{sec:fitting}). The hybrid2 law
+matches the quadratic law in median and improves on it in the tails.
 
 To show what the poles contribute, we fitted even polynomials in $\mu^2$ with
 the same numbers of parameters and no poles, $1-\sum_{k\le n}w_k(1-\mu^{2k})$.
-On the method study their median light-curve errors are 193, 44, and 24\ppm{}
-for $n=2$, 4, and 5. The corresponding hybrid laws give 41, 4.3, and 1.2\ppm{}
-(PHOENIX; MPS-ATLAS similar), so the poles reduce the error by factors of
-5--30.
+With the production metric ($p=0.1$) on the method study, their median
+light-curve errors are 193, 44, and 24\ppm{} for $n=2$, 4, and 5 on PHOENIX,
+against 41, 4.3, and 1.2\ppm{} for the corresponding hybrid laws. The poles
+thus reduce the error by factors of 4.7--20 on PHOENIX and 4.5--30 on
+MPS-ATLAS. (Table~\ref{tab:weighting} uses the wider metric with $p$ up to
+0.15, hence its larger values.)
 
 The hybrid2 pole was tuned on models that are also evaluated here. To test it
 out of sample, we tuned it on PHOENIX alone, which gives $\varepsilon=0.34$,
 and on MPS-ATLAS alone, which gives 0.39. Random half-splits of the models
 give 0.35--0.38, and the held-out error exceeds the in-sample optimum by a
-median of 0.5\ppm. Rescanned with the exact quadrature, $\varepsilon=0.36$
-still minimises the 90th and 99th percentiles on PHOENIX and on both grids
-together (93 and 115\ppm{} on PHOENIX; 102 and 99\ppm{} at the 90th percentile
-for $\varepsilon=0.32$ and 0.40). The poles of hybrid4 and hybrid5 are
-analytic and were not tuned.
+median of 0.5\ppm. We repeated the scan with the exact quadrature on the
+method study, with the metric of Table~\ref{tab:weighting}. The 90th
+percentile of the light-curve error on PHOENIX is then 93\ppm{} at
+$\varepsilon=0.36$, against 102\ppm{} at 0.32 and 99\ppm{} at 0.40, so 0.36
+is still the optimum for PHOENIX and for both grids together; MPS-ATLAS alone
+would prefer 0.40. The poles of hybrid4 and hybrid5 are analytic and were not
+tuned.
 
 Every hybrid row is physical, by construction. The worst hybrid5 rows
 (57 of the 67\,280 PHOENIX $r$-weighted rows exceed 15\ppm) are
 metal-poor models at 2300--2500\,K in blue passbands. There the PHOENIX
-profile itself brightens towards the limb at $\mu\approx0.01$--0.02, and the
-monotonicity constraint binds. We did not try to decide whether this
-brightening is physical. These rows are flagged, and the light curve of a
-monotonic law misrepresents them by up to 50\ppm.
+profile itself brightens towards the limb, by about 0.08 in $I/I(1)$ between
+$\mu\approx0.11$ and 0.016, and the monotonicity constraint binds. The
+brightening survives with the M2 edge and with the edge moved one or two
+nodes inward, so it is a feature of the model intensities, not of where the
+edge falls; we did not try to decide whether it is physical. These rows are
+flagged, and the light curve of a monotonic law misrepresents them by up to
+50\ppm.
 
 \begin{table*}
 \caption{Light-curve error (ppm) of the tabulated fits: median / 99th
@@ -481,15 +574,15 @@ on a symmetric logarithmic scale that is linear within $\pm10^{-3}$.}
 \label{fig:profiles}
 \end{figure*}
 
-\begin{figure*}
+\begin{figure}
 \centering
-\includegraphics[width=17cm]{figures/fig_quality.pdf}
+\includegraphics[width=\hsize]{figures/fig_quality.pdf}
 \caption{Light-curve error of the tabulated fits against $\teff$ for PHOENIX
-(left) and MPS-ATLAS Set~2 (right): median over passbands, gravities, and
-metallicities (lines), and 16th--84th percentiles for the hybrid laws
-(shading).}
+(top) and MPS-ATLAS Set~2 (bottom): median over passbands, gravities, and
+metallicities at each grid temperature (lines), and 16th--84th percentiles for
+the hybrid laws (shading).}
 \label{fig:quality}
-\end{figure*}
+\end{figure}
 
 Figure~\ref{fig:coef} shows the hybrid5 weights. A transit constrains only one
 or two combinations of them, mostly the polynomial weights and the outer pole
@@ -505,15 +598,21 @@ MPS-ATLAS reflect the different limbs of spherical and plane-parallel models.
 \centering
 \includegraphics[width=17cm]{figures/fig_coefficients.pdf}
 \caption{hybrid5 weights against $\teff$ for $\log g=4.5$ and $[{\rm M/H}]=0$
-in five passbands, for PHOENIX (top) and MPS-ATLAS Set~2 (bottom).}
+in five passbands, for PHOENIX (top) and MPS-ATLAS Set~2 (bottom). A transit
+constrains only one or two combinations of the weights, so the individual
+weights should not be interpreted physically.}
 \label{fig:coef}
 \end{figure*}
 
-The tabulated fits interpolate well. We left out a model and interpolated
-linearly across the doubled gap. This changes the light curve by a median of
-4\ppm{} in $\teff$ (200\,K gap), 15\ppm{} in $\log g$, and
-13\ppm{} in [M/H] (1\,dex gaps); at the native spacing the error should
-be about four times smaller. For the linear laws, interpolating the
+We tested interpolation by leaving out a model and interpolating linearly
+across the doubled gap. This changes the light curve by a median of
+4\ppm{} (90th percentile 26\ppm) in $\teff$ (200\,K gap), 15\ppm{} in
+$\log g$, and 13\ppm{} in [M/H] (1\,dex gaps). Leaving out two models
+(a 300\,K gap) doubles the error, which scales as the gap to the power 1.7;
+extrapolated to the native 100\,K spacing, the error is about 1.3\ppm{} in the
+median and 12\ppm{} at the 90th percentile, comparable to the law errors of
+hybrid5 and the four-term law. On MPS-ATLAS, whose metallicity steps are 0.1\,dex,
+interpolation in [M/H] costs 0.3\ppm{} (90th percentile 1.8\ppm). For the linear laws, interpolating the
 band-integrated profiles and refitting gives the same coefficients wherever no
 constraint binds, because the fit is a linear map of the profile. Our code
 offers this refit, and it helps only power-2 (median 16.5 to 14.3\ppm{}
@@ -541,25 +640,30 @@ the planet crosses the limb. The worst error changes by a median factor of
 1.18, and at most 2.1, for $0\le b\le0.85$.
 
 Figure~\ref{fig:lc} shows the residuals and Table~\ref{tab:lc} the largest
-deviations. hybrid5 reproduces every light curve to 0.4--2.2\ppm, and the
-four-term law to 0.2--5.4\ppm. hybrid5 is the better of the two in 11 of the
-15 cases; the four-term law wins in TESS for the M and K dwarfs and the solar
-analogue. hybrid4 (3.8--15\ppm) is worse than the four-term law except in two
-cases. Of the two-parameter laws, power-2 (0.9--15\ppm) is much more accurate
-than the quadratic law (25--113\ppm) and hybrid2 (28--97\ppm). hybrid2 beats
-the quadratic law for the M dwarfs but is worse for the K dwarf and the solar
+deviations. The hybrid5 law reproduces every light curve to 0.4--2.2\ppm, and
+the four-term law to 0.2--5.4\ppm. The hybrid5 law is the better of the two in
+11 of the 15 cases; the four-term law wins in TESS for the mid and early M
+dwarfs, the K dwarf, and the solar analogue. The hybrid4 law (3.8--15\ppm) is
+worse than the four-term law except in two cases. Of the two-parameter laws,
+power-2 (0.9--15\ppm) is much more accurate than the quadratic law
+(25--113\ppm) and hybrid2 (28--97\ppm), but its M-dwarf fits are mostly
+unphysical (marked in Table~\ref{tab:lc}). The hybrid2 law beats the
+quadratic law for the M dwarfs but is worse for the K dwarf and the solar
 analogue in TESS. These 15 cases are examples; Table~\ref{tab:quality} gives
 the grid-wide statistics.
 
 The quadratic law fails over the whole disc, not only at the limb. If its
 profile error is kept only at $\mu<0.05$, the M-dwarf light-curve errors fall
-from 72--114\ppm{} to 8--13\ppm; refitted to $\mu\ge0.05$ alone, it still errs
+from 70--113\ppm{} to 8--13\ppm; refitted to $\mu\ge0.05$ alone, it still errs
 by 49--86\ppm. Two parameters cannot bend at the limb without being pulled away
 from the profile over the rest of the disc. The errors grow with planet size
-roughly as $p^{1.1}$--$p^{1.4}$ (Table~\ref{tab:geom}). For $p=0.03$ hybrid5,
-the four-term law, and power-2 are accurate to $\lesssim1\ppm$. Grazing
+roughly as $p^{1.1}$--$p^{1.4}$ (Table~\ref{tab:geom}). For $p=0.03$ the median
+errors of hybrid5, the four-term law, and power-2 are below 1\ppm. Grazing
 transits ($b=1-p/2$) give smaller errors than full ones for every law, because
-the largest error occurs when the whole planet crosses the limb.
+the largest error occurs when the whole planet crosses the limb. Relative to
+the shallower grazing depth (6700\,ppm for $p=0.1$, against 11\,200\,ppm for a
+central transit) the errors are similar or smaller, except for power-2, whose
+relative error grows from 0.04\% to 0.05\% of the depth.
 
 \begin{table*}
 \caption{Largest light-curve error (ppm) of each law, with its tabulated
@@ -571,12 +675,12 @@ central transit of a planet with $p=0.1$.}
 \hline\hline
 Star & Passband & hybrid5 & hybrid4 & hybrid2 & Four-term & Power-2 & Quadratic\\
 \hline
-Late M & TESS & 1.3 & 15 & 89 & 1.6 & 12 & 111\\
- & WFC3 G141 & 1.5 & 11 & 97 & 1.9 & 4.5 & 113\\
- & NIRSpec PRISM & 0.8 & 8.5 & 80 & 3.2 & 2.0 & 94\\
-Mid M & TESS & 1.4 & 11 & 85 & 0.5 & 3.0 & 102\\
- & WFC3 G141 & 1.1 & 7.7 & 77 & 2.8 & 1.3 & 89\\
- & NIRSpec PRISM & 0.6 & 6.5 & 66 & 3.4 & 1.3 & 76\\
+Late M & TESS & 1.3 & 15 & 89 & 1.6 & 12$^\dagger$ & 111\\
+ & WFC3 G141 & 1.5 & 11 & 97 & 1.9 & 4.5$^\dagger$ & 113\\
+ & NIRSpec PRISM & 0.8 & 8.5 & 80 & 3.2 & 2.0$^\dagger$ & 94\\
+Mid M & TESS & 1.4 & 11 & 85 & 0.5 & 3.0$^\dagger$ & 102\\
+ & WFC3 G141 & 1.1 & 7.7 & 77 & 2.8 & 1.3$^\dagger$ & 89\\
+ & NIRSpec PRISM & 0.6 & 6.5 & 66 & 3.4 & 1.3$^\dagger$ & 76\\
 Early M & TESS & 1.0 & 10 & 70 & 0.2 & 3.4 & 85\\
  & WFC3 G141 & 0.7 & 6.6 & 66 & 3.3 & 2.5 & 77\\
  & NIRSpec PRISM & 0.4 & 6.2 & 59 & 3.2 & 0.9 & 70\\
@@ -589,13 +693,14 @@ Solar analogue & TESS & 2.1 & 4.4 & 33 & 2.0 & 13 & 27\\
 \hline
 \end{tabular}
 \tablefoot{Late, mid, and early M dwarfs: 2800, 3300, and 3800\,K, $\log g=5.0$;
-K dwarf 4600\,K and solar analogue 5800\,K, $\log g=4.5$; all [M/H]$\,=0$.}
+K dwarf 4600\,K and solar analogue 5800\,K, $\log g=4.5$; all [M/H]$\,=0$.
+$^\dagger$Unphysical power-2 coefficients ($c=1.01$--1.48).}
 \end{table*}
 
 \begin{table}
 \caption{Median (maximum) over the cases of Table~\ref{tab:lc} of the largest
 light-curve error (ppm) for other planet sizes, for central ($b=0$) and grazing
-($b=1-p/2$) transits.}
+($b=1-p/2$) transits, and the rms deviation over the central transit.}
 \label{tab:geom}
 \centering
 \small
@@ -609,6 +714,7 @@ $p$ & hybrid5 & hybrid4 & Four-term & Power-2 & Quadratic\\
 0.1 & 0.84 (2.2) & 6.5 (15) & 3.2 (5.4) & 4.5 (15) & 76 (113)\\
 0.2 & 2.6 (6.6) & 13 (28) & 7.5 (12) & 8.4 (35) & 146 (217)\\
 0.3 & 4.7 (12) & 20 (42) & 14 (22) & 15 (64) & 273 (404)\\
+rms, 0.1 & 0.50 & 2.8 & 1.5 & 1.7 & 30\\
 \multicolumn{6}{l}{$b=1-p/2$}\\
 0.1 & 0.40 (0.87) & 3.4 (7.7) & 1.2 (2.0) & 3.4 (12) & 41 (60)\\
 0.2 & 0.58 (1.3) & 4.6 (11) & 3.2 (5.7) & 6.2 (26) & 113 (167)\\
@@ -621,50 +727,67 @@ $p$ & hybrid5 & hybrid4 & Four-term & Power-2 & Quadratic\\
 \centering
 \includegraphics[width=17cm]{figures/fig_lightcurves.pdf}
 \caption{Light curve of each law minus that of the PHOENIX model profile, for a
-central transit of a planet with $p=0.1$, on a symmetric logarithmic scale
-that is linear within $\pm1\ppm$. Vertical lines mark the contact points. The
-largest deviations of hybrid5 and of the quadratic law are given above each
-panel.}
+central transit of a planet with $p=0.1$, for the mid M dwarf and the solar
+analogue of Table~\ref{tab:lc}, on a symmetric logarithmic scale that is
+linear within $\pm1\ppm$. Vertical lines mark the contact points. The largest
+deviations of hybrid5 and of the quadratic law are given above each panel.}
 \label{fig:lc}
 \end{figure*}
 
 An observer measures transit parameters, not a light-curve residual. We
 therefore fitted the noiseless model light curves of the cases of
-Table~\ref{tab:lc}, now at $b=0.3$, for $p$, $b$, and the chord velocity.
-Each law was fitted twice: once with its coefficients fixed at the tabulated
-values and once with them free within their physical regions
-(Table~\ref{tab:bias}). With fixed coefficients, hybrid5 and the four-term law
-bias the depth $p^2=10^4\ppm$ by at most 0.3 and 1.1\ppm. For the quadratic law
-the bias reaches 97\ppm, for hybrid2 60\ppm, and for power-2 9\ppm. Freeing
-the coefficients reduces the residuals but not the bias. A free quadratic law
-fits the M-dwarf light curves to a 5\ppm{} rms, yet biases their depths by up
-to $+113\ppm$, because the depth trades against the limb darkening. Free hybrid5
-and hybrid4 fits trade the same way, by up to 6 and 34\ppm. The bias differs
-between passbands, and this difference is what enters a transmission spectrum.
-Across the three passbands of one star it is at most 0.5\ppm{} for hybrid5
-with fixed coefficients and 53\ppm{} for the quadratic law.
+Table~\ref{tab:lc}, now at $b=0.3$, for $p$, $b$, and the chord velocity $v$
+(the speed of the planet across the disc, which sets the duration), with the
+mid-transit time and baseline fixed, 600 points per transit, and unweighted
+least squares. Each law was fitted three times (Table~\ref{tab:bias}): with its
+coefficients fixed at the tabulated values; free within its exact physical
+region (for power-2, $0\le c\le1$); and free but with a Gaussian prior of
+width 0.05 on each coefficient, centred on the tabulated values. The
+constraints never bind in the free hybrid fits. With fixed coefficients,
+hybrid5 and the four-term law bias the depth $p^2=10^4\ppm$ by at most 0.3 and
+1.1\ppm, and $b$ by less than $10^{-3}$. For the quadratic law the depth bias
+reaches 97\ppm{} and the bias in $b$ 0.05, which matters for stellar densities;
+for hybrid2 it reaches 60\ppm, and for power-2 9\ppm. Freeing the coefficients
+reduces the residuals but not the bias, as \citet{howarth2011} and
+\citet{espinoza2016} found for two-parameter laws. A free quadratic law fits
+the M-dwarf light curves to a 5\ppm{} rms, yet biases their depths by up to
+113\ppm, because the depth trades against the limb darkening. The free hybrid4
+law trades in the same way, by up to 34\ppm, and the free hybrid5 law by up to
+7\ppm; the free four-term law stays within 2.2\ppm. A prior of 0.05 recovers
+most of the fixed-coefficient accuracy for hybrid5 (median 0.34\ppm). The bias
+differs between passbands, and this difference is what enters a transmission
+spectrum: across the three passbands of one star it is at most 0.5\ppm{} for
+hybrid5 with fixed coefficients and 53\ppm{} for the quadratic law. On the
+MPS-ATLAS profiles of the early M dwarf, K dwarf, and solar analogue (nine cases)
+the pattern is the same,
+with the four-term law slightly better than hybrid5 (median fixed bias
+0.08\ppm{} for both; free 0.5 against 1.3\ppm).
 
 \begin{table}
 \caption{Bias in the transit depth $|\Delta(p^2)|$ (ppm of a $10^4\ppm$ depth)
-for noiseless fits of the cases of Table~\ref{tab:lc} at $b=0.3$: median /
-maximum over the 15 cases, and the largest spread across the three passbands of
-one star.}
+for noiseless fits of the PHOENIX cases of Table~\ref{tab:lc} at $b=0.3$:
+median / maximum over the 15 cases, with coefficients fixed, free, or under a
+prior of width 0.05; the largest bias in $b$ with fixed coefficients; and the
+largest spread of the fixed (free) depth bias across the three passbands of one
+star.}
 \label{tab:bias}
 \centering
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{lcccc}
+\small
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lccccc}
 \hline\hline
- & \multicolumn{2}{c}{Fixed coefficients} & \multicolumn{2}{c}{Free coefficients}\\
-Law & $|\Delta(p^2)|$ & Spread & $|\Delta(p^2)|$ & Spread\\
+Law & Fixed & Free & Prior & $|\Delta b|$ & Spread\\
 \hline
-hybrid5 & 0.08 / 0.29 & 0.54 & 1.9 / 6.0 & 4.3\\
-hybrid4 & 0.49 / 1.4 & 0.88 & 10 / 34 & 24\\
-Four-term & 0.54 / 1.1 & 1.3 & 1.3 / 1.8 & 3.2\\
-Power-2 & 2.1 / 8.9 & 10 & 8.3 / 58 & 49\\
-hybrid2 & 22 / 60 & 29 & 29 / 50 & 32\\
-Quadratic & 31 / 97 & 53 & 41 / 113 & 57\\
+hybrid5 & 0.08 / 0.3 & 1.4 / 7.2 & 0.34 / 1.7 & 0.0004 & 0.5 (2.9)\\
+hybrid4 & 0.49 / 1.4 & 6.0 / 34 & 1.6 / 11 & 0.002 & 0.9 (33)\\
+Four-term & 0.54 / 1.1 & 1.3 / 2.2 & 1.5 / 3.5 & 0.0003 & 1.3 (1.2)\\
+Power-2 & 2.1 / 8.9 & 8.3 / 58 & 2.7 / 62 & 0.005 & 10 (49)\\
+hybrid2 & 22 / 60 & 29 / 50 & 17 / 28 & 0.037 & 29 (32)\\
+Quadratic & 31 / 97 & 41 / 113 & 24 / 58 & 0.053 & 53 (57)\\
 \hline
 \end{tabular}
+\tablefoot{Free fits are within each law's exact physical region (power-2:
+$0\le c\le1$).}
 \end{table}
 
 %======================================================================
@@ -686,11 +809,17 @@ four-term law both reproduce their light curves to a median of 3--5\ppm{}
 bands at the same wavelengths and interpolated in $\teff$ to 5772\,K: PHOENIX
 between 5700 and 5800\,K at $\log g=4.5$, MPS-ATLAS at $\log g=4.4$.
 MPS-ATLAS Set~1 (optical, median 25\ppm) and MURaM with a small-scale dynamo
-(near-infrared, 23\ppm) are closest to the observed Sun. PHOENIX v3.0 is
-furthest (156--307\ppm); part of this difference may come from the definition
-of the model limb.
+(near-infrared, 23\ppm) are closest to the observed Sun. MPS-ATLAS Set~2 gives
+43 and 53\ppm{} in the optical (450--700\,nm) and near-infrared
+(700--1100\,nm). Corrected as our tables are, by the ratio of the MURaM
+profiles with and without field, Set~2 gives 24 and 40\ppm{} with the
+small-scale dynamo but 136 and 55\ppm{} with 100\,G, the combination we
+recommend for FGK stars (Sect.~\ref{sec:budget}). The quiet Sun thus prefers
+a much weaker field than the Kepler hosts of Sect.~\ref{sec:kepler}.
+PHOENIX v3.0 is furthest (240 and 156\ppm, and 307\ppm{} below 450\,nm); part
+of this difference may come from the definition of the model limb.
 
-\subsection{Kepler and TESS}
+\subsection{Kepler and TESS}\label{sec:kepler}
 Figure~\ref{fig:valid} compares the predicted $h'_1=I(2/3)$ and
 $h'_2=I(2/3)-I(1/3)$ with the measurements of \citet{maxted2023} for the 24
 Kepler and 10 TESS hosts with $b<0.65$. These quantities probe the disc
@@ -702,7 +831,9 @@ $\Delta h'_1=+0.0080\pm0.0017$ ($4.9\sigma$) and
 $\Delta h'_2=-0.013\pm0.003$ ($4.0\sigma$) in Kepler. Adding the MURaM 100\,G
 correction of \citet{kostogryz2026} reduces this to $-0.0023\pm0.0015$ and
 $-0.004\pm0.003$ ($1.5\sigma$ and $1.2\sigma$), as \citet{kostogryz2024}
-found. Their field strength was inferred from these same Kepler measurements,
+found. In TESS the uncorrected offsets are smaller and only marginally
+significant ($+0.0050\pm0.0033$ and $-0.0089\pm0.0045$), and the correction
+brings them to $-0.0039\pm0.0035$ and $-0.0003\pm0.0043$. Their field strength was inferred from these same Kepler measurements,
 so this is a consistency check, not an independent validation. A 200\,G
 correction overshoots ($\Delta h'_1=-0.013$, $8\sigma$), and the small-scale
 dynamo alone is not enough. PHOENIX starts further off. The SPAM coefficients
@@ -718,151 +849,177 @@ hosts. For the models we computed $\ell$ in the same way: a quadratic law fitted
 uniformly in $\mu$ to the model profile at $\mu\ge0.2$, evaluated at $\mu=0$.
 They publish per-wavelength $\ell$ for six of the hosts; for WASP-12 only the
 averaged offset is given, so we used the other six. Without WASP-12 their own
-mean offsets change by less than 0.007. The MPS-ATLAS Set~2 predictions are
-too dark at the limb by $\Delta\ell=+0.035$, with a star-to-star scatter of
-0.031 and a standard error of the mean of 0.013 ($2.8\sigma$), in agreement
-with their result. The 100\,G correction reduces this to $+0.024\pm0.012$
-($2.0\sigma$), a shift of about one standard error. WASP-6 has the largest
-offset in every case.
+mean offsets change by less than 0.007. For each star we take the
+inverse-variance mean over wavelength bins (bin correlations ignored), and
+then the plain mean over the six stars. The MPS-ATLAS Set~2 predictions are
+too dark at the limb by $\Delta\ell=+0.043$, with a star-to-star scatter of
+0.031 and a standard error of the mean of 0.013 ($3.4\sigma$); for Set~1 we
+find $+0.041$, as \citet{sing2026} do for these six stars. Their tabulated
+means differ slightly from the plain means of their per-star values, and they
+do not state how they averaged. The 100\,G correction, applied to the
+profiles as in our tables, reduces the Set~2 offset to $+0.033\pm0.012$
+($2.7\sigma$), a shift of less than one standard error. Computed instead from
+our $r$-weighted hybrid5 fits, the MPS-ATLAS offsets are 0.008 smaller, because
+$\ell$ extrapolates a quadratic fitted to $\mu\ge0.2$ and amplifies the
+residuals of the fit there. WASP-6 has the largest offset in every case.
 
 With the geometric rescaling of the limb used here (Sect.~\ref{sec:limb}),
 PHOENIX shows a similar offset ($+0.041\pm0.018$), whereas \citet{sing2026}
 found none. They place the edge at the same node, but rescale linearly,
 $\mu'=(\mu-\mu_{\rm cri})/(1-\mu_{\rm cri})$, after removing the four nodes
-nearest the edge. Applied to our models, their rescaling lowers $\ell$ by
-0.029--0.036 for every star and reproduces their per-star offsets to a mean of
+nearest the edge. Applied to our models, their rescaling raises the model
+$\ell$, and so lowers $\Delta\ell$, by 0.029--0.036 for every star and reproduces their per-star offsets to a mean of
 0.002 (Table~\ref{tab:sing}). Removing the four nodes changes $\ell$ by less
 than $10^{-4}$. The PHOENIX difference between the two studies is thus
 entirely the rescaling convention. That convention moves $\ell$ by as much as
-the model--data offset itself, whereas the same choices change a transit light
-curve by only a few ppm (Sect.~\ref{sec:method}), because $\ell$ extrapolates a
-fit to the limb. Which atmosphere ``fits JWST'' therefore depends on a
-convention.
+the model--data offset itself, and it changes the light curve too: for the
+cases of Table~\ref{tab:lc}, the profiles rescaled in the two ways give light
+curves that differ by 63--151\ppm{} (median 99\ppm), and on the PHOENIX part of
+the method study by a median of 100\ppm{} (90th percentile 212\ppm). The two
+conventions differ over the whole disc, not only at the limb. The geometric
+rescaling is the projection of a sphere of radius $r_{\rm c}$, as in the
+$r$-method of \citet{espinoza2015} and \citet{claretsouthworth2023}; the linear
+one has no geometric basis away from the disc centre. The agreement of
+PHOENIX with JWST found by \citet{sing2026} therefore rests on a
+non-geometric remapping, and with the geometric one PHOENIX is offset like
+MPS-ATLAS. Coefficients from tools that use the linear convention differ from
+ours by about 100\ppm{} in light-curve terms, as much as the difference between
+model grids.
 
 \begin{figure*}
 \centering
 \includegraphics[width=17cm]{figures/fig_validation.pdf}
-\caption{Offsets of model predictions from measured limb darkening, computed
-through the hybrid5 fits. Left: Kepler (circles) and TESS (squares) hosts with
-$b<0.65$ \citep{maxted2023}: mean offset and its uncertainty for each model
-and correction. Right: JWST hosts \citep{sing2026}, per star, with the
-statistical uncertainty of the per-star mean. Shading marks $\pm$ the
-star-to-star scatter of the measured offsets, centred on zero.}
+\caption{Offsets of model predictions from measured limb darkening. Left:
+Kepler (circles) and TESS (squares) hosts with $b<0.65$ \citep{maxted2023},
+computed through the hybrid5 fits: mean offset and its uncertainty for each
+model and correction. Right: JWST hosts \citep{sing2026}, computed from the
+model profiles as in Sect.~\ref{sec:obs}, per star and as mean $\pm$ standard
+error; the per-star statistical errors (0.002--0.004) are mostly smaller than
+the symbols. Shading marks $\pm$ the star-to-star scatter of the measured
+offsets, centred on zero.}
 \label{fig:valid}
 \end{figure*}
 
-\begin{table}
-\caption{PHOENIX $\Delta\ell$ (observed $-$ model) for the JWST hosts of
-\citet{sing2026} with our geometric and their linear limb rescaling, and their
-published values.}
-\label{tab:sing}
-\centering
-\begin{tabular}{lcccc}
-\hline\hline
-Star & $\mu_{\rm cri}$ & Geometric & Linear & Sing et al.\\
-\hline
-HAT-P-11 & 0.047 & $+0.037$ & $+0.005$ & $+0.006$\\
-WASP-107 & 0.048 & $+0.036$ & $+0.004$ & $+0.006$\\
-WASP-121 & 0.073 & $+0.078$ & $+0.044$ & $+0.051$\\
-WASP-6 & 0.048 & $+0.087$ & $+0.058$ & $+0.059$\\
-WASP-80 & 0.048 & $-0.036$ & $-0.067$ & $-0.064$\\
-WASP-94A & 0.068 & $+0.041$ & $+0.005$ & $+0.005$\\
-\hline
-Mean & & $+0.041$ & $+0.008$ & $+0.010$\\
-\hline
-\end{tabular}
-\tablefoot{$\mu_{\rm cri}$ in NIRSpec PRISM or NIRISS SOSS, as observed. The
-values of \citet{sing2026} were read from their figures of the offset against
-$\mu_{\rm min}$, at $\mu_{\rm min}=0.2$.}
-\end{table}
+
 
 %======================================================================
 \section{Error budget and recommendations}\label{sec:budget}
 %======================================================================
 Table~\ref{tab:budget} orders the error sources of a transit model that uses
 tabulated coefficients. For $p=0.1$ the law errors of hybrid5 and the
-four-term law (1--3\ppm) are at the level of the limb convention and below the
-interpolation error. hybrid4 and power-2 come next, at 5--8\ppm. All of these
-are an order of magnitude below the differences between model grids, the
-passband convention, and the offsets between models and observations. Two
-conclusions follow.
+four-term law (1--3\ppm) are comparable to the errors from the limb definition
+and from interpolation at the native grid spacing. Those of hybrid4 and power-2
+are 5--8\ppm. All of these are an order of magnitude below the differences
+between model grids, the size of the magnetic correction, and the offsets
+between models and observations. Two conventions, the limb rescaling and the
+photon or energy weighting of the passband, have effects of the same order as
+the model differences; they are not uncertainties but choices that must be
+made correctly.
 
 \begin{table}
-\caption{Error budget for a transit with $p=0.1$ (medians, ppm of the
-out-of-transit flux).}
+\caption{Error budget for a transit with $p=0.1$, in ppm of the out-of-transit
+flux: medians (90th percentiles), or ranges over cases.}
 \label{tab:budget}
 \centering
+\small
 \begin{tabular}{lr}
 \hline\hline
 Source & ppm\\
 \hline
+\multicolumn{2}{l}{Uncertainties}\\
 Law, hybrid5 / four-term & 1--3\\
 Law, hybrid4 / power-2 & 5--8\\
-Law, hybrid2 / quadratic & 42--51\\
-Limb definition and $\mu$ sampling & 1--3\\
-Interpolation (doubled gaps) & 4--15\\
-Model grid (PHOENIX vs MPS-ATLAS) & 87\\
-Photon vs energy weighting & 44--258\\
-Models vs Sun (MPS-ATLAS, MURaM) & 23--150\\
+Law, hybrid2 / quadratic & 41--51\\
+Limb definition and $\mu$ sampling & 1--4 (2--8)\\
+Interpolation, native spacing (estimate) & 1.3 (12)\\
+Interpolation, doubled gaps & 4--15 (28--65)\\
+Magnetic correction, 100\,G (size) & 34 (133)\\
+Model grids, largest pairwise difference & 87 (279)\\
+Models vs Sun (MPS-ATLAS, MURaM) & 23--136\\
+\multicolumn{2}{l}{Conventions}\\
+Limb rescaling, linear vs geometric & 100 (212)\\
+Photon vs energy passband weighting & 1--258\\
 \hline
 \end{tabular}
+\tablefoot{The model-grid row is the largest of the three pairwise differences
+between PHOENIX and the two MPS-ATLAS sets. The solar row gives the medians of
+Sect.~\ref{sec:obs} for MPS-ATLAS and the MURaM-corrected profiles, in the
+optical and near-infrared.}
 \end{table}
 
 With coefficients held fixed, the atmosphere dominates, and the law matters
 only where its error approaches the grid spread. That is the case for the
 quadratic law and hybrid2, whose fixed-coefficient depth biases reach
 60--100\ppm{} for M dwarfs (Table~\ref{tab:bias}). With coefficients fitted, a
-single transit constrains one (TESS) to two (JWST) combinations of the weights
-to better than 0.05. We found this from the Fisher matrix of the hybrid4 and
-hybrid5 weights, with the geometry free, for one transit at 100\ppm{} per
-minute and at 1000\ppm{} per two minutes. The best-measured combination is
-mostly the polynomial weights and the outer pole, and the other combinations
-are set by the prior.
+single transit constrains only one or two combinations of the weights. We
+computed the Fisher matrix of the hybrid4 and hybrid5 weights for one transit
+of a planet with $p=0.1$ or 0.15, $b=0.3$ or 0.7, $a/R_\star=10$, and a period
+of 3\,d, with $p$, $b$, $a/R_\star$, and the mid-transit time free. At JWST-like
+precision (100\ppm{} per 1-min point) one or two unit-norm combinations of the
+weights have standard deviations below 0.05; at TESS-like precision (1000\ppm{}
+per 2-min point) none or one. The best-measured combination of the hybrid5
+weights is close to $(0.70,0.60,0.00,0.02,0.35)$, the polynomial weights and
+the outer pole; the others are set by the prior.
 
 \citet{sing2026} found the quadratic law statistically preferred over
 higher-order laws for most FGK white-light curves at JWST precision. Our
 noiseless test agrees that a free quadratic law fits the light curve well
 (5\ppm{} rms), but shows that its depth can still be biased by up to 1\%. A
-statistically adequate fit is therefore not necessarily an unbiased one,
-particularly for M dwarfs and when comparing depths across passbands. The
-tables are most useful as priors, and their value lies in the combinations
-the data do not constrain.
+statistically adequate fit is therefore not necessarily an unbiased one
+\citep{howarth2011,espinoza2016}, particularly for M dwarfs and when comparing
+depths across passbands. The tables are most useful as priors, and their value
+lies in the combinations the data do not constrain.
 
 We recommend the following.
 \begin{itemize}
-\item Law. hybrid5 or the four-term law where the light curve must be
-reproduced to a few ppm. hybrid4 where four parameters and an elementary light
-curve are wanted, at a cost of a few ppm. Power-2 or hybrid2 where two
-parameters suffice; power-2 is more accurate, hybrid2 has the elementary
-light curve.
-\item Grid for FGK stars. MPS-ATLAS Set~2 with the MURaM 100\,G correction.
-This combination is consistent with the Kepler and TESS measurements above
-and closest to the JWST ones. We prefer Set~2 to Set~1, although Set~1 is
-closer to the Sun in the optical, because the corrected Set~2 matches the
-Kepler hosts better. The MURaM corrections cover 3200--6800\,K
+\item Law, fixed coefficients. hybrid5 or the four-term law, which are
+equivalent within the model uncertainties; for PHOENIX, the four-term law
+improves to the accuracy of hybrid5 when the fit ignores $\mu<0.02$, which our
+code offers. The hybrid4 law costs a few ppm. Power-2 is more accurate than
+hybrid2, but most of its PHOENIX fits below 3500\,K are unphysical, and
+constrained to $c\le1$ they err by 17\ppm{} in the median.
+\item Law, free coefficients. The four-term law is the least biased (at most
+2.2\ppm{} in depth), then hybrid5 (7\ppm). The hybrid4 law (34\ppm) and the
+two-parameter laws (up to 113\ppm) should be fitted with priors from the
+tables; a prior of 0.05 per coefficient removes most of the bias.
+\item MIRI LRS. Limb darkening is weak at 5--12\,$\mu$m: on MPS-ATLAS the
+median errors are 0.3\ppm{} for hybrid5 and 1.7\ppm{} for power-2, so a
+two-parameter law suffices for FGK hosts. No coefficients exist below 3500\,K.
+\item Grid for FGK stars. MPS-ATLAS Set~2 with the MURaM 100\,G correction
+best matches the Kepler and TESS hosts, though the field strength was
+inferred from the same measurements, so the match is not independent; it is
+also the closest to the JWST hosts. The corrected Set~2 matches the Kepler
+hosts better than the corrected Set~1. The quiet Sun prefers the small-scale
+dynamo (Sect.~\ref{sec:obs}), so for quiet Sun-like stars that correction may
+be the better choice. The MURaM corrections cover 3200--6800\,K
 \citep{kostogryz2026}.
 \item Grid for M dwarfs ($\teff<3500$\,K). Only PHOENIX covers them, and no
 observational test validates it there. The PHOENIX profiles are furthest from
 the Sun, and the magnetic correction is negligible for M dwarfs
-\citep{kostogryz2026}. Users should adopt prior widths of at least the
-grid-to-grid spread.
-\item Passband convention. Use the photon-counting response of the instrument;
-check whether a published curve is a photon or an energy response.
+\citep{kostogryz2026}. Prior widths should be at least the grid-to-grid spread
+at 3500\,K, which our code substitutes.
 \item Priors. Draw coefficients through the interpolation code with the
-stellar-parameter uncertainties, and optionally add the grid-to-grid
-covariance (Sect.~\ref{sec:tables}). The empirical offsets of
-Sect.~\ref{sec:obs} are measured in $h'_1$, $h'_2$, or $\ell$. All three are
-linear functionals of $w$ for the linear laws, so an offset with its scatter is
-a Gaussian constraint on $w$, and the code applies it as a conditional update.
+stellar-parameter uncertainties and the grid-to-grid covariance. The draws
+alone give covariances that are nearly singular along some directions
+($\sigma\sim10^{-5}$--$10^{-4}$), far narrower than the model uncertainties of
+this section, so a covariance floor (e.g. $0.01^2$) should be added. The
+empirical offsets of Sect.~\ref{sec:obs} are measured in $h'_1$, $h'_2$, or
+$\ell$, all linear functionals of $w$ for the linear laws, so an offset with its
+scatter is a Gaussian constraint on $w$. The code applies the $h'_1$ and $h'_2$
+offsets jointly, with their correlation, and only to a prior in the same
+correction state as the offset.
+\item Conventions. Use the photon-counting response of the instrument, and the
+geometric rescaling of the limb.
 \item Spectroscopy. Use the coefficient spectra, which share one stellar edge
 per model (Sect.~\ref{sec:limb}).
 \item Active stars. Unocculted and occulted spots and faculae change the
-effective limb darkening of a transit, so prior widths should be widened for
-active stars.
+effective limb darkening of a transit \citep{ballerini2012,csizmadia2013}, so
+prior widths should be widened for active stars.
 \end{itemize}
 Long integrations smooth the ingress and egress features in which the law
-errors concentrate \citep{kipping2010}, so the light-curve errors quoted here
-are upper limits for long cadences.
+errors concentrate \citep{kipping2010}, so the light-curve residuals quoted
+here are upper limits for long cadences; the parameter biases still require
+the integration to be modelled.
 
 %======================================================================
 \section{The tables}\label{sec:tables}
@@ -915,9 +1072,10 @@ spread).}
 \subsection{Coefficient spectra}\label{sec:spectra}
 For PHOENIX we also give, per model, the coefficients of hybrid2, hybrid4, and
 hybrid5 in each $R=3000$ bin over 0.1--5.5\,$\mu$m. They are unconstrained
-fits, uniform in $r$ on the native nodes (trapezoidal weights), to the
-unnormalised intensity, with one stellar edge per model. This keeps each fit a
-linear map of the data. For any bandpass with bin-averaged throughput $\bar
+fits, uniform in $r$ on the native nodes (trapezoidal weights, not the
+Gauss--Legendre quadrature of the band tables), to the unnormalised intensity,
+with one stellar edge per model. This keeps each fit a linear map of the data.
+The same construction would work for the four-term law. For any bandpass with bin-averaged throughput $\bar
 S_k$, $w_j=\sum_k\bar S_k a_{kj}/\sum_k\bar S_k I_k(1)$ reproduces the direct
 fit with the same settings to $10^{-9}$, so coefficients for any spectroscopic
 bin follow by summation. The summed coefficients differ from the passband
@@ -928,12 +1086,15 @@ Single $R=3000$ bins inside strong lines can be unphysical. The summed
 coefficients are unphysical for 3.6\% of hybrid5 bins at $R=100$--1000 in M
 dwarfs (0.8\% in K dwarfs, none in FG stars), all between 0.6 and 1.8\,$\mu$m,
 where molecular bands dominate. For hybrid4 the fraction is 0.5--0.6\%, and
-for hybrid2 0.25\%. The code flags such bins. The NIRSpec G395H resolution is
+for hybrid2 0.25\%. The code flags such bins; they should be merged with a
+neighbour or fitted directly with the constraint. The NIRSpec G395H resolution is
 close to $R=3000$, so bins should span several resolution elements. MPS-ATLAS
-has only ODF wavelength sampling, so we provide no coefficient spectra for it;
-the code computes MPS-ATLAS coefficients for any throughput from the model
-files. The coefficient spectra (1.0\,GB) and the band-integrated profiles of
-every model are archived at Zenodo (\tbd{DOI}).
+has only ODF wavelength sampling, so we provide no coefficient spectra for it.
+Instead the code computes MPS-ATLAS coefficients for any throughput from the
+model archive \citep[about 9.5\,GB per set;][]{kostogryz2022}, by integrating
+the corner models, interpolating their profiles, and fitting as in
+production. The coefficient spectra (1.0\,GB) and the band-integrated profiles
+of every model (0.1\,GB) are archived at Zenodo (\tbd{DOI}).
 
 \subsection{Corrections, offsets, and interpolation}
 We tabulate weight shifts $\Delta w$ for surface magnetic fields (MURaM:
@@ -946,20 +1107,45 @@ to the tabulated weights. For the magnetic states $C$ is the ratio of the
 MURaM profile with field to that without; for MURaM 3D convection it is the
 ratio of the hydrodynamic MURaM profile to the MPS-ATLAS Set~2 profile (the
 code that synthesised the MURaM spectra) at the nearest grid point. MURaM
-ratios are held constant below $\mu=0.1$. For Stagger, $\Delta w$ is the
-difference between the fits to the Stagger and the ATLAS9 profiles at the same
-parameters, both from the ExoTiC-LD bundle. Added to the MPS-ATLAS Set~2
-weights, none of the 2.1 million magnetic and 1600 3D corrections leaves the
-physical region (one hybrid5 set leaves the simplex by $2\times10^{-6}$ but
+ratios are held constant below $\mu=0.1$, so the inner-pole weights of the
+corrected sets are not constrained by MURaM there (Sect.~\ref{sec:budget}
+gives the size of this assumption). The MURaM simulations exist for six
+solar-metallicity stars between 3196 and 6807\,K, each at one gravity, plus
+two metallicity variants near the solar temperature. We interpolate the
+corrections linearly in $\teff$, hold them constant beyond these limits, and
+apply them at all gravities and metallicities, which is an extrapolation. For
+Stagger, $\Delta w$ is the difference between the fits to the Stagger and the
+ATLAS9 \citep{castelli2003} profiles at the same parameters, both from the
+ExoTiC-LD bundle; adding it to MPS-ATLAS weights assumes that the 3D shift
+transfers between the two 1D grids. Added to the MPS-ATLAS Set~2
+weights, none of the corrected sets (2.1 million magnetic and 1600 3D per
+law) leaves the physical region (one hybrid5 set leaves the simplex by $2\times10^{-6}$ but
 remains physical); the code checks this. The empirical offsets of Sect.~\ref{sec:obs} are tabulated with their
 star-to-star scatter.
 
-The interpolation code (Python, using numpy and scipy only) reads the CDS
-tables and returns coefficients for given $(\teff,\log g,[{\rm M/H}])$. It
-interpolates linearly within one grid. It also draws priors, applies the
-empirical offsets, and optionally refits interpolated profiles. It is archived
-at \tbd{Zenodo DOI} under \tbd{licence}. The light-curve code for the hybrid
-laws is that of the companion paper \citep{squishier}.
+The CDS release (0.9\,GB compressed) holds the 18 coefficient tables and the
+three auxiliary tables. The interpolation code (Python, using numpy and scipy
+only) reads them and returns coefficients for given
+$(\teff,\log g,[{\rm M/H}])$, interpolating linearly on a Delaunay
+triangulation within one grid, which handles the gaps of the PHOENIX grid and
+the irregular MPS-ATLAS spacing. It also:
+\begin{itemize}
+\item applies the $\Delta w$ corrections, so the recommended MPS-ATLAS Set~2 +
+100\,G coefficients can be built from the CDS files alone;
+\item draws priors over the stellar-parameter uncertainties, optionally adds
+the grid-to-grid covariance, warns when only one grid covers the star (below
+3500\,K) and then substitutes the spread at 3500\,K, and accepts a covariance
+floor;
+\item applies the empirical offsets as a joint Gaussian update of $h'_1$ and
+$h'_2$ (or $\ell$), and refuses an offset measured in a different correction
+state;
+\item refits interpolated profiles, optionally ignoring $\mu<0.02$;
+\item computes the transit light curve of any tabulated law for a circular
+planet, with the reference quadrature of this paper.
+\end{itemize}
+It is archived at \tbd{Zenodo DOI} under \tbd{licence}. The elementary
+light-curve code for the hybrid laws, for circular and elliptical planets, is
+that of the companion paper \citep{squishier}.
 
 %======================================================================
 \section{Conclusions}
@@ -971,25 +1157,29 @@ of any elliptical outline. Our main conclusions are as follows.
 \begin{itemize}
 \item Fitting uniformly in projected radius, the weighted-$r$ method of
 \citet{morello2020}, reduces the median light-curve error of every law by
-factors of 1.7--9 relative to fitting uniformly in $\mu$. The limb intensities
-are fitted less well in exchange. The least-squares integral must resolve the
-steep limb of spherical models.
-\item Against 1D model profiles, hybrid5 is the most accurate law tested
-(median 1.3\ppm{} on PHOENIX for $p=0.1$), followed closely by the four-term
-law. hybrid4, the four-parameter law with an elementary light curve, costs a
-few ppm. The poles reduce the error of an even polynomial by factors of
-5--30. All hybrid coefficients are physical by construction, and linear
-interpolation preserves this.
-\item These law errors are smaller than the errors from interpolation, and an
-order of magnitude smaller than the differences between model grids or between
-photon and energy weighting. With fixed coefficients, the choice of
-atmosphere matters more than the choice of law, except for the quadratic law
-and hybrid2. Freeing the coefficients of a two-parameter law does not remove
-its depth bias.
+factors of 1.7--9 relative to fitting uniformly in $\mu$, at the cost of the
+limb intensities. The least-squares integral must resolve the steep limb of
+spherical models.
+\item Against 1D model profiles, hybrid5 and the four-term law are equally
+accurate within the model uncertainties (1--3\ppm{} for $p=0.1$); the
+remaining PHOENIX advantage of hybrid5 comes from the outermost $\mu<0.02$.
+The hybrid4 law, the four-parameter law with an elementary light curve, costs
+a few ppm with its analytic poles. The poles reduce the error of an even
+polynomial by factors of 5--30. All hybrid coefficients are physical by
+construction, and linear interpolation preserves this.
+\item These law errors are comparable to the interpolation error and an order
+of magnitude smaller than the differences between model grids. With fixed
+coefficients the choice of atmosphere matters more than the choice of law,
+except for the quadratic law and hybrid2. Freeing the coefficients of a
+two-parameter law does not remove its depth bias.
+\item The conventions used at the limb of spherical models and for passband
+weighting change light curves by as much as the model grids differ. With the
+geometric limb rescaling, PHOENIX is offset from JWST limb darkening as
+MPS-ATLAS is.
 \item The coefficients inherit the offsets of the model atmospheres from
 observed limb darkening. Surface magnetic fields account for these offsets in
-Kepler and TESS, but only partly for JWST, where the limb conventions
-themselves matter.
+Kepler and TESS, but only partly for JWST, and the quiet Sun prefers a weaker
+field.
 \item No observational test yet validates any grid for M dwarfs, where the
 hybrid laws gain most over the quadratic law. We tested only circular
 planets.
@@ -1005,11 +1195,15 @@ data bundle.
 \begin{thebibliography}{}
 \bibitem[{Agol} et~al.(2020)]{agol2020} Agol, E., Luger, R., \& Foreman-Mackey, D. 2020, AJ, 159, 123
 \bibitem[{Akinsanmi} et~al.(2020)]{akinsanmi2020} Akinsanmi, B., Barros, S. C. C., Santos, N. C., et~al. 2020, A\&A, 635, A8
+\bibitem[{Akinsanmi} et~al.(2024)]{akinsanmi2024} Akinsanmi, B., et~al. 2024, A\&A, 685, A63
 \bibitem[{Asplund} et~al.(2009)]{asplund2009} Asplund, M., Grevesse, N., Sauval, A. J., \& Scott, P. 2009, ARA\&A, 47, 481
+\bibitem[{Ballerini} et~al.(2012)]{ballerini2012} Ballerini, P., et~al. 2012, A\&A, 539, A140
 \bibitem[{Barnes} \& {Fortney}(2003)]{barnesfortney2003} Barnes, J. W., \& Fortney, J. J. 2003, ApJ, 588, 545
+\bibitem[{Barros} et~al.(2022)]{barros2022} Barros, S. C. C., et~al. 2022, A\&A, 657, A52
 \bibitem[{Bessell}(1990)]{bessell1990} Bessell, M. S. 1990, PASP, 102, 1181
 \bibitem[{Carter} \& {Winn}(2010)]{carterwinn2010} Carter, J. A., \& Winn, J. N. 2010, ApJ, 709, 1219
 \bibitem[{Cassese} et~al.(2024)]{cassese2024} Cassese, B., Vega, J., Lu, T., et~al. 2024, JOSS, 9, 6972
+\bibitem[{Castelli} \& {Kurucz}(2003)]{castelli2003} Castelli, F., \& Kurucz, R. L. 2003, in IAU Symp. 210, Modelling of Stellar Atmospheres, ed. N. Piskunov, W. W. Weiss, \& D. F. Gray, A20
 \bibitem[{Chishtie} et~al.(2025)]{chishtie2025} Chishtie, F. A., Saeed, M. I., \& Goderya, S. N. 2025, MNRAS, accepted (arXiv:2506.18860)
 \bibitem[{Claret}(2000)]{claret2000} Claret, A. 2000, A\&A, 363, 1081
 \bibitem[{Claret}(2017)]{claret2017} Claret, A. 2017, A\&A, 600, A30
@@ -1028,12 +1222,13 @@ data bundle.
 \bibitem[{Hestroffer}(1997)]{hestroffer1997} Hestroffer, D. 1997, A\&A, 327, 199
 \bibitem[{Howarth}(2011)]{howarth2011} Howarth, I. D. 2011, MNRAS, 418, 1165
 \bibitem[{Husser} et~al.(2013)]{husser2013} Husser, T.-O., Wende-von Berg, S., Dreizler, S., et~al. 2013, A\&A, 553, A6
+\bibitem[{IRAC Instrument Team}(2021)]{irachandbook} IRAC Instrument and Instrument Support Teams 2021, IRAC Instrument Handbook, v4.0 (Pasadena: IPAC)
 \bibitem[{Kipping}(2010)]{kipping2010} Kipping, D. M. 2010, MNRAS, 408, 1758
 \bibitem[{Kipping}(2013)]{kipping2013} Kipping, D. M. 2013, MNRAS, 435, 2152
 \bibitem[{Kostogryz} et~al.(2022)]{kostogryz2022} Kostogryz, N. M., Witzke, V., Shapiro, A. I., et~al. 2022, A\&A, 666, A60
 \bibitem[{Kostogryz} et~al.(2024)]{kostogryz2024} Kostogryz, N. M., Shapiro, A. I., Witzke, V., et~al. 2024, Nature Astronomy, 8, 929
 \bibitem[{Kostogryz} et~al.(2026)]{kostogryz2026} Kostogryz, N., Shapiro, A. I., Witzke, V., et~al. 2026, A\&A, accepted (arXiv:2606.21912)
-\bibitem[{Liu} et~al.(2025)]{liu2025} Liu, Q., Zhu, W., Zhou, Y., et~al. 2025, AJ, 169, 69 % VERIFY volume/page (doi 10.3847/1538-3881/ad9b8c)
+\bibitem[{Liu} et~al.(2025)]{liu2025} Liu, Q., Zhu, W., Zhou, Y., et~al. 2025, AJ, 169, 79
 \bibitem[{Magic} et~al.(2015)]{magic2015} Magic, Z., Chiavassa, A., Collet, R., \& Asplund, M. 2015, A\&A, 573, A90
 \bibitem[{Mandel} \& {Agol}(2002)]{mandelagol2002} Mandel, K., \& Agol, E. 2002, ApJ, 580, L171
 \bibitem[{Maxted}(2018)]{maxted2018} Maxted, P. F. L. 2018, A\&A, 616, A39
@@ -1042,12 +1237,14 @@ data bundle.
 \bibitem[{Morello} et~al.(2017)]{morello2017} Morello, G., Tsiaras, A., Howarth, I. D., \& Homeier, D. 2017, AJ, 154, 111
 \bibitem[{Morello} et~al.(2020)]{morello2020} Morello, G., Claret, A., Martin-Lagarde, M., et~al. 2020, AJ, 159, 75
 \bibitem[{Neckel} \& {Labs}(1994)]{neckel1994} Neckel, H., \& Labs, D. 1994, Sol. Phys., 153, 91
+\bibitem[{Parviainen} \& {Aigrain}(2015)]{parviainen2015} Parviainen, H., \& Aigrain, S. 2015, MNRAS, 453, 3821
 \bibitem[{Patel} \& {Espinoza}(2022)]{patel2022} Patel, J. A., \& Espinoza, N. 2022, AJ, 163, 228
 \bibitem[{Seager} \& {Hui}(2002)]{seagerhui2002} Seager, S., \& Hui, L. 2002, ApJ, 574, 1004
 \bibitem[{Sing} et~al.(2026)]{sing2026} Sing, D. K., Lothringer, J. D., Valenti, J. A., et~al. 2026, AJ, accepted (arXiv:2609.00263)
 \bibitem[{SquishierPlanet}(2026)]{squishier} $\langle$Authors$\rangle$ 2026, submitted (companion paper; arXiv:$\langle$id$\rangle$)
-\bibitem[{Viani} et~al.(2018)]{viani2018} Viani, L. S., Basu, S., Ong J., M. J., Bonaca, A., \& Chaplin, W. J. 2018, ApJ, 858, 28
 \bibitem[{V{\"o}gler} et~al.(2005)]{voegler2005} V{\"o}gler, A., Shelyag, S., Sch{\"u}ssler, M., et~al. 2005, A\&A, 429, 335
+\bibitem[{Vanderspek} et~al.(2018)]{vanderspek2018} Vanderspek, R., et~al. 2018, TESS Instrument Handbook (Cambridge, MA: MIT Kavli Institute)
+\bibitem[{Viani} et~al.(2018)]{viani2018} Viani, L. S., Basu, S., Ong J., M. J., Bonaca, A., \& Chaplin, W. J. 2018, ApJ, 858, 28
 \bibitem[{Witzke} et~al.(2021)]{witzke2021} Witzke, V., Shapiro, A. I., Cernetic, M., et~al. 2021, A\&A, 653, A65
 \bibitem[{Zhu} et~al.(2014)]{zhu2014} Zhu, W., Huang, C. X., Zhou, G., \& Lin, D. N. C. 2014, ApJ, 796, 67
 \end{thebibliography}
@@ -1066,14 +1263,19 @@ MPS-ATLAS archive spectra matches their profiles to 1--$7\times10^{-4}$ in
 Kepler, TESS, and CHEOPS. The exception is their Set~1 profiles at
 $-1.7\le[{\rm M/H}]\le-0.75$, which differ by 0.5--$2\times10^{-2}$ from the
 archive spectra; the archive spectra are smooth in [M/H], and we use them.
-Against ExoTiC-LD \citep{grant2024}, our fits of the same profile agree to
-$1.2\times10^{-5}$. The integrated profiles differ by up to $10^{-2}$, partly
-because the TESS and Spitzer curves differ and partly because a 500-node
-Gauss--Legendre quadrature over a whole mode is not converged on
-high-resolution spectra. Our exact bin integrals agree with the exact
-integral of the linear interpolants to $4\times10^{-6}$. Our light-curve
-quadrature agrees with the closed-form hybrid5 light curve of
-\citet{squishier} to $10^{-8}\ppm$.
+Against ExoTiC-LD \citep{grant2024}, on four Kurucz and four Stagger models in
+seven modes, our fits of the same profile agree to $1.2\times10^{-5}$. The
+integrated profiles differ by up to $10^{-2}$ in $I/I(1)$, for two separate
+reasons. Most of the difference is in TESS and Spitzer, where the bundled
+response curves differ from the mission curves we use. The rest comes from
+ExoTiC-LD's 500-node Gauss--Legendre quadrature over the whole mode, which is
+not converged on high-resolution spectra: 500 and 20\,000 nodes differ by up
+to $1.7\times10^{-3}$ (Stagger, STIS G430L). Our exact bin integrals agree
+with the exact integral of the linear interpolants to $4\times10^{-6}$. Our
+light-curve quadrature agrees with the closed-form light curves of
+\citet{squishier} to $2\times10^{-8}\ppm$, for the tabulated hybrid2, hybrid4,
+and hybrid5 coefficients of the 15 cases of Table~\ref{tab:lc}, with
+$p=0.03$--0.2 and $b=0$--1 (81\,000 points).
 
 \paragraph{Spherical PHOENIX models.} The PHOENIX-COND intensities of
 \citet{claretsouthworth2023} are not public, so we applied their recipe to
@@ -1081,25 +1283,58 @@ PHOENIX-ACES v3.0: M1 and M2 edges, 900 points uniform in $\mu$, and
 unweighted Levenberg--Marquardt. For 13 dwarfs in Kepler, TESS, and CHEOPS, our
 $\mu_{\rm cri}$ (M1) agree with theirs to $\sim10^{-3}$, and their M2 edge
 lies inward of M1, as ours does. The power-2 coefficients differ by a median
-of 0.014--0.016 (maximum 0.04), the size of the difference between the COND
-and ACES models. \citet{claret2025} tabulate four-term and power-2
-coefficients for JWST passbands from new high-resolution PHOENIX models,
-which are also not public. For the 241 solar-metallicity models and nine
-passbands we share, their $\mu_{\rm cri}$ agree with our M1 edges to a median
-of 0.0012 (90th percentile 0.0054). Their coefficients reproduce the light
-curves of our model profiles to a median of 26\ppm{} (four-term) and 24\ppm{}
-(power-2), with 90th percentiles of 55\ppm. That is comparable to the
-difference between MPS-ATLAS Set~1 and Set~2 (32\ppm), and we take it as the
-floor set by the different model versions. By passband the medians range from
-12--16\ppm{} in G395H and G395M to 32--41\ppm{} in F322W2 and G235. The
-largest differences, up to 370\ppm, are all in NIRISS SOSS order 2 at
-2400--2600\,K. Their coefficients lie closer to our fits uniform in $r$
-(22--25\ppm) than to our fits uniform in $\mu$ (35--41\ppm).
+of 0.014--0.016 (maximum 0.04). Because the two model grids differ, this
+comparison is not like-for-like and cannot separate pipeline from model
+differences. \citet{claret2025} tabulate four-term and power-2 coefficients for
+JWST passbands from new high-resolution PHOENIX models, which are also not
+public, so again the comparison is not like-for-like. For the 241
+solar-metallicity models and nine passbands we share, their $\mu_{\rm cri}$
+agree with our M1 edges to a median of 0.0012 (90th percentile 0.0054). At the
+coefficient level the agreement is poor. Applying their stated recipe (uniform
+in $\mu$, unconstrained) to our models gives power-2 coefficients that differ
+from theirs by a median of 0.17 in $c$ and 0.09 in $\alpha$, and four-term
+coefficients that differ by 1--3, reflecting the strong degeneracy of the
+four-term basis. Their coefficients lie closer to our fits uniform in $r$ than
+to our fits uniform in $\mu$, which suggests a limb treatment we could not
+reproduce from their description. In light-curve terms, their coefficients
+reproduce the light curves of our model profiles to a median of 26\ppm{}
+(four-term) and 24\ppm{} (power-2), with 90th percentiles of 55\ppm. By
+passband the medians range from 12--16\ppm{} in G395H and G395M to
+32--41\ppm{} in F322W2 and G235, and the largest differences, up to 370\ppm,
+are all in NIRISS SOSS order 2 at 2400--2600\,K. We cannot say how much of
+this comes from the models and how much from the recipes; a comparison on the
+same intensities would settle it.
 
 \paragraph{JWST limb intensities.} With the recipe of \citet{sing2026}, our
 MPS-ATLAS Set~1 offsets $\Delta\ell$ agree with their per-star values to
 0.001 for five stars and 0.008 for WASP-121. With their linear rescaling, our
 PHOENIX offsets agree with theirs to a mean of 0.002 (Table~\ref{tab:sing}).
+
+\begin{table}
+\caption{PHOENIX $\Delta\ell$ (observed $-$ model) for the JWST hosts of
+\citet{sing2026} with our geometric and their linear limb rescaling, and their
+published values.}
+\label{tab:sing}
+\centering
+\begin{tabular}{lcccc}
+\hline\hline
+Star & $\mu_{\rm cri}$ & Geometric & Linear & Sing et al.\\
+\hline
+HAT-P-11 & 0.047 & $+0.037$ & $+0.005$ & $+0.006$\\
+WASP-107 & 0.048 & $+0.036$ & $+0.004$ & $+0.006$\\
+WASP-121 & 0.073 & $+0.078$ & $+0.044$ & $+0.051$\\
+WASP-6 & 0.048 & $+0.087$ & $+0.058$ & $+0.059$\\
+WASP-80 & 0.048 & $-0.036$ & $-0.067$ & $-0.064$\\
+WASP-94A & 0.068 & $+0.041$ & $+0.005$ & $+0.005$\\
+\hline
+Mean & & $+0.041$ & $+0.008$ & $+0.010$\\
+\hline
+\end{tabular}
+\tablefoot{$\mu_{\rm cri}$ in NIRSpec PRISM or NIRISS SOSS, as observed. The
+values of \citet{sing2026} were read from their figures of the offset against
+$\mu_{\rm min}$, at $\mu_{\rm min}=0.2$.}
+\end{table}
+
 \end{appendix}
 
 \end{document}

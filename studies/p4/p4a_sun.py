@@ -89,6 +89,14 @@ def main():
             ratio = PchipInterpolator(pm.mu, pm.y / mps2_558.interpolant()(pm.mu))
             C = ratio(np.clip(MU, pm.mu[0], 1.0))
             model[f"muram_{s}"] = Profile(MU, model["mps2"].y * C)
+        # the recommended combination: MPS-ATLAS Set 2 times the MURaM field/hydro
+        # ratio (as the tabulated Δw corrections), ratio held constant below μ = 0.1
+        ph_ = band_profile(mu_states["hydro"], *th)
+        for s in ("ssd", "B100G"):
+            pm = band_profile(mu_states[s], *th)
+            ratio = PchipInterpolator(pm.mu, pm.y / ph_.interpolant()(pm.mu))
+            C = ratio(np.clip(MU, 0.1, 1.0))
+            model[f"mps2+{s}"] = Profile(MU, model["mps2"].y * C)
         sel = MU >= 0.1
         cmp = {k: dict(max_dI=float(np.max(np.abs(p.y[sel] - obs.y[sel]))),
                        lc_ppm=G.errors(*G.columns(p), *G.columns(obs))["max_ppm"])

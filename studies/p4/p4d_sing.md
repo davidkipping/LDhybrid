@@ -1,16 +1,19 @@
 # P4d: JWST per-bin (ℓ, δ), Sing et al. (2026), μ_min = 0.2
 
-Per-star weighted mean offsets (observed − model), then mean over stars ± star-to-star s.d. (Sing et al. Table 3 convention).
+Per star: inverse-variance (1/σ_ℓ² per bin) weighted mean of observed − model over wavelength bins, error √(1/Σw) (bin correlations ignored). Over stars: plain mean, s.d., SEM = s.d./√n, mean/SEM, median. Headline route: recipe (quadratic fitted to the model profile at μ ≥ 0.2).
 
-| case | stars | Δℓ | Δδ | per star Δℓ |
-|---|---|---|---|---|
-| mps1|hybrid5 | 6 | +0.033 ± 0.033 | -0.008 ± 0.018 | HAT-P-11 +0.034, WASP-107 +0.039, WASP-121 +0.044, WASP-6 +0.083, WASP-80 -0.017, WASP-94 +0.017 |
-| mps1|recipe | 6 | +0.041 ± 0.033 | -0.012 ± 0.017 | HAT-P-11 +0.040, WASP-107 +0.046, WASP-121 +0.054, WASP-6 +0.090, WASP-80 -0.009, WASP-94 +0.025 |
-| mps2|hybrid5 | 6 | +0.035 ± 0.031 | -0.007 ± 0.018 | HAT-P-11 +0.033, WASP-107 +0.041, WASP-121 +0.048, WASP-6 +0.083, WASP-80 -0.011, WASP-94 +0.019 |
-| mps2|hybrid5+B100G | 6 | +0.024 ± 0.030 | -0.007 ± 0.018 | HAT-P-11 +0.026, WASP-107 +0.037, WASP-121 +0.027, WASP-6 +0.072, WASP-80 -0.015, WASP-94 +0.000 |
-| mps2|recipe | 6 | +0.043 ± 0.031 | -0.011 ± 0.017 | HAT-P-11 +0.040, WASP-107 +0.048, WASP-121 +0.057, WASP-6 +0.090, WASP-80 -0.003, WASP-94 +0.027 |
-| phoenix|hybrid5 | 6 | +0.040 ± 0.044 | -0.004 ± 0.016 | HAT-P-11 +0.037, WASP-107 +0.036, WASP-121 +0.078, WASP-6 +0.087, WASP-80 -0.037, WASP-94 +0.041 |
-| phoenix|recipe | 6 | +0.041 ± 0.044 | -0.004 ± 0.016 | HAT-P-11 +0.037, WASP-107 +0.036, WASP-121 +0.078, WASP-6 +0.087, WASP-80 -0.036, WASP-94 +0.041 |
+| case | n | mean Δℓ | s.d. | SEM | mean/SEM | median | Δδ (mean ± s.d.) | per star Δℓ |
+|---|---|---|---|---|---|---|---|---|
+| mps2|recipe | 6 | +0.043 | 0.031 | 0.013 | 3.4 | +0.044 | -0.011 ± 0.017 | HAT-P-11 +0.040, WASP-107 +0.048, WASP-121 +0.057, WASP-6 +0.090, WASP-80 -0.003, WASP-94 +0.027 |
+| mps2|recipe+B100G | 6 | +0.033 | 0.030 | 0.012 | 2.7 | +0.035 | -0.011 ± 0.018 | HAT-P-11 +0.033, WASP-107 +0.044, WASP-121 +0.037, WASP-6 +0.079, WASP-80 -0.007, WASP-94 +0.010 |
+| mps2|recipe+ssd | 6 | +0.041 | 0.031 | 0.013 | 3.3 | +0.043 | -0.011 ± 0.018 | HAT-P-11 +0.039, WASP-107 +0.047, WASP-121 +0.054, WASP-6 +0.088, WASP-80 -0.004, WASP-94 +0.025 |
+| mps1|recipe | 6 | +0.041 | 0.033 | 0.013 | 3.1 | +0.043 | -0.012 ± 0.017 | HAT-P-11 +0.040, WASP-107 +0.046, WASP-121 +0.054, WASP-6 +0.090, WASP-80 -0.009, WASP-94 +0.025 |
+| phoenix|recipe | 6 | +0.041 | 0.044 | 0.018 | 2.3 | +0.039 | -0.004 ± 0.016 | HAT-P-11 +0.037, WASP-107 +0.036, WASP-121 +0.078, WASP-6 +0.087, WASP-80 -0.036, WASP-94 +0.041 |
+| phoenix|recipe_lin | 6 | +0.008 | 0.043 | 0.018 | 0.5 | +0.005 | +0.001 ± 0.017 | HAT-P-11 +0.005, WASP-107 +0.004, WASP-121 +0.044, WASP-6 +0.058, WASP-80 -0.067, WASP-94 +0.005 |
+| mps2|hybrid5 | 6 | +0.035 | 0.031 | 0.013 | 2.8 | +0.037 | -0.007 ± 0.018 | HAT-P-11 +0.033, WASP-107 +0.041, WASP-121 +0.048, WASP-6 +0.083, WASP-80 -0.011, WASP-94 +0.019 |
+| mps2|hybrid5+B100G | 6 | +0.024 | 0.030 | 0.012 | 2.0 | +0.026 | -0.007 ± 0.018 | HAT-P-11 +0.026, WASP-107 +0.037, WASP-121 +0.027, WASP-6 +0.072, WASP-80 -0.015, WASP-94 +0.000 |
+| mps1|hybrid5 | 6 | +0.033 | 0.033 | 0.014 | 2.5 | +0.036 | -0.008 ± 0.018 | HAT-P-11 +0.034, WASP-107 +0.039, WASP-121 +0.044, WASP-6 +0.083, WASP-80 -0.017, WASP-94 +0.017 |
+| phoenix|hybrid5 | 6 | +0.040 | 0.044 | 0.018 | 2.3 | +0.039 | -0.004 ± 0.016 | HAT-P-11 +0.037, WASP-107 +0.036, WASP-121 +0.078, WASP-6 +0.087, WASP-80 -0.037, WASP-94 +0.041 |
 
 Sing et al. (2026) Table 3, μ_min = 0.2 (7 stars incl. WASP-12):
 

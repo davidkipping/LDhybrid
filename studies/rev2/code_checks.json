@@ -1,0 +1,396 @@
+{
+ "lightcurve": {
+  "hybrid5|0.03": 0.0,
+  "hybrid5|0.1": 0.0,
+  "hybrid5|0.3": 0.0,
+  "claret4|0.03": 0.0,
+  "claret4|0.1": 0.0,
+  "claret4|0.3": 0.0,
+  "power2|0.03": 0.0,
+  "power2|0.1": 0.0,
+  "power2|0.3": 0.0,
+  "quadratic|0.03": 0.0,
+  "quadratic|0.1": 0.0,
+  "quadratic|0.3": 0.0,
+  "hybrid2|0.03": 0.0,
+  "hybrid2|0.1": 0.0,
+  "hybrid2|0.3": 0.0
+ },
+ "columns": {
+  "phoenix|hybrid2": {
+   "expanded_vs_w": 9.814691358522865e-07,
+   "q_range": [
+    -0.0,
+    1.0
+   ]
+  },
+  "phoenix|hybrid5": {
+   "expanded_vs_w": 3.3828392044243927e-06,
+   "q_range": [
+    -0.0,
+    1.0
+   ]
+  },
+  "mps2|hybrid2": {
+   "expanded_vs_w": 9.886481481258258e-07,
+   "q_range": [
+    0.004601,
+    0.728537
+   ]
+  },
+  "mps2|hybrid5": {
+   "expanded_vs_w": 2.8206858170842786e-06,
+   "q_range": [
+    0.05221,
+    0.989854
+   ]
+  }
+ },
+ "mps_custom": {
+  "nodes": [
+   {
+    "model": [
+     5800,
+     4.5,
+     0.0
+    ],
+    "band": "TESS",
+    "law": "hybrid5",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     5800,
+     4.5,
+     0.0
+    ],
+    "band": "TESS",
+    "law": "claret4",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     5800,
+     4.5,
+     0.0
+    ],
+    "band": "TESS",
+    "law": "power2",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     5800,
+     4.5,
+     0.0
+    ],
+    "band": "JWST_NIRSpec_PRISM",
+    "law": "hybrid5",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     5800,
+     4.5,
+     0.0
+    ],
+    "band": "JWST_NIRSpec_PRISM",
+    "law": "claret4",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     5800,
+     4.5,
+     0.0
+    ],
+    "band": "JWST_NIRSpec_PRISM",
+    "law": "power2",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     5800,
+     4.5,
+     0.0
+    ],
+    "band": "JWST_MIRI_LRS",
+    "law": "hybrid5",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     5800,
+     4.5,
+     0.0
+    ],
+    "band": "JWST_MIRI_LRS",
+    "law": "claret4",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     5800,
+     4.5,
+     0.0
+    ],
+    "band": "JWST_MIRI_LRS",
+    "law": "power2",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     4200,
+     4.6,
+     -0.5
+    ],
+    "band": "TESS",
+    "law": "hybrid5",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     4200,
+     4.6,
+     -0.5
+    ],
+    "band": "TESS",
+    "law": "claret4",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     4200,
+     4.6,
+     -0.5
+    ],
+    "band": "TESS",
+    "law": "power2",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     4200,
+     4.6,
+     -0.5
+    ],
+    "band": "JWST_NIRSpec_PRISM",
+    "law": "hybrid5",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     4200,
+     4.6,
+     -0.5
+    ],
+    "band": "JWST_NIRSpec_PRISM",
+    "law": "claret4",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     4200,
+     4.6,
+     -0.5
+    ],
+    "band": "JWST_NIRSpec_PRISM",
+    "law": "power2",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     4200,
+     4.6,
+     -0.5
+    ],
+    "band": "JWST_MIRI_LRS",
+    "law": "hybrid5",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     4200,
+     4.6,
+     -0.5
+    ],
+    "band": "JWST_MIRI_LRS",
+    "law": "claret4",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     4200,
+     4.6,
+     -0.5
+    ],
+    "band": "JWST_MIRI_LRS",
+    "law": "power2",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     6600,
+     4.0,
+     0.3
+    ],
+    "band": "TESS",
+    "law": "hybrid5",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     6600,
+     4.0,
+     0.3
+    ],
+    "band": "TESS",
+    "law": "claret4",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     6600,
+     4.0,
+     0.3
+    ],
+    "band": "TESS",
+    "law": "power2",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     6600,
+     4.0,
+     0.3
+    ],
+    "band": "JWST_NIRSpec_PRISM",
+    "law": "hybrid5",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     6600,
+     4.0,
+     0.3
+    ],
+    "band": "JWST_NIRSpec_PRISM",
+    "law": "claret4",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     6600,
+     4.0,
+     0.3
+    ],
+    "band": "JWST_NIRSpec_PRISM",
+    "law": "power2",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     6600,
+     4.0,
+     0.3
+    ],
+    "band": "JWST_MIRI_LRS",
+    "law": "hybrid5",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     6600,
+     4.0,
+     0.3
+    ],
+    "band": "JWST_MIRI_LRS",
+    "law": "claret4",
+    "dw": 0.0
+   },
+   {
+    "model": [
+     6600,
+     4.0,
+     0.3
+    ],
+    "band": "JWST_MIRI_LRS",
+    "law": "power2",
+    "dw": 0.0
+   }
+  ],
+  "offnode_lc_ppm": 0.0015655812098114286
+ },
+ "corrections": {
+  "max_dw": 4.871847291421094e-07,
+  "warned_outside": true
+ },
+ "condition": {
+  "seq_vs_joint_mean": 1.3877787807814457e-17,
+  "seq_vs_joint_cov": 1.0842021724855044e-19,
+  "sd_h1": [
+   0.015274717212264567,
+   0.0055790161649638525,
+   0.005225072767709497
+  ]
+ },
+ "prior": {
+  "m_dwarf": {
+   "sd_eig_no_floor": [
+    3.7676016955283064e-06,
+    0.00013871219666472995,
+    0.0011213319555785687,
+    0.0040474908852985375,
+    0.007676193062922911
+   ],
+   "sd_eig_floor": [
+    8.122295675185498e-06,
+    0.0006356596941526196,
+    0.0015548036821153575,
+    0.004638676308782626,
+    0.05109641843374214
+   ],
+   "floor_point": [
+    3500.0,
+    5.0,
+    0.0
+   ],
+   "warnings": [
+    "only ['phoenix'] cover this star in JWST_NIRSpec_G395H: no grid-to-grid systematic",
+    "only ['phoenix'] cover this star in JWST_NIRSpec_G395H: no grid-to-grid systematic; using the spread at the nearest shared point (3500.0, 5.0, 0.0) (['phoenix', 'mps1', 'mps2'])"
+   ]
+  },
+  "cov_floor": {
+   "sd_eig": [
+    7.086275021869979e-05,
+    0.00034311519624396754,
+    0.0007980492148966021,
+    0.0019356481318147658,
+    0.008226371750119126
+   ],
+   "sd_eig_floor": [
+    0.008641431625837909,
+    0.009610846052138846,
+    0.009833172866845081,
+    0.009938583823092192,
+    0.011725636894436375
+   ]
+  },
+  "edge": {
+   "dropped": 0.383,
+   "warned": true
+  },
+  "sigma0_correction": 1.4183539343015639e-09
+ },
+ "offsets": {
+  "h1_shift": -0.0016199745135964116,
+  "mismatch_raises": true,
+  "ell_shift": 0.0014699614373934189
+ },
+ "refit_mu_min": {
+  "median_full": 3.528428893200507,
+  "median_cut": 1.3440159283126165,
+  "p90_full": 6.244963221179423,
+  "p90_cut": 2.7706562871029923
+ }
+}

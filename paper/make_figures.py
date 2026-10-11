@@ -141,31 +141,56 @@ def fig_profiles():
 
 
 def fig_quality():
-    fig, ax = plt.subplots(1, 2, figsize=(PAGE, 2.6), sharey=True, gridspec_kw=dict(wspace=0.08))
+    fig, ax = plt.subplots(2, 1, figsize=(COL, 4.6), sharex=True, gridspec_kw=dict(hspace=0.22))
     for a, grid, title in ((ax[0], "phoenix", "PHOENIX v3.0 (spherical)"),
                            (ax[1], "mps2", "MPS-ATLAS Set 2 (plane-parallel)")):
         h = h5py.File(DATA / "products" / f"{grid}.h5")
         T, cov = h["teff"][()], h["covered"][()]
-        Tb = np.unique(np.round(T / 200) * 200)
+        Tn = np.unique(T)
         for n in LAW_ORDER[::-1]:
             e = h[f"{n}|r|lc_ppm"][()].astype(float)
             e[~cov] = np.nan
-            sel = [np.abs(T - t) <= 100 for t in Tb]
-            med = np.array([np.nanmedian(e[s]) for s in sel])
+            sel = [T == t for t in Tn]
+            med = np.array([np.nanmedian(e[s_]) for s_ in sel])
             col, ls, lw, _ = STYLE[n]
             if n.startswith("hybrid"):
-                lo = np.array([np.nanpercentile(e[s], 16) for s in sel])
-                hi = np.array([np.nanpercentile(e[s], 84) for s in sel])
-                a.fill_between(Tb, lo, hi, color=col, alpha=0.13, lw=0)
-            a.plot(Tb, med, color=col, ls=ls, lw=lw)
+                lo = np.array([np.nanpercentile(e[s_], 16) for s_ in sel])
+                hi = np.array([np.nanpercentile(e[s_], 84) for s_ in sel])
+                a.fill_between(Tn, lo, hi, color=col, alpha=0.13, lw=0)
+            a.plot(Tn, med, color=col, ls=ls, lw=lw)
         a.set_yscale("log")
-        a.set_ylim(0.3, 300)
+        a.set_ylim(0.2, 300)
+        a.set_xlim(2300, 7500)
         a.set_title(title)
-        a.set_xlabel(r"$T_{\rm eff}$ (K)")
-    ax[0].set_ylabel("light-curve error (ppm)")
-    ax[0].yaxis.set_major_formatter(mpl.ticker.FuncFormatter(lambda v, _: f"{v:g}"))
-    top_legend(fig, [law_handle(n) for n in LAW_ORDER], y=0.95)
+        a.set_ylabel("light-curve error (ppm)")
+        a.yaxis.set_major_formatter(mpl.ticker.FuncFormatter(lambda v, _: f"{v:g}"))
+    ax[1].set_xlabel(r"$T_{\rm eff}$ (K)")
+    fig.subplots_adjust(top=0.86)
+    top_legend(fig, [law_handle(n) for n in LAW_ORDER], y=0.885, ncol=3)
     save(fig, "fig_quality")
+
+
+def fig_basis():
+    """Shapes T_j(μ) of hybrid5 (and the hybrid2 pole), one column."""
+    mu = np.linspace(0, 1, 1200)
+    fig, ax = plt.subplots(figsize=(COL, 2.4))
+    L = laws.get("hybrid5")
+    T = L.T(mu)
+    labs = [r"$1-\mu^4$", r"$(1-\mu^2)^2$"] + [rf"$\Pi_{{{e:.4g}}}$" for e in v1.HYBRID5_EPS]
+    cols = [INK2, MUTED, RAMP[650], RAMP[450], RAMP[250]]
+    sty = ["-", (0, (4, 1.5)), "-", "-", "-"]
+    for j in range(5):
+        ax.plot(mu, T[:, j], color=cols[j], ls=sty[j], lw=1.4, label=labs[j])
+    ax.plot(mu, laws.get("hybrid2").T(mu)[:, 1], color=AQUA, ls=(0, (1, 1.3)), lw=1.4,
+            label=r"$\Pi_{0.36}$ (hybrid2)")
+    ax.set_xscale("log")
+    ax.set_xlim(1e-3, 1)
+    ax.set_ylim(-0.02, 1.02)
+    ax.set_xlabel(r"$\mu$")
+    ax.set_ylabel(r"$T_j(\mu)$")
+    ax.legend(loc="lower left", fontsize=6.2, handlelength=2.0)
+    clean_x_grid(ax)
+    save(fig, "fig_basis")
 
 
 def fig_coefficients():
@@ -203,7 +228,7 @@ def fig_coefficients():
 def fig_validation():
     import csv
     mx = json.loads((ROOT / "studies" / "p4" / "p4b_maxted.json").read_text())
-    pts = list(csv.DictReader(open(ROOT / "studies" / "rev" / "val_sing_points.csv")))
+    pts = list(csv.DictReader(open(ROOT / "studies" / "rev2" / "code_sing_points.csv")))
     fig, ax = plt.subplots(1, 3, figsize=(PAGE, 2.6),
                            gridspec_kw=dict(width_ratios=[1, 1, 1.15], wspace=0.42))
     cases = [("phoenix", "none", "PHOENIX"), ("mps2", "none", "MPS-ATLAS 2"),
@@ -228,19 +253,24 @@ def fig_validation():
         a.set_xlabel(lab + "  (observed − predicted)")
         clean_x_grid(a)
     ax[0].set_title("Kepler & TESS hosts · Maxted (2023)")
-    jw = [("phoenix|hybrid5", "PHOENIX", MUTED), ("mps2|hybrid5", "MPS-ATLAS 2", INK2),
-          ("mps2|hybrid5+B100G", "MPS-ATLAS 2 + 100 G (recommended)", BLUE)]
-    stars = [r["star"] for r in pts if r["case"] == "mps2|hybrid5"]
+    jw = [("phoenix|recipe", "PHOENIX", MUTED), ("mps2|recipe", "MPS-ATLAS 2", INK2),
+          ("mps2|recipe+B100G", "MPS-ATLAS 2 + 100 G (recommended)", BLUE)]
+    stars = [r["star"] for r in pts if r["case"] == "mps2|recipe"]
     ax[2].axvspan(-0.031, 0.031, color=WASH, lw=0, zorder=0)
     ax[2].axvline(0, color=INK2, lw=0.6, zorder=1)
     for k, (case, name, col) in enumerate(jw):
         per = {r["star"]: (float(r["dl"]), float(r["dl_err"])) for r in pts if r["case"] == case}
-        ax[2].errorbar([per[s_][0] for s_ in stars], np.arange(len(stars)) + (k - 1) * 0.24,
+        v = np.array([per[s_][0] for s_ in stars])
+        ax[2].errorbar(v, np.arange(len(stars)) + (k - 1) * 0.24,
                        xerr=[per[s_][1] for s_ in stars], fmt="D", ms=3.2, color=col,
                        mec="white", mew=0.4, elinewidth=1.0, capsize=0, zorder=3)
-    ax[2].set_yticks(range(len(stars)))
-    ax[2].set_yticklabels(stars)
-    ax[2].set_ylim(len(stars) - 0.5, -0.5)
+        ax[2].errorbar(v.mean(), len(stars) + 0.3 + (k - 1) * 0.24,
+                       xerr=v.std(ddof=1) / np.sqrt(len(v)), fmt="D", ms=3.6, color=col,
+                       mec="white", mew=0.4, elinewidth=1.2, capsize=0, zorder=3)
+    ax[2].axhline(len(stars) - 0.2, color=GRID, lw=0.6)
+    ax[2].set_yticks(list(range(len(stars))) + [len(stars) + 0.3])
+    ax[2].set_yticklabels([("WASP-94A" if s_ == "WASP-94" else s_) for s_ in stars] + ["mean ± SEM"])
+    ax[2].set_ylim(len(stars) + 0.8, -0.5)
     ax[2].set_xlabel(r"$\Delta\ell$  (observed − model)")
     ax[2].set_title("JWST hosts · Sing et al. (2026)")
     clean_x_grid(ax[2])
@@ -257,8 +287,9 @@ def fig_lightcurves():
     d = json.loads((ROOT / "studies" / "lc" / "lc_section.json").read_text())
     p = d["p"]
     t = np.array(d["x"]) / (1 + p)                         # time from mid-transit / (T14/2)
-    stars, bnames = d["stars"], d["bands"]
-    fig, ax = plt.subplots(len(stars), len(bnames), figsize=(PAGE, 7.0), sharex=True, sharey=True,
+    stars, bnames = ["mid M", "Sun analogue"], d["bands"]
+    names = {"mid M": "mid M dwarf (3300 K)", "Sun analogue": "solar analogue (5800 K)"}
+    fig, ax = plt.subplots(len(stars), len(bnames), figsize=(PAGE, 3.4), sharex=True, sharey=True,
                            gridspec_kw=dict(hspace=0.34, wspace=0.06))
     for i, st in enumerate(stars):
         for j, bn in enumerate(bnames):
@@ -279,23 +310,24 @@ def fig_lightcurves():
             a.set_xlim(-1.08, 1.08)
             w5 = d["worst"][f"{st}|{bn}|hybrid5"]
             wq = d["worst"][f"{st}|{bn}|quadratic"]
-            a.text(1.0, 1.03, f"max |Δ|: hybrid5 {w5:.1f}, quadratic {wq:.0f} ppm",
+            a.text(1.0, 1.03, f"max |ΔF|: hybrid5 {w5:.1f}, quadratic {int(wq + 0.5)} ppm",
                    transform=a.transAxes, fontsize=5.6, color=MUTED, va="bottom", ha="right")
             if i == 0:
                 a.text(0.0, 1.22, bn, transform=a.transAxes, fontsize=7.5, fontweight="bold",
                        color=INK, va="bottom")
             if j == 0:
-                a.set_ylabel(st, fontsize=7.2, fontweight="bold", color=INK)
+                a.set_ylabel(names[st], fontsize=7.2, fontweight="bold", color=INK)
             if i == len(stars) - 1:
                 a.set_xlabel(r"time from mid-transit  /  ($T_{14}/2$)")
-    fig.subplots_adjust(left=0.1, top=0.9)
-    top_legend(fig, [law_handle(n) for n in LAW_ORDER], y=0.94)
+    fig.subplots_adjust(left=0.1, top=0.82)
+    top_legend(fig, [law_handle(n) for n in LAW_ORDER], y=0.9)
     fig.text(0.005, 0.5, r"law − model  (ppm)", rotation=90, va="center", ha="left",
              fontsize=7.5, color=INK2)
     save(fig, "fig_lightcurves")
 
 
 if __name__ == "__main__":
+    fig_basis()
     fig_lightcurves()
     fig_profiles()
     fig_quality()
