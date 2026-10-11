@@ -1,8 +1,10 @@
 # Note from LDhybrid: hybrid4's poles move to the α = 25/16 ladder (v1.0)
 
-**Status (2026-10-11): adopted in LDhybrid** (`ldhybrid/v1.py`:
-`HYBRID4_ALPHA = 25/16`, `HYBRID4_EPS = ladder(2, 25/16)`). Not yet applied in
-SquishierPlanet or Elómë (`elome`).
+**Status (2026-10-11): applied everywhere.** LDhybrid (`ldhybrid/v1.py`:
+`HYBRID4_ALPHA = 25/16`), SquishierPlanet (`HYBRID4_ALPHA = 1.5625`, legacy
+`HYBRID4_ALPHA_V0 = 1.0`) and Elómë v0.15.0 (`047a625`) carry identical poles.
+Our quadrature light curves with the tabulated hybrid4 coefficients agree with
+SquishierPlanet's closed form, built from its own hybrid4, to 1e-8 ppm.
 
 ## Change
 

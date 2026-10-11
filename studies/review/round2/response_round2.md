@@ -254,5 +254,5 @@ made the changes below.
 - Author list, affiliations, acknowledgements.
 - Companion arXiv identifier.
 - Zenodo DOI and licence.
-- Propagate the new hybrid4 poles (α = 25/16) to SquishierPlanet and Elómë
-  (docs/upstream/hybrid4_ladder_alpha.md) and to the companion paper.
+- Propagate the new hybrid4 poles (α = 25/16) to the companion paper
+  (SquishierPlanet and Elómë v0.15.0 already carry them).
