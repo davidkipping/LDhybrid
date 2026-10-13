@@ -19,6 +19,17 @@ transit observations, with emphasis on HST WFC3 and JWST.
 
 ## Use
 
+**Full guide: [`docs/interpolator.md`](docs/interpolator.md)** (laws,
+standalone files, table interpolator, priors, offsets, corrections, refits,
+light curves). The quickest route is a single file from [`standalone/`](standalone/)
+(hybrid4; PHOENIX or MPS-ATLAS Set 2; TESS or Kepler; numpy + scipy only):
+
+```python
+from ldhybrid_hybrid4_mps2_tess import coefficients
+coefficients(5600, 4.4, 0.0, correction="B100G")["w"]
+```
+
+
 ```python
 import ldhybrid as ld
 # tabulated coefficients (linear interpolation within one grid)
