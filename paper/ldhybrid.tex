@@ -242,7 +242,14 @@ $(1.2010,-0.2010)$; its three edges are zero limb intensity ($w_1+w_2=1$),
 zero slope at the disc centre, and zero slope at the limb. For hybrid4 and
 hybrid5 the simplex $w_j\ge0$, $\sum w_j\le1$ is a sufficient region; we
 restrict the fits to it, and it binds in fewer than 1\% of the $r$-weighted
-fits (Sect.~\ref{sec:fitting}). Linear (barycentric) interpolation of
+fits (Sect.~\ref{sec:fitting}). The simplex is not the whole physical region:
+for hybrid4 it fills 13\% of the volume of the exact region of conditions
+I--II (about 8\% for hybrid5), which also holds profiles with a negative weight
+offset by the others. Refitting every bound hybrid4 fit within the exact region
+moves only 126 PHOENIX fits outside the simplex (2300--2600\,K, blue and
+visual bands; $w_3\ge-0.042$), and every MPS-ATLAS fit lies inside it with a
+margin. The restriction is immaterial for the tables, but a uniform prior on
+the simplex excludes physical profiles in free fits. Linear (barycentric) interpolation of
 tabulated weights forms convex combinations and so stays inside the region;
 higher-order (e.g. cubic) interpolation does not. Four-term fits, by contrast,
 have coefficients of mixed sign, and their physical region has no simple form.
