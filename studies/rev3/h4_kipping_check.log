@@ -10,10 +10,10 @@
 * q-map: min w = 0, max sum w = 1.000000000000000
 * q-map images of q in [0,1]^4 (incl. corners): 50016 sets; violate (I) 0, (II) 0, (III) 0, (IV) 0; min I = -2.22e-16, min dI/dxi = -8.67e-19
 * phoenix table: 134560 rows; min w = 0, max sum w = 1.000000, rows with sum w = 1 (zero limb intensity): 6
-* phoenix table q columns: min 0.000000, max 1.000000, rows with any q outside [0, 1]: 0, rows with a q exactly 0 or 1 (on a face): 13348
+* phoenix table q columns: min 0.000000, max 1.000000, rows with any q outside [0, 1]: 0, rows with a q exactly 0 or 1 (on a face): 13281
 * phoenix tabulated hybrid4 (r and mu methods): 134560 sets; violate (I) 0, (II) 0, (III) 0, (IV) 0; min I = -2.22e-16, min dI/dxi = 0.015
 * mps1 table: 1391868 rows; min w = 0.0126, max sum w = 0.922829, rows with sum w = 1 (zero limb intensity): 0
-* mps1 table q columns: min 0.000053, max 0.871937, rows with any q outside [0, 1]: 0, rows with a q exactly 0 or 1 (on a face): 0
+* mps1 table q columns: min 0.000053, max 0.871939, rows with any q outside [0, 1]: 0, rows with a q exactly 0 or 1 (on a face): 0
 * mps1 tabulated hybrid4 (r and mu methods): 1391868 sets; violate (I) 0, (II) 0, (III) 0, (IV) 0; min I = 0.0772, min dI/dxi = 0.0188
 * mps2 table: 1391868 rows; min w = 0.0121, max sum w = 0.914385, rows with sum w = 1 (zero limb intensity): 0
 * mps2 table q columns: min 0.000046, max 0.880589, rows with any q outside [0, 1]: 0, rows with a q exactly 0 or 1 (on a face): 0
