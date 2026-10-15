@@ -28,3 +28,14 @@ def test_hybrid4_q_map():
     I0 = laws.get("hybrid4").intensity(w.T, 0.0)          # one value per row
     assert np.allclose(q[:, 0], (1 - I0) ** 4)
     assert np.allclose(qspace.to_q("hybrid4", w[0]), q[0])
+
+
+def test_hybrid2_outside_region_leaves_cube():
+    # weights with negative depth (limb brighter than centre) mirror the
+    # triangle through the origin; their q must not land in [0, 1]^2
+    from ldhybrid import interpolate
+    q = np.random.default_rng(2).uniform(size=(200, 2))
+    w = -np.asarray(sl.hybrid2_from_q(q[:, 0], q[:, 1], v1.HYBRID2_EPS))
+    for x in w[np.abs(w.sum(1)) > 1e-6]:
+        for back in (qspace.hybrid2_to_q(x), interpolate.to_q("hybrid2", x)):
+            assert not np.all((back >= 0) & (back <= 1))

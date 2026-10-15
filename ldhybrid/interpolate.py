@@ -182,7 +182,8 @@ def _to_q(law, coeffs):
     if law == "hybrid2":
         Vc, Vl = (np.array(v) for v in H2_VERTICES)
         s, t = np.linalg.solve(np.column_stack([Vc, Vl - Vc]), w)
-        return np.array([s * s, t / s if s != 0 else 0.0])
+        # s|s|, not s²: a negative depth (limb brighter than centre) gives q1 < 0
+        return np.array([s * abs(s), t / s if s != 0 else 0.0])
     raise ValueError("sampling coordinates are defined for the hybrid laws")
 
 

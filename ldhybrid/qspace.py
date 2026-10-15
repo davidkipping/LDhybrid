@@ -30,7 +30,9 @@ def hybrid2_to_q(w, eps: float = v1.HYBRID2_EPS):
     Vc, Vl = hybrid2_vertices(eps)
     M = np.column_stack([Vc, Vl - Vc])                 # w = s Vc + t (Vl − Vc)
     s, t = np.linalg.solve(M, np.asarray(w, float))
-    return _tidy([s * s, t / s if s != 0 else 0.0])
+    # q1 = s|s|, not s², so that a negative depth (limb brighter than centre)
+    # gives q1 < 0 rather than mirroring into the cube
+    return _tidy([_spow(s, 2), t / s if s != 0 else 0.0])
 
 
 def _tidy(q, tol=1e-9):
