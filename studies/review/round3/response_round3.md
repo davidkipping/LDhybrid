@@ -196,16 +196,26 @@ The margin is small; the author list will add a few lines.
 
 - **Placeholders:** authors, DOI, licence, the companion arXiv id, and the
   companion code's language, gradients and archive.
-- **Release (needs a re-upload):**
-  - version tag in the ReadMe header;
-  - Phys/Bound flag wording for hybrid4;
-  - Δw basis note;
-  - missing G280/MIRI corrections noted in the ReadMe;
-  - "constrained to their physical regions" in the ReadMe Description;
-  - q printed in E format (the paper now says w is primary).
-- **Code:** an isotropic `cov_floor`; the depth-flat q variant.
+- **Done after the first draft of this response:**
+  - The ladder parameter is now γ; α is kept for the power-2 exponent, which
+    is now defined in Sect. 4.2. The companion paper should use the same
+    symbol.
+  - Table 2 is now one column wide.
+  - `cov_floor` now raises every eigenvalue of the prior covariance to the
+    floor, as Sect. 8 recommends.
+  - `apply_offsets` now refuses a prior built in a passband the offsets were
+    not measured in (override: `force=True`).
+  - Both interpolators now return `mu_cri`.
+  - ReadMe:
+    - a version line;
+    - the constraint of each law (new Note 16);
+    - the Bound flag wording;
+    - the basis of the hybrid4 Δw and s_w;
+    - the missing G280/MIRI corrections;
+    - q derived from w, with its precision and the implied prior;
+    - the ladder formula.
 - **Not done:**
   - noisy injection–recovery tests;
   - M-dwarf prior widths in coefficient units;
-  - a separate symbol for the ladder α versus the power-2 α (kept, because
-    the ReadMe and the companion paper use α).
+  - the depth-flat q variant in code;
+  - q printed in E format (the ReadMe now states that w is primary).

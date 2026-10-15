@@ -14,7 +14,7 @@ Law (hybrid4, curvature-simplex basis):
     I(mu)/I(1) = 1 - w1 (1 - mu^2) - w2 (1 - mu^2)^2 - w3 S3(mu) - w4 S4(mu)
     S3, S4 = B[k] . (1 - mu^4, (1 - mu^2)^2, P(mu; e0), P(mu; e1)), B = BASIS[2:]
     P(mu; e) = [(mu^2 + e)^-2 - (1 + e)^-2] / [e^-2 - (1 + e)^-2]
-    e0, e1 = 0.028601207249486824, 0.38582417584735224  (pole ladder with alpha = 25/16)
+    e0, e1 = 0.028601207249486824, 0.38582417584735224  (pole ladder with gamma = 25/16)
 With x = mu^2, w >= 0 and sum(w) <= 1 is exactly the set of hybrid4 profiles
 with I(0) >= 0, dI/dx >= 0, d2I/dx2 <= 0, d3I/dx3 >= 0 on [0, 1]. Sampling
 coordinates (the analogue of Kipping 2013's q1, q2): s = sum(w) = 1 - I(0) =

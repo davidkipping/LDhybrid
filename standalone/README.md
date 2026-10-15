@@ -33,7 +33,7 @@ or `python ldhybrid_hybrid4_mps2_tess.py 5600 4.4 0.0`.
   slope. `from_q`/`to_q` convert to the sampling coordinates q1–q4 (q1 =
   (1 − I(0))⁴, the analogue of Kipping's q1). For SquishierPlanet or Elómë,
   which take weights on the monomial-pole shapes, use `w @ BASIS`.
-- hybrid4 here uses the α = 25/16 poles (0.02860121, 0.38582418). Do not use
+- hybrid4 here uses the γ = 25/16 poles (0.02860121, 0.38582418). Do not use
   them with hybrid4 implementations that use the old α = 1 poles.
 
 Regenerate with `.venv/bin/python scripts/make_standalone.py`.

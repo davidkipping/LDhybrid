@@ -84,6 +84,14 @@ _OFF_W = [("Regime", 15), ("Bands", 26), ("Grid", 7), ("Corr", 11), ("Route", 7)
           ("Offset", 7), ("e_Offset", 6), ("Scatter", 6), ("rho", 6), ("N", 2), ("Ref", 30)]
 #: offsets-table statistic -> observables() name
 _STAT = {"h1p": "h1", "h2p": "h2", "ell": "ell", "delta": "delta"}
+#: passbands each offsets.dat regime applies to (apply_offsets checks the prior's band)
+OFFSET_BANDS = {"Kepler": ("Kepler",), "TESS": ("TESS",),
+                "JWST_0.86-5.5um": ("JWST_NIRISS_SOSS_o1", "JWST_NIRISS_SOSS_o2", "JWST_NIRSpec_PRISM",
+                                    "JWST_NIRSpec_G140M_F070LP", "JWST_NIRSpec_G140M_F100LP",
+                                    "JWST_NIRSpec_G140H_F070LP", "JWST_NIRSpec_G140H_F100LP",
+                                    "JWST_NIRSpec_G235M", "JWST_NIRSpec_G235H", "JWST_NIRSpec_G395M",
+                                    "JWST_NIRSpec_G395H", "JWST_NIRSpec_G395H_NRS1",
+                                    "JWST_NIRSpec_G395H_NRS2", "JWST_NIRCam_F322W2", "JWST_NIRCam_F444W")}
 #: lowest Teff shared by PHOENIX and MPS-ATLAS (for the M-dwarf systematic floor)
 TEFF_SHARED = 3500.0
 
@@ -530,7 +538,7 @@ class LDTables:
                      extrapolate=None, refit=False, correction=None, mu_min=0.0):
         """Interpolated coefficients of `law` at (Teff, log g, [M/H]) in `band`.
 
-        Returns dict(coeffs, physical, mucri, lc_ppm, inside, grid, method, band,
+        Returns dict(coeffs, physical, mu_cri, lc_ppm, inside, grid, method, band,
         correction, and for the hybrid laws q: the sampling coordinates, to_q()). lc_ppm is the interpolated light-curve error of the
         tabulated fits. refit=True interpolates the band profiles instead and
         refits (refit(); needs the profile files and h5py; r-weighted method
@@ -559,7 +567,7 @@ class LDTables:
                 y = g(x)[0]
             n = len(COEFFS[law])
             coeffs = dict(zip(COEFFS[law], (float(v) for v in y[:n])))
-            r = dict(law=law, coeffs=coeffs, mucri=float(y[n]), lc_ppm=float(y[n + 1]),
+            r = dict(law=law, coeffs=coeffs, mu_cri=float(y[n]), lc_ppm=float(y[n + 1]),
                      inside=inside, grid=grid, method=method, band=band)
         if correction:
             dw = self.delta_w(law, band, teff, correction)
@@ -629,7 +637,7 @@ class LDTables:
             self._data["_off"] = self._fixed("offsets.dat", _OFF_W)
         return self._data["_off"]
 
-    def apply_offsets(self, prior, regime, statistics=None, route="hybrid5"):
+    def apply_offsets(self, prior, regime, statistics=None, route="hybrid5", force=False):
         """Condition a prior (from prior()) on the tabulated empirical offsets
         for `regime` ("Kepler", "TESS", "JWST_0.86-5.5um"), measured against
         predictions of the same grid and correction state as the prior (an
@@ -637,7 +645,16 @@ class LDTables:
         magnetic correction twice). Kepler/TESS h'1 and h'2 are applied jointly
         with their tabulated correlation; the star-to-star scatter is the
         width. route="hybrid5" uses the offsets of the hybrid5 fits' statistics
-        (exact for conditioning weights). Returns (mean', cov')."""
+        (exact for conditioning weights). The prior's passband must be one the
+        offsets were measured in: Kepler or TESS for those regimes, and for the
+        JWST regime a JWST band within 0.6-5.5 um (the offsets are means over
+        NIRISS SOSS and NIRSpec PRISM bins at 0.86-5.5 um). force=True skips
+        this check. Returns (mean', cov')."""
+        band = prior.get("band")
+        if not force and band is not None and band not in OFFSET_BANDS.get(regime, (band,)):
+            raise ValueError(f"the {regime} offsets were not measured in {band}; build the prior "
+                             f"in one of {sorted(OFFSET_BANDS[regime])}, or pass force=True to "
+                             "apply them anyway")
         corr = {None: "none"}.get(prior.get("correction"), "MURaM_" + str(prior.get("correction")))
         stats = statistics or (["ell"] if regime.startswith("JWST") else ["h1p", "h2p"])
         rows = {r["Stat"]: r for r in self.offsets() if r["Regime"] == regime
@@ -675,11 +692,12 @@ class LDTables:
         True, the spread at the nearest point shared by all three grids
         (Teff = 3500 K, log g and [M/H] clipped to the MPS-ATLAS range) is used
         instead, with a warning.
-        cov_floor: minimum variance (scalar, or one per coefficient) on the
-        diagonal, for the uncertainties the tables do not contain (limb
-        convention, μ sampling, model-observation offsets); the interpolated
-        covariance alone is nearly singular along directions the stellar
-        parameters do not move. With σ → 0, no systematic and no floor, mean
+        cov_floor: minimum variance in every direction (a scalar): eigenvalues of
+        the covariance below it are raised to it, for the uncertainties the
+        tables do not contain (limb convention, μ sampling, model-observation
+        offsets); the interpolated covariance alone is nearly singular along
+        directions the stellar parameters do not move. The floor is per weight,
+        so its meaning depends on the law's basis. With σ → 0, no systematic and no floor, mean
         equals coefficients() and cov → 0."""
         rng = np.random.default_rng(seed)
         f, _ = self._interpolator(grid, law, band, method, None)
@@ -725,8 +743,9 @@ class LDTables:
             if len(W) > 1:
                 cov = cov + np.atleast_2d(np.cov(W.T, ddof=1))
         if cov_floor is not None:
-            fl = np.broadcast_to(np.asarray(cov_floor, float), (cov.shape[0],))
-            cov = cov + np.diag(np.clip(fl - np.diag(cov), 0.0, None))
+            fl = float(cov_floor)
+            lam, V = np.linalg.eigh(0.5 * (cov + cov.T))
+            cov = (V * np.maximum(lam, fl)) @ V.T
         return dict(law=law, mean=mean, cov=np.atleast_2d(cov), n_used=int(ok.sum()),
                     dropped=float(dropped), grids=grids, grid=grid, band=band, method=method,
                     correction=correction, floor_point=floor_point)
@@ -816,7 +835,7 @@ def main(argv=None):
                                         a.method, "nearest" if a.nearest else None,
                                         correction=a.correction)
     print(" ".join(f"{k} = {v:.6f}" for k, v in r["coeffs"].items()))
-    print(f"physical = {r['physical']}, mu_cri = {r['mucri']:.5f}, "
+    print(f"physical = {r['physical']}, mu_cri = {r['mu_cri']:.5f}, "
           f"fit LC error ≈ {r['lc_ppm']:.2f} ppm, inside grid = {r['inside']}, "
           f"correction = {r['correction']}")
 

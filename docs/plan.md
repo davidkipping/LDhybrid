@@ -21,7 +21,7 @@ profiles, with the physical constraints imposed by construction.
 | law | shapes T_j | poles ε | free |
 |---|---|---|---|
 | hybrid2 | 1 − μ², Π_ε | **0.36** (re-tuned in P2c; was 0.208, J band) | 2 |
-| hybrid4 | 1 − μ², (1 − μ²)², S3, S4 (curvature-simplex basis since 2026-10-14; was 1 − μ⁴, (1 − μ²)², Π_ε0, Π_ε1) | analytic ladder K=2, α = 25/16: 0.02860, 0.3858 (was α = 1: 0.01176, 0.3041) | 4 |
+| hybrid4 | 1 − μ², (1 − μ²)², S3, S4 (curvature-simplex basis since 2026-10-14; was 1 − μ⁴, (1 − μ²)², Π_ε0, Π_ε1) | analytic ladder K=2, γ = 25/16: 0.02860, 0.3858 (was α = 1: 0.01176, 0.3041) | 4 |
 | hybrid5 | 1 − μ⁴, (1 − μ²)², Π_ε0..2 | analytic ladder K=3: 0.001597, 0.04128, 0.3874 | 5 |
 
 Poles are universal constants, never fitted per star: this keeps the laws

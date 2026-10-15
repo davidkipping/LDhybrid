@@ -79,9 +79,10 @@ F = light_curve("hybrid4", r["coeffs"], z, p=0.1)        # circular planet
 python -m ldhybrid.interpolate hybrid5 5600 4.4 0.1 TESS --grid mps2 --tables cds
 ```
 
-`cov_floor` raises each coefficient's variance to at least the floor; it does
-not lift the off-diagonal structure, so check the eigenvalues of `p["cov"]` if
-you need every direction to be at least that wide. Refits of interpolated
+`cov_floor` raises every eigenvalue of the covariance to at least the floor,
+so no combination of the coefficients is narrower than √floor. `apply_offsets`
+checks that the prior's passband is one the offsets were measured in (Kepler,
+TESS, or a JWST band for the JWST regime). Refits of interpolated
 profiles (`refit=True`) need the Zenodo band profiles and h5py; see the
 [guide](docs/interpolator.md).
 
@@ -99,7 +100,7 @@ law = ld.to_law("hybrid5", r["w"])     # squishierplanet.Law (needs SquishierPla
 
 ### hybrid4's basis
 
-hybrid4 (poles ε = 0.028601, 0.38582, from the α = 25/16 ladder) is tabulated
+hybrid4 (poles ε = 0.028601, 0.38582, from the γ = 25/16 ladder) is tabulated
 on its **curvature-simplex basis**: w ≥ 0, Σw ≤ 1 is exactly the set of hybrid4
 profiles that are positive, monotonic, concave in μ² and of convex slope in μ²,
 and q1–q4 ∈ [0, 1] (q1 = (1 − I(0))⁴) map onto it uniformly. Codes that take
@@ -116,7 +117,7 @@ interchangeable: recompute q from w. Details:
 and band profiles released (GitHub draft release and Zenodo draft); the paper
 is under internal (mock) referee review (`studies/review/`). v1.0 law and
 method definitions are frozen in `ldhybrid/v1.py` (hybrid2 ε = 0.36; hybrid4
-curvature basis with α = 25/16 poles; r-weighted fits; M1 limb). Validation:
+curvature basis with γ = 25/16 poles; r-weighted fits; M1 limb). Validation:
 `studies/p4/results.md`, `studies/rev*/`. Plan of work: [`docs/plan.md`](docs/plan.md).
 
 Products are described in [`docs/products.md`](docs/products.md): band

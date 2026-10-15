@@ -61,7 +61,7 @@ standalone files) convert.
 hybrid4 weights on the monomial-pole shapes (1 − μ⁴, (1 − μ²)², Π(0.028601),
 Π(0.38582)). Convert with `w @ H4_BASIS` (or use the expanded-form columns
 c0, c2, c4, d1, d2 of the tables, which are basis-free). hybrid4 uses the pole
-ladder with α = 25/16 (since 2026-10-11): do not combine its coefficients with
+ladder with γ = 25/16 (since 2026-10-11): do not combine its coefficients with
 code that still uses the α = 1 poles (0.01176, 0.3041).
 
 **Which fit.** The headline coefficients (`method="r"`) are least-squares fits
@@ -136,7 +136,7 @@ r = t.coefficients("hybrid5", teff=5600, logg=4.4, mh=0.1, band="TESS", grid="mp
 r["coeffs"]      # {"w1": ..., ..., "w5": ...}
 r["q"]           # sampling coordinates (hybrid laws)
 r["physical"]    # positive and monotonic?
-r["mucri"]       # mu at the stellar edge (spherical models; 0 for MPS-ATLAS)
+r["mu_cri"]      # mu at the stellar edge (spherical models; 0 for MPS-ATLAS)
 r["lc_ppm"]      # light-curve error of the tabulated fit (p = 0.1)
 r["inside"]      # False if extrapolate="nearest" was used outside the grid
 
@@ -190,14 +190,11 @@ covariance of the coefficients.
 - `systematic=True` adds the spread between the PHOENIX, MPS-ATLAS Set 1 and
   Set 2 grids at the star. Below 3500 K only PHOENIX covers the star, and the
   spread at 3500 K is substituted (with a warning).
-- `cov_floor` raises the variance of each coefficient to at least the floor
-  (scalar, or one value per coefficient). **Use it**: without it the covariance
-  is nearly singular in directions the stellar parameters don't move, which
-  would effectively fix those combinations at the model values. It acts on the
-  diagonal only, so correlated directions can stay narrower than the floor
-  (e.g. smallest eigen-direction s.d. 0.002–0.005 for the example above with
-  `systematic=True`); add `floor * np.eye(n)` to `p["cov"]` yourself if every
-  direction must be at least that wide.
+- `cov_floor` (a scalar variance) raises every eigenvalue of the covariance
+  to at least the floor, so no combination of the coefficients is narrower
+  than √floor; wider directions are left unchanged. **Use it**: without it the
+  covariance is nearly singular in directions the stellar parameters don't
+  move, which would effectively fix those combinations at the model values.
 - The floor and any fixed prior width are per coefficient, so their meaning
   depends on the basis (hybrid4's curvature basis differs from its
   monomial-pole form); widths on h′₁, h′₂ and I(0) (`observables`) are
@@ -208,9 +205,10 @@ covariance of the coefficients.
 ### Empirical offsets
 
 Measured offsets between model and observed limb darkening (Maxted 2023 for
-Kepler and TESS; Sing et al. 2026 for JWST) can update the prior. Use the
-regime that matches the prior's passband (the code checks the grid and
-correction state, not the band):
+Kepler and TESS; Sing et al. 2026 for JWST) can update the prior. The regime
+must match the prior's passband: Kepler or TESS, or for `"JWST_0.86-5.5um"`
+a JWST band at 0.6–5.5 µm (NIRISS SOSS, NIRSpec, NIRCam). A mismatch raises;
+`force=True` applies the offsets anyway.
 
 ```python
 m, C = t.apply_offsets(p, regime="Kepler")    # or "TESS", "JWST_0.86-5.5um"

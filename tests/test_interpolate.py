@@ -63,3 +63,26 @@ def test_agrees_with_package_api():
     a = t.coefficients("hybrid4", 4321, 4.37, -0.13, "HST_WFC3_G141", grid="phoenix")
     b = ld.coefficients("hybrid4", 4321, 4.37, -0.13, "HST_WFC3_G141", grid="phoenix")
     assert np.allclose(list(a["coeffs"].values()), b["w"], atol=2e-6)   # 6-decimal tables
+
+
+def test_mu_cri_key_and_eigenvalue_floor(tmp_path):
+    _write_table(tmp_path / "phoenix_hybrid5.dat.gz", "hybrid5")
+    t = LDTables(tmp_path, cache=False)
+    assert t.coefficients("hybrid5", 5100, 4.2, -0.2, "TESS", grid="phoenix")["mu_cri"] == 0.05
+    # a Teff-only spread is rank one; the floor must lift every other direction
+    p0 = t.prior("hybrid5", 5100, 30, 4.2, 0.0, -0.2, 0.0, "TESS", grid="phoenix")
+    p = t.prior("hybrid5", 5100, 30, 4.2, 0.0, -0.2, 0.0, "TESS", grid="phoenix", cov_floor=1e-6)
+    lam0, lam = np.linalg.eigvalsh(p0["cov"]), np.linalg.eigvalsh(p["cov"])
+    assert lam0[0] < 1e-12 and np.isclose(lam[0], 1e-6) and lam0[-1] > 1e-5
+    assert np.isclose(lam[-1], lam0[-1])                          # wide direction untouched
+
+
+@pytest.mark.data
+@pytest.mark.skipif(not (CDS / "offsets.dat").exists(), reason="CDS tables not built")
+def test_offsets_check_the_passband():
+    t = LDTables(CDS, cache=False)
+    p = t.prior("hybrid5", 5600, 50, 4.4, 0.1, 0.0, 0.1, "TESS", grid="mps2", n=200)
+    t.apply_offsets(p, "TESS")
+    with pytest.raises(ValueError, match="not measured in TESS"):
+        t.apply_offsets(p, "Kepler")
+    t.apply_offsets(p, "Kepler", force=True)

@@ -176,19 +176,19 @@ $\{1-\mu^2,1-\mu^4\}$, and both its shapes are monotonic, so non-negative
 weights suffice for a monotonic profile. The weights of the two laws therefore
 mean different things; the tables also give a basis-free form
 (Sect.~\ref{sec:tables}). The poles of hybrid4 and hybrid5 lie on the ladder
-$\varepsilon_k=\exp[(2\pi/\sqrt\alpha)(\sqrt{k+1/2}-\sqrt K)]$, $k=0,\dots,K-1$,
-which follows from discretising an exact representation of $\mu^{2\alpha}$ as a
+$\varepsilon_k=\exp[(2\pi/\sqrt\gamma)(\sqrt{k+1/2}-\sqrt K)]$, $k=0,\dots,K-1$,
+which follows from discretising an exact representation of $\mu^{2\gamma}$ as a
 superposition of double poles in $\mu^2$ \citep{squishier}. Its poles cluster
 exponentially towards the limb with the tapered spacing of the ``lightning''
 rational approximations of \citet{gopal2019} and \citet{herremans2023}, which
 likewise combine clustered poles with a low-degree polynomial; $K$ is the
-number of poles and $\alpha$ sets how strongly they cluster. For hybrid5
-($K=3$) we use $\alpha=1$, which gives $\varepsilon=0.0015966$, 0.041275, and
-0.38743. For hybrid4 ($K=2$), $\alpha=1$ puts the inner pole at
+number of poles and $\gamma$ sets how strongly they cluster. For hybrid5
+($K=3$) we use $\gamma=1$, which gives $\varepsilon=0.0015966$, 0.041275, and
+0.38743. For hybrid4 ($K=2$), $\gamma=1$ puts the inner pole at
 $\varepsilon=0.0118$, where it acts only at $\mu\lesssim0.1$, and spends one of
 four parameters on a part of the limb that a transit barely samples. We
-therefore treat $\alpha$ as a tuning constant for hybrid4 and use
-$\alpha=25/16$, which gives $\varepsilon=0.028601$ and 0.38582 and lowers the
+therefore treat $\gamma$ as a tuning constant for hybrid4 and use
+$\gamma=25/16$, which gives $\varepsilon=0.028601$ and 0.38582 and lowers the
 median light-curve error on the method study (Sect.~\ref{sec:fitting}) from
 5.0 to 1.9\ppm; Appendix~\ref{app:laws} gives the tuning and its
 out-of-sample tests. The light curve is elementary for any $\varepsilon>0$. We
@@ -519,7 +519,8 @@ unconstrained four-term fit would have a median light-curve error of 1.8\ppm{}
 instead of 4.6\ppm, but it would describe a profile that brightens somewhere
 on the disc.
 
-Power-2 was fitted without constraints by the Levenberg--Marquardt method
+Power-2, $I/I(1)=1-c\,(1-\mu^\alpha)$, was fitted without constraints by the
+Levenberg--Marquardt method
 (start $c=0.7$, $\alpha=0.6$; tolerances $10^{-14}$), as in published tables.
 Its fits are unphysical ($c>1$, a negative limb intensity) in 22\% of PHOENIX
 and 3.5--3.8\% of MPS-ATLAS rows (29\% of the uniform-$\mu$ PHOENIX fits). The
@@ -613,14 +614,16 @@ edge falls; we did not try to decide whether it is physical. These rows are
 flagged, and the light curve of a monotonic law misrepresents them by up to
 50\ppm.
 
-\begin{table*}
+\begin{table}
 \caption{Light-curve error (ppm) of the tabulated fits: median / 99th
 percentile / maximum over all models and passbands, $p=0.1$.}
 \label{tab:quality}
 \centering
+\small
+\setlength{\tabcolsep}{2.5pt}
 \begin{tabular}{lcccc}
 \hline\hline
-Law & $n$ & PHOENIX & MPS-ATLAS Set 1 & MPS-ATLAS Set 2\\
+Law & $n$ & PHOENIX & MPS-ATLAS 1 & MPS-ATLAS 2\\
 \hline
 hybrid5 & 5 & 1.3 / 5.6 / 51 & 0.83 / 4.3 / 6.9 & 0.85 / 4.3 / 7.0\\
 hybrid4 & 4 & 2.1 / 6.6 / 51 & 1.6 / 5.6 / 7.4 & 1.5 / 5.7 / 7.4\\
@@ -634,7 +637,7 @@ Quadratic & 2 & 41 / 133 / 507 & 51 / 100 / 133 & 49 / 98 / 131\\
 and 695\,934 MPS-ATLAS (per set) model--passband rows of each law ($r$-weighted fits).
 The power-2 statistics include the unphysical fits ($c>1$; 22\% of the PHOENIX
 rows).}
-\end{table*}
+\end{table}
 
 \begin{figure*}
 \centering
@@ -1054,8 +1057,9 @@ below 3500\,K (Fig.~\ref{fig:coef}), this is a lower limit.
 stellar-parameter uncertainties and the grid-to-grid covariance. The draws
 alone give covariances that are nearly singular along some directions
 ($\sigma\sim10^{-5}$--$10^{-4}$), far narrower than the model uncertainties of
-this section, so a covariance floor should be added to every direction
-(e.g. $0.01^2$ times the identity), not only to the diagonal. Narrow priors
+this section, so a floor should be imposed on every direction, not only on
+the diagonal; our code raises every eigenvalue of the covariance to at least
+the floor (e.g. $0.01^2$). Narrow priors
 centred on small infrared weights put some mass outside the region; truncating
 there shifts the effective prior mean. The
 empirical offsets of Sect.~\ref{sec:obs} are measured in $h'_1$, $h'_2$, or
@@ -1094,8 +1098,8 @@ largest pairwise light-curve difference between the three grids at each
 shared point.
 
 The hybrid4 weights refer to the curvature basis of Sect.~\ref{sec:laws} with
-the $\alpha=25/16$ poles (LDhybrid v1.0). Earlier versions of hybrid4 used the
-$\alpha=1$ poles, or the same poles on the monomial-pole shapes $T$ of
+the $\gamma=25/16$ poles (LDhybrid v1.0). Earlier versions of hybrid4 used the
+$\gamma=1$ poles, or the same poles on the monomial-pole shapes $T$ of
 Appendix~\ref{app:laws}; weights from one definition give a wrong profile in a
 code that expects another. Weights on $T$ are $wB$, and $q$ values from any
 earlier basis must be recomputed from $w$. The hybrid4 $\Delta w$ corrections
@@ -1405,8 +1409,8 @@ $\mu_{\rm min}$, at $\mu_{\rm min}=0.2$.}
 
 \section{Construction of the hybrid laws}\label{app:laws}
 \paragraph{The hybrid4 ladder.} Scaling $\ln\varepsilon_k$ of the
-$\alpha=1$ ladder by a common factor $\kappa$, equivalent to
-$\alpha=1/\kappa^2$, the median light-curve error of hybrid4 on the method
+$\gamma=1$ ladder by a common factor $\kappa$, equivalent to
+$\gamma=1/\kappa^2$, the median light-curve error of hybrid4 on the method
 study (production metric of Sect.~\ref{sec:lcerr}, both grids) falls from
 5.0\ppm{} at $\kappa=1$ to a broad minimum of 1.9\ppm{} at
 $\kappa=0.80$--0.83. Optimising the two poles independently gains nothing
@@ -1416,14 +1420,14 @@ at $\kappa\approx0.87$ (1.6\ppm) and MPS-ATLAS alone at $\kappa\approx0.77$
 times that grid's optimum, so the accuracy of hybrid4 depends more on the grid
 than that of hybrid5. Tuned on one grid and tested on the other, the choice
 still reduces the error on the held-out grid by a factor of 1.5--2 relative to
-$\alpha=1$, and 40 random halves of the method study select the same poles,
+$\gamma=1$, and 40 random halves of the method study select the same poles,
 at a median cost of 0.0\ppm{} (90th percentile 0.5\ppm) on the other half.
 On 200 further models (8100 model--passband combinations, outside the method
 study) the median error is 1.8\ppm{} for $\kappa=0.8$, against 5.8\ppm{} for
-$\alpha=1$ and 2.0\ppm{} for the four-term law. We adopt $\kappa=0.8$, i.e.
-$\alpha=25/16$. For hybrid5 the same scan is flat ($\kappa=0.7$--1.0 changes
-the median error by less than 0.1\ppm), so we keep $\alpha=1$ there. With
-$\alpha\ne1$ the ladder no longer discretises a profile we fit; it is a
+$\gamma=1$ and 2.0\ppm{} for the four-term law. We adopt $\kappa=0.8$, i.e.
+$\gamma=25/16$. For hybrid5 the same scan is flat ($\kappa=0.7$--1.0 changes
+the median error by less than 0.1\ppm), so we keep $\gamma=1$ there. With
+$\gamma\ne1$ the ladder no longer discretises a profile we fit; it is a
 parametrisation of the pole spacing.
 
 \paragraph{The hybrid2 pole.} To test the pole of hybrid2 out of sample, we
