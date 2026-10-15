@@ -1,0 +1,1 @@
+{"MURaM": {"sets": 304, "matched_exact": 304, "nearest": 0, "missing": 0, "outside_simplex": 0, "violate_I_II": 0, "min_w": 0.018524, "max_sum": 0.849346, "worst": []}, "Stagger": {"sets": 1320, "matched_exact": 1320, "nearest": 0, "missing": 0, "outside_simplex": 0, "violate_I_II": 0, "min_w": 0.024559, "max_sum": 0.866798, "worst": []}}
