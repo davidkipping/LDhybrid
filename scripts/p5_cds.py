@@ -145,12 +145,14 @@ def write_table(grid, law):
     for m in METHODS:
         k = f"{law}|{m}"
         W = h[k + "|w"][()][i, j]
+        Wt = W
         if law in ("hybrid4", "hybrid5"):
-            W = round_simplex(snap_simplex(W))      # binding fits exactly on their faces
+            W = snap_simplex(W)                     # binding fits exactly on their faces
+            Wt = round_simplex(W)                   # printed weights stay in the simplex
         rc = h["r_c"][()][i, j]
         vals = [h["teff"][()][i], h["logg"][()][i], h["mh"][()][i], bands[j],
                 np.full(len(i), m), np.sqrt(np.clip(1 - rc ** 2, 0, None))]
-        vals += [W[:, n] for n in range(W.shape[1])]
+        vals += [Wt[:, n] for n in range(Wt.shape[1])]   # q and expanded form from full precision
         if law.startswith("hybrid"):
             Q, X = to_q(law, W), expanded(law, W)
             vals += [Q[:, n] for n in range(Q.shape[1])] + [X[:, n] for n in range(X.shape[1])]
