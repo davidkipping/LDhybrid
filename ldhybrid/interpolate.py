@@ -43,6 +43,14 @@ models in scaled coordinates (Teff/100 K, log g/0.5, [M/H]/0.5), so grid holes
 are bridged and the result is exact at the models. For the hybrid laws,
 linear interpolation keeps the weights inside their convex physical region.
 Points outside the grid raise ValueError unless extrapolate="nearest".
+
+hybrid4 is tabulated on its curvature-simplex basis (H4_BASIS): w ≥ 0,
+Σw ≤ 1 is exactly the set of hybrid4 profiles that are positive, monotonic,
+concave in μ² and of convex slope in μ². from_q()/to_q() map the hybrid
+weights to and from sampling coordinates q in the unit hypercube (for
+hybrid4, q1 = (1 − I(0))⁴, the analogue of Kipping 2013's q1); a uniform q
+is a uniform prior over the region. Weights on SquishierPlanet's monomial-pole
+hybrid4 shapes are w @ H4_BASIS.
 """
 
 from __future__ import annotations
@@ -61,8 +69,8 @@ COEFFS = {"hybrid2": ("w1", "w2"), "hybrid4": ("w1", "w2", "w3", "w4"),
           "claret4": ("a1", "a2", "a3", "a4"), "power2": ("c", "alpha")}
 LAWS = tuple(COEFFS)
 #: v1.0 pole positions (frozen; ldhybrid/v1.py)
-POLES = {"hybrid2": (0.36,), "hybrid4": (0.02860121, 0.38582418),
-         "hybrid5": (0.00159655, 0.04127504, 0.38743472)}
+POLES = {"hybrid2": (0.36,), "hybrid4": (0.028601207249486824, 0.38582417584735224),
+         "hybrid5": (0.0015965451792942786, 0.04127504477274302, 0.38743471584956696)}
 SCALE = np.array([100.0, 0.5, 0.5])
 #: layout of the parsed-table cache (<table>.npz); bump when the parser changes
 TABLE_FORMAT = 2
@@ -87,12 +95,106 @@ def _pole_shape(mu, eps):
     return ((mu * mu + eps) ** -2 - (1 + eps) ** -2) / (eps ** -2 - (1 + eps) ** -2)
 
 
+def _hybrid4_basis(eps):
+    """hybrid4's shapes as rows of weights on (1 − μ⁴, (1 − μ²)², Π_ε0, Π_ε1): the
+    four non-trivial vertices of the curvature simplex (ldhybrid/v1.py). With
+    g = dI/dξ, ξ = μ²: S1 = 1 − μ², S2 = (1 − μ²)², S3 with I(0) = 0 and
+    g(1) = g'(1) = g''(1) = 0, S4 with I(0) = 0, g(1) = g'(1) = 0, g''(0) = 0."""
+    e0, e1 = eps
+    a0, a1 = (1.0 / (e ** -2 - (1 + e) ** -2) for e in eps)
+    g = lambda x: [2 * x, 2 * (1 - x), 2 * a0 * (x + e0) ** -3, 2 * a1 * (x + e1) ** -3]
+    g1 = lambda x: [2.0, -2.0, -6 * a0 * (x + e0) ** -4, -6 * a1 * (x + e1) ** -4]
+    g2 = lambda x: [0.0, 0.0, 24 * a0 * (x + e0) ** -5, 24 * a1 * (x + e1) ** -5]
+    rhs = [1.0, 0.0, 0.0, 0.0]
+    S3 = np.linalg.solve(np.array([[1.0] * 4, g(1.0), g1(1.0), g2(1.0)]), rhs)
+    S4 = np.linalg.solve(np.array([[1.0] * 4, g(1.0), g1(1.0), g2(0.0)]), rhs)
+    return np.array([[0.5, 0.5, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], S3, S4])
+
+
+#: hybrid4 basis (since 2026-10-14): S_k = Σ_j H4_BASIS[k, j] T_j. w ≥ 0, Σw ≤ 1 is
+#: then exactly the set of hybrid4 profiles that are positive, monotonic, concave
+#: in μ² and of convex slope in μ². Weights on the monomial-pole shapes
+#: (SquishierPlanet's hybrid4) are w @ H4_BASIS.
+H4_BASIS = _hybrid4_basis(POLES["hybrid4"])
+#: hybrid2's triangle vertices (exact physical region; O is the third)
+H2_VERTICES = ((-0.124615, 1.124615), (1.201039, -0.201039))
+
+
+def from_q(law, q):
+    """Hybrid weights from sampling coordinates q in the unit hypercube (a
+    uniform q gives a uniform prior over the law's region). hybrid4 (the
+    analogue of Kipping 2013's q1, q2): s = Σw = 1 − I(0) = q1^(1/4),
+    w1 = s(1 − q2^(1/3)), w2 = s q2^(1/3)(1 − q3^(1/2)),
+    w3 = s q2^(1/3) q3^(1/2)(1 − q4), w4 = s q2^(1/3) q3^(1/2) q4.
+    hybrid5: stick-breaking w_j = (1 − q_j^(1/(n+1−j))) Π_{i<j} q_i^(1/(n+1−i)).
+    hybrid2: w = √q1 [(1 − q2) V_c + q2 V_ℓ]."""
+    q = np.asarray(q, float)
+    if law == "hybrid4":
+        s = q[..., 0] ** 0.25
+        a, b = q[..., 1] ** (1 / 3), q[..., 2] ** 0.5
+        return np.stack([s * (1 - a), s * a * (1 - b), s * a * b * (1 - q[..., 3]),
+                         s * a * b * q[..., 3]], axis=-1)
+    if law == "hybrid5":
+        n = q.shape[-1]
+        out, stick = [], 1.0
+        for j in range(n):
+            r = q[..., j] ** (1.0 / (n - j))
+            out.append(stick * (1 - r))
+            stick = stick * r
+        return np.stack(out, axis=-1)
+    if law == "hybrid2":
+        Vc, Vl = (np.array(v) for v in H2_VERTICES)
+        s = np.sqrt(q[..., 0])[..., None]
+        return s * ((1 - q[..., 1])[..., None] * Vc + q[..., 1][..., None] * Vl)
+    raise ValueError("sampling coordinates are defined for the hybrid laws")
+
+
+def to_q(law, coeffs):
+    """Inverse of from_q for one set of weights (dict or sequence). Weights
+    outside the region give q outside [0, 1]; rounding noise within 1e-9 of 0
+    or 1 is put on the bound."""
+    q = _to_q(law, coeffs)
+    q = np.where((q < 0) & (q > -1e-9), 0.0, q)
+    return np.where((q > 1) & (q < 1 + 1e-9), 1.0, q)
+
+
+def _to_q(law, coeffs):
+    """Inverse of from_q for one set of weights (dict or sequence). Weights
+    outside the region give q outside [0, 1]."""
+    w = np.array([coeffs[k] for k in COEFFS[law]] if isinstance(coeffs, dict) else coeffs, float)
+    if law == "hybrid4":
+        s = w.sum()
+        if s == 0:
+            return np.zeros(4)
+        f = w / s
+        r1 = 1 - f[0]
+        r2 = 1 - f[1] / r1 if r1 != 0 else 0.0
+        f34 = f[2] + f[3]
+        return np.array([np.sign(s) * abs(s) ** 4, np.sign(r1) * abs(r1) ** 3,
+                         r2 * r2 if r2 >= 0 else r2, f[3] / f34 if f34 != 0 else 0.0])
+    if law == "hybrid5":
+        n, q, stick = w.size, np.empty(w.size), 1.0
+        for j in range(n):
+            f = 1.0 - w[j] / stick if stick > 0 else 1.0
+            q[j] = abs(f) ** (n - j) if f >= 0 else f
+            stick = stick * f if f > 0 else 0.0
+        return q
+    if law == "hybrid2":
+        Vc, Vl = (np.array(v) for v in H2_VERTICES)
+        s, t = np.linalg.solve(np.column_stack([Vc, Vl - Vc]), w)
+        return np.array([s * s, t / s if s != 0 else 0.0])
+    raise ValueError("sampling coordinates are defined for the hybrid laws")
+
+
 def shapes(law, mu):
     """The terms T_j(μ) of I(μ)/I(1) = 1 − Σ_j c_j T_j(μ), shape (len(mu), n)."""
     mu = np.asarray(mu, float)
     if law == "hybrid2":
         T = [1 - mu ** 2] + [_pole_shape(mu, e) for e in POLES[law]]
-    elif law in ("hybrid4", "hybrid5"):
+    elif law == "hybrid4":
+        T0 = np.stack([1 - mu ** 4, (1 - mu ** 2) ** 2] + [_pole_shape(mu, e) for e in POLES[law]], -1)
+        return T0 @ H4_BASIS.T
+    elif law == "hybrid5":
         T = [1 - mu ** 4, (1 - mu ** 2) ** 2] + [_pole_shape(mu, e) for e in POLES[law]]
     elif law == "quadratic":
         T = [1 - mu, (1 - mu) ** 2]
@@ -116,6 +218,8 @@ def shape_slopes(law, x):
             D = [-np.ones_like(x)] + [dpole(e) for e in POLES[law]]
         else:
             D = [-2 * x, -2 * (1 - x)] + [dpole(e) for e in POLES[law]]
+            if law == "hybrid4":
+                return np.stack(D, axis=-1) @ H4_BASIS.T
     elif law == "quadratic":
         D = [-np.ones_like(x), -2 * (1 - x)]
     elif law == "claret4":
@@ -426,7 +530,7 @@ class LDTables:
         """Interpolated coefficients of `law` at (Teff, log g, [M/H]) in `band`.
 
         Returns dict(coeffs, physical, mucri, lc_ppm, inside, grid, method, band,
-        correction). lc_ppm is the interpolated light-curve error of the
+        correction, and for the hybrid laws q: the sampling coordinates, to_q()). lc_ppm is the interpolated light-curve error of the
         tabulated fits. refit=True interpolates the band profiles instead and
         refits (refit(); needs the profile files and h5py; r-weighted method
         only; mu_min as in refit()). correction: None or a MURaM state
@@ -462,6 +566,8 @@ class LDTables:
                                                   zip(r["coeffs"].values(), dw))))
         r["correction"] = correction
         r["physical"] = is_physical(law, r["coeffs"])
+        if law.startswith("hybrid"):
+            r["q"] = tuple(float(v) for v in to_q(law, r["coeffs"]))
         return r
 
     # ---------------------------------------------------------- corrections, offsets

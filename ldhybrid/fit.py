@@ -5,7 +5,9 @@ constraints, as a convex QP.
 
 Constraints (all linear in w):
   "none"      unconstrained;
-  "simplex"   w ≥ 0, Σ w ≤ 1 (hybrid4/5's sufficient region);
+  "simplex"   w ≥ 0, Σ w ≤ 1 (hybrid5's sufficient region; for hybrid4, in its
+              curvature-simplex basis, exactly the profiles that are positive,
+              monotonic, concave in μ² and of convex slope in μ²);
   "physical"  the exact region of conditions I–II: Σ w ≤ 1 and
               −Σ_j w_j T_j'(x) ≥ 0 on a dense grid of the law's variable
               (ξ = μ² for hybrids, μ for controls); for hybrid2 this is the
@@ -27,6 +29,7 @@ from .profile import Profile, quadrature
 
 N_CONSTRAINT = 2001          # dense grid for the monotonicity constraint
 TOL_ACTIVE = 1e-9
+SNAP_TOL = 1e-9             # simplex fits within this of a face are put on it
 
 
 @dataclass
@@ -92,6 +95,8 @@ def fit_linear(law: LinearLaw, profile: Profile, measure: str = "r",
                       e if e is not None else np.zeros(0)) / scale
         if len(d) and np.any(C @ w > d + 1e-12):
             w = _qp(As, bs, scale, C, d, E, e)
+        if constraint == "simplex":
+            w = snap_simplex(w)
         active = _active(law, w, constraint)
         if fcm:
             active.append("fcm")
@@ -162,6 +167,16 @@ def _qp(As, bs, scale, C, d, E, e, tol=1e-8):
     if feasible and np.sum((R @ v1 - g) ** 2) <= obj0 * (1 + 1e-9) + 1e-30:
         v0 = v1
     return v0 / scale
+
+
+def snap_simplex(w, tol: float = SNAP_TOL):
+    """Put simplex fits exactly onto the faces they reach within the solver
+    tolerance: w_j < tol -> 0, and Σw > 1 − tol -> Σw = 1 (rescaled), so that
+    the sampling coordinates q of binding fits are exactly 0 or 1. Works on
+    one weight vector or on rows; a change of at most ~tol."""
+    w = np.where(np.asarray(w, float) < tol, 0.0, w)
+    s = w.sum(axis=-1, keepdims=True)
+    return np.where(s > 1.0 - tol, w / np.where(s > 0, s, 1.0), w)
 
 
 def is_physical(law: LinearLaw, w, tol: float = 1e-10) -> bool:

@@ -1,0 +1,22 @@
+corrections.dat              Lrecl 167  8976 records
+offsets.dat                  Lrecl 139  32 records
+systematics.dat              Lrecl 104  122400 records
+phoenix_hybrid2.dat          Lrecl 204  134560 records
+phoenix_hybrid4.dat          Lrecl 262  134560 records
+phoenix_hybrid5.dat          Lrecl 299  134560 records
+phoenix_quadratic.dat        Lrecl 120  134560 records
+phoenix_claret4.dat          Lrecl 142  134560 records
+phoenix_power2.dat           Lrecl 120  134560 records
+mps1_hybrid2.dat             Lrecl 204  1391868 records
+mps1_hybrid4.dat             Lrecl 262  1391868 records
+mps1_hybrid5.dat             Lrecl 299  1391868 records
+mps1_quadratic.dat           Lrecl 120  1391868 records
+mps1_claret4.dat             Lrecl 142  1391868 records
+mps1_power2.dat              Lrecl 120  1391868 records
+mps2_hybrid2.dat             Lrecl 204  1391868 records
+mps2_hybrid4.dat             Lrecl 262  1391868 records
+mps2_hybrid5.dat             Lrecl 299  1391868 records
+mps2_quadratic.dat           Lrecl 120  1391868 records
+mps2_claret4.dat             Lrecl 142  1391868 records
+mps2_power2.dat              Lrecl 120  1391868 records
+ReadMe written

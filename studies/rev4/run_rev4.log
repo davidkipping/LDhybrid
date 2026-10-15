@@ -1,0 +1,55 @@
+== phoenix refit with face snapping Wed Oct 14 19:52:43 EDT 2026
+phoenix: 43 chunks to update (0 done)
+  phoenix 20/43  1.7 min  eta 2 min
+  phoenix 40/43  2.6 min  eta 0 min
+  phoenix 43/43  2.7 min  eta 0 min
+ALL DONE
+phoenix 1682 models 40 bands
+   tables/phoenix/hybrid2_r.csv.gz
+   tables/phoenix/hybrid2_mu.csv.gz
+   tables/phoenix/hybrid4_r.csv.gz
+   tables/phoenix/hybrid4_mu.csv.gz
+   tables/phoenix/hybrid5_r.csv.gz
+   tables/phoenix/hybrid5_mu.csv.gz
+   tables/phoenix/quadratic_r.csv.gz
+   tables/phoenix/quadratic_mu.csv.gz
+   tables/phoenix/claret4_r.csv.gz
+   tables/phoenix/claret4_mu.csv.gz
+   tables/phoenix/power2_r.csv.gz
+   tables/phoenix/power2_mu.csv.gz
+corrections.dat              Lrecl 167  8976 records
+offsets.dat                  Lrecl 139  32 records
+systematics.dat              Lrecl 104  122400 records
+phoenix_hybrid2.dat          Lrecl 204  134560 records
+phoenix_hybrid4.dat          Lrecl 262  134560 records
+phoenix_hybrid5.dat          Lrecl 299  134560 records
+phoenix_quadratic.dat        Lrecl 120  134560 records
+phoenix_claret4.dat          Lrecl 142  134560 records
+phoenix_power2.dat           Lrecl 120  134560 records
+mps1_hybrid2.dat             Lrecl 204  1391868 records
+mps1_hybrid4.dat             Lrecl 262  1391868 records
+mps1_hybrid5.dat             Lrecl 299  1391868 records
+mps1_quadratic.dat           Lrecl 120  1391868 records
+mps1_claret4.dat             Lrecl 142  1391868 records
+mps1_power2.dat              Lrecl 120  1391868 records
+mps2_hybrid2.dat             Lrecl 204  1391868 records
+mps2_hybrid4.dat             Lrecl 262  1391868 records
+mps2_hybrid5.dat             Lrecl 299  1391868 records
+mps2_quadratic.dat           Lrecl 120  1391868 records
+mps2_claret4.dat             Lrecl 142  1391868 records
+mps2_power2.dat              Lrecl 120  1391868 records
+ReadMe written
+== standalone Wed Oct 14 20:06:30 EDT 2026
+standalone/ldhybrid_hybrid4_phoenix_tess.py  1682 models  60 kB
+standalone/ldhybrid_hybrid4_phoenix_kepler.py  1682 models  60 kB
+standalone/ldhybrid_hybrid4_mps2_tess.py  16974 models  460 kB
+standalone/ldhybrid_hybrid4_mps2_kepler.py  16974 models  461 kB
+== kipping Wed Oct 14 20:06:41 EDT 2026
+== bound Wed Oct 14 20:09:22 EDT 2026
+== validate Wed Oct 14 20:10:45 EDT 2026
+== p2 weighting Wed Oct 14 20:12:21 EDT 2026
+== p2 limb Wed Oct 14 20:12:51 EDT 2026
+== bias Wed Oct 14 20:13:19 EDT 2026
+== fisher Wed Oct 14 20:16:47 EDT 2026
+== lc section Wed Oct 14 20:17:06 EDT 2026
+== REV4 DONE Wed Oct 14 20:17:20 EDT 2026

@@ -128,9 +128,12 @@ circular planet. For circular planets the hybrid laws share with the quadratic
 and four-term laws the advantages of linearity in the coefficients: convex
 constrained fits, analytic marginalisation under Gaussian priors, and
 coefficient spectra that integrate exactly to any passband. Two properties are
-specific to them. Their light curve is elementary, and every basis shape is
-monotonic, so a simplex is a sufficient physical region; the fits lie inside
-it, so interpolated coefficients and uniform priors stay physical. With
+specific to them. Their light curve is elementary, and their physical regions
+are simplices. For hybrid4 we choose the basis so that the simplex is exact:
+it holds every hybrid4 profile that is positive, monotonic, concave in $\mu^2$,
+and of convex slope, and nothing else, and it maps to the unit hypercube like
+the $q_1$, $q_2$ of \citet{kipping2013}. The fits lie inside these regions, so
+interpolated coefficients and uniform priors stay physical. With
 tabulated coefficients, their four- and five-parameter members are as accurate
 as the four-term law. For circular-planet users the broader value of this paper may
 lie in the uniform, transit-optimised tables of all six laws, the error budget,
@@ -167,10 +170,17 @@ steeply near $\mu\approx\sqrt\varepsilon$ (Fig.~\ref{fig:basis}), the three laws
 are
 \begin{align}
 \text{hybrid2:}\ & T=\{1-\mu^2,\ \Pi_{0.36}\},\\
-\text{hybrid4:}\ & T=\{1-\mu^4,\ (1-\mu^2)^2,\ \Pi_{\varepsilon_0},\ \Pi_{\varepsilon_1}\},\\
+\text{hybrid4:}\ & T=\{1-\mu^2,\ (1-\mu^2)^2,\ S_3,\ S_4\},\\
 \text{hybrid5:}\ & T=\{1-\mu^4,\ (1-\mu^2)^2,\ \Pi_{\varepsilon_0},\ \Pi_{\varepsilon_1},\ \Pi_{\varepsilon_2}\}.
 \end{align}
-The polynomial pair spans the same space as $\{1-\mu^2,1-\mu^4\}$. We chose it
+with
+\begin{align}
+S_3&=1.020963\,\Pi_{\varepsilon_0}-0.022993\,\Pi_{\varepsilon_1}+0.001252\,(1-\mu^2)+0.000778\,(1-\mu^2)^2,\nonumber\\
+S_4&=1.338604\,\Pi_{\varepsilon_1}-0.000591\,\Pi_{\varepsilon_0}-0.162320\,(1-\mu^2)-0.175693\,(1-\mu^2)^2,\nonumber
+\end{align}
+the two pole-dominated vertices of hybrid4's physical region
+(defined below; full precision in the CDS ReadMe). The polynomial pair of
+hybrid5 spans the same space as $\{1-\mu^2,1-\mu^4\}$. We chose it
 because both shapes are monotonic, so that non-negative weights suffice for a
 monotonic profile. The poles of hybrid4 and hybrid5 lie on the ladder
 $\varepsilon_k=\exp[(2\pi/\sqrt\alpha)(\sqrt{k+1/2}-\sqrt K)]$, $k=0,\dots,K-1$.
@@ -234,22 +244,51 @@ the light curve is linear in $w$, so with Gaussian priors the coefficients can
 be marginalised analytically, conditionally on the geometry, as for the
 polynomial laws of \citet{agol2020}.
 
-Two properties are specific to the hybrid laws. Every shape decreases
-monotonically, so non-negative weights with $\sum w_j\le1$ guarantee a
-positive, monotonic profile. For hybrid2 the exact physical region is the
+Two properties are specific to the hybrid laws. The first is a physical region
+of simple form. For hybrid2 the exact region of conditions I--II is the
 triangle with vertices $(w_1,w_2)=(0,0)$, $(-0.1246,1.1246)$, and
 $(1.2010,-0.2010)$; its three edges are zero limb intensity ($w_1+w_2=1$),
-zero slope at the disc centre, and zero slope at the limb. For hybrid4 and
-hybrid5 the simplex $w_j\ge0$, $\sum w_j\le1$ is a sufficient region; we
-restrict the fits to it, and it binds in fewer than 1\% of the $r$-weighted
-fits (Sect.~\ref{sec:fitting}). The simplex is not the whole physical region:
-for hybrid4 it fills 13\% of the volume of the exact region of conditions
-I--II (about 8\% for hybrid5), which also holds profiles with a negative weight
-offset by the others. Refitting every bound hybrid4 fit within the exact region
-moves only 126 PHOENIX fits outside the simplex (2300--2600\,K, blue and
-visual bands; $w_3\ge-0.042$), and every MPS-ATLAS fit lies inside it with a
-margin. The restriction is immaterial for the tables, but a uniform prior on
-the simplex excludes physical profiles in free fits. Linear (barycentric) interpolation of
+zero slope at the disc centre, and zero slope at the limb. Every shape of
+hybrid5 decreases monotonically, so non-negative weights with $\sum w_j\le1$
+guarantee a positive, monotonic profile. This simplex is sufficient but not
+complete: it fills about 8\% of the volume of the exact region, which also
+holds profiles with a negative weight offset by the others. We restrict the
+hybrid5 fits to it, and it binds in fewer than 1\% of the $r$-weighted fits
+(Sect.~\ref{sec:fitting}).
+
+For hybrid4 we choose the basis so that the simplex is exact. Writing
+$x=\mu^2$, we add to conditions I--II, $I(0)\ge0$ and ${\rm d}I/{\rm d}x\ge0$,
+two conditions on the curvature: the profile is concave in $\mu^2$ and its
+slope is convex, ${\rm d}^2I/{\rm d}x^2\le0$ and ${\rm d}^3I/{\rm d}x^3\ge0$ on
+$0\le x\le1$. Any profile that is concave and increasing in $\mu$ is concave in
+$\mu^2$, and the linear law satisfies all four conditions. They are
+supported by the models. All but 0.002\% of the MPS-ATLAS Set~2 band profiles
+satisfy them at every tabulated $\mu$ (the exceptions are blue bands at
+$\mu\le0.03$). PHOENIX profiles violate them mainly at $\mu<0.1$, where the
+spherical limb has an inflection; above $\mu=0.1$, 0.2\% of them do. For
+hybrid4 the four conditions reduce to five linear inequalities. The third
+derivative involves only the two pole terms, whose ratio is monotonic in $x$,
+so it is non-negative on $[0,1]$ if it is at both ends. The second derivative
+then increases, so it is non-positive if it is at $x=1$, and the slope then
+decreases, so it is non-negative if it is at $x=1$. With $I(0)\ge0$, these
+five inequalities in four weights bound a 4-simplex. Its vertices are the
+uniform disc, $I=\mu^2$, $I=1-(1-\mu^2)^2$, and two profiles with zero limb
+intensity dominated by the inner and the outer pole (Fig.~\ref{fig:basis}).
+We take the drops $1-I$ of the four non-trivial vertices as the hybrid4 shapes, so that
+$w_j\ge0$, $\sum w_j\le1$ is exactly the set of hybrid4 profiles that satisfy
+the four conditions: every weight vector in it gives such a profile, and
+every such profile has one. We checked both statements numerically
+(400\,000 uniform draws from the simplex; 82\,000 profiles drawn uniformly from
+the region defined by the conditions alone). The region is smaller than that
+of conditions I--II alone, of which it fills 9\%; 96\% of the excluded volume
+is convex in $\mu^2$ somewhere, like $I=\mu^4$, which no model produces. All
+2.9~million tabulated hybrid4 fits satisfy the curvature conditions with a
+margin. The only fits that would gain from dropping them are 123 PHOENIX fits
+at 2300--2600\,K in blue and visual bands. Their light-curve errors fall from
+26 to 15\ppm{} (median) when they give up concavity to follow the spherical
+limb.
+
+Linear (barycentric) interpolation of
 tabulated weights forms convex combinations and so stays inside the region;
 higher-order (e.g. cubic) interpolation does not. Four-term fits, by contrast,
 have coefficients of mixed sign, and their physical region has no simple form.
@@ -271,13 +310,22 @@ any tabulated law can be computed for a circular planet with our
 interpolation code or with any transit code that accepts a numerical radial
 profile.
 
-For sampling we map the physical region to the unit hypercube, in the manner
+For sampling we map each region to the unit hypercube, in the manner
 of \citet{kipping2013}. For hybrid2,
 $w=\sqrt{q_1}\,[(1-q_2)V_{\rm c}+q_2V_\ell]$, with $V_{\rm c}$ and $V_\ell$
-the two non-zero vertices above. For hybrid4 and hybrid5 we use stick-breaking
-of a flat Dirichlet distribution,
-$w_j=(1-q_j^{1/(n+1-j)})\prod_{i<j}q_i^{1/(n+1-i)}$. Both maps give uniform
-priors over the region. A uniform prior on the simplex is not uninformative
+the two non-zero vertices above. For hybrid4 we follow Kipping's $q_1$, $q_2$
+most closely. The depth $s=\sum w_j=1-I(0)/I(1)$ is set by $q_1=s^4$, the
+analogue of Kipping's $q_1=(u_1+u_2)^2$, and the direction by stick-breaking of
+a flat Dirichlet distribution:
+\begin{align}
+w_1&=s\,(1-q_2^{1/3}), & w_2&=s\,q_2^{1/3}(1-q_3^{1/2}),\nonumber\\
+w_3&=s\,q_2^{1/3}q_3^{1/2}(1-q_4), & w_4&=s\,q_2^{1/3}q_3^{1/2}q_4.\nonumber
+\end{align}
+Every $q\in[0,1]^4$ then gives a positive, monotonic profile, concave in
+$\mu^2$ with a convex slope, and every such hybrid4 profile has exactly one $q$
+(up to the degenerate faces of the cube). For hybrid5 we use stick-breaking of the simplex,
+$w_j=(1-q_j^{1/(n+1-j)})\prod_{i<j}q_i^{1/(n+1-i)}$. All three maps give uniform
+priors over the regions, and the tables list $q$ beside $w$. A uniform prior on the simplex is not uninformative
 about the profile. For hybrid5 it implies 90\% intervals of 0.58--0.93 for
 $h'_1=I(2/3)$, 0.08--0.32 for $h'_2=I(2/3)-I(1/3)$, and 0.01--0.45 for $I(0)$.
 These cover the optical profiles of FGKM dwarfs, but not the flatter
@@ -424,11 +472,11 @@ on the method study.}
 \hline\hline
 Grid & Weighting & hybrid5 & hybrid4 & hybrid2 & Four-term & Power-2 & Quadratic\\
 \hline
-PHOENIX & Equal per node & 43 / 333 & 104 / 222 & 465 / 1270 & 75 / 204 & 247 / 582 & 289 / 914\\
- & Uniform in $\mu$ & 13 / 33 & 58 / 110 & 213 / 461 & 55 / 123 & 56 / 166 & 182 / 422\\
+PHOENIX & Equal per node & 43 / 333 & 108 / 209 & 465 / 1270 & 75 / 204 & 247 / 582 & 289 / 914\\
+ & Uniform in $\mu$ & 13 / 33 & 58 / 112 & 213 / 461 & 55 / 123 & 56 / 166 & 182 / 422\\
  & Uniform in $r$ & 1.9 / 9.7 & 3.9 / 11 & 56 / 146 & 6.3 / 20 & 12 / 73 & 60 / 176\\
  & Uniform in area & 2.3 / 12 & 4.9 / 13 & 58 / 133 & 7.3 / 23 & 12 / 75 & 58 / 168\\
-MPS-ATLAS 2 & Equal per node & 8.1 / 23 & 74 / 140 & 326 / 499 & 8.7 / 33 & 60 / 326 & 256 / 456\\
+MPS-ATLAS 2 & Equal per node & 8.1 / 23 & 74 / 145 & 326 / 499 & 8.7 / 33 & 60 / 326 & 256 / 456\\
  & Uniform in $\mu$ & 4.0 / 16 & 14 / 35 & 170 / 264 & 3.7 / 16 & 24 / 102 & 140 / 247\\
  & Uniform in $r$ & 1.4 / 8.8 & 2.3 / 8.6 & 49 / 111 & 1.3 / 9.2 & 9.8 / 52 & 74 / 116\\
  & Uniform in area & 1.7 / 10 & 2.6 / 9.7 & 54 / 101 & 1.5 / 10 & 10 / 54 & 70 / 111\\
@@ -445,15 +493,16 @@ below rest has 400 model--passband combinations. They are 34 PHOENIX and 16
 MPS-ATLAS Set~2 models spanning the grids, in eight passbands from Kepler to
 NIRSpec G395H.
 
-Constraints differ by law. For hybrid4 and hybrid5 the fits are restricted to
-the simplex, and for hybrid2 to its exact triangle. The quadratic and
+Constraints differ by law. For hybrid4 the fits are restricted to its
+curvature simplex, for hybrid5 to the simplex, and for hybrid2 to its exact
+triangle. The quadratic and
 four-term fits are restricted to their exact positive--monotonic regions,
 imposed on a grid of 2001 values of the law's variable. Over the PHOENIX grid
 the constraints bind in 0.5\% (hybrid5), 0.2\% (hybrid4), and 0.06\%
 (hybrid2) of the $r$-weighted fits, and never for MPS-ATLAS. For the four-term
 law they bind more often: in 6.1\% of PHOENIX and 1.1--1.4\% of MPS-ATLAS fits.
 In the uniform-$\mu$ fits, which weight the limb more, they bind more often on
-PHOENIX: 10\% for hybrid5, 20\% for hybrid4, 13\% for the quadratic law, and
+PHOENIX: 10\% for hybrid5, 19\% for hybrid4, 13\% for the quadratic law, and
 6.0\% for the four-term law. The hybrid4 poles were chosen for the
 $r$-weighted fit, and its uniform-$\mu$ fits are also less accurate
 (Table~\ref{tab:weighting}); for limb-sensitive uses hybrid5 or the four-term
@@ -505,7 +554,7 @@ choices made at the limb on the PHOENIX part of the method study: M1 against
 M2, one edge per model against one per passband, and resampling the profile
 onto the coarser $\mu$ grids of ATLAS (17 points), MPS-ATLAS (24), and Stagger
 (10). For hybrid5 and hybrid4 each choice changes the fitted light curves by a
-median of $\le2.7\ppm$ (90th percentile $\le4.8\ppm$). For the four-term law
+median of $\le2.4\ppm$ (90th percentile $\le4.8\ppm$). For the four-term law
 the change is up to 3.5\ppm{} (90th percentile 7.9\ppm). The innermost-pole
 weight $w_3$ of hybrid5 moves by a median of 0.012 (M2) to 0.017 (MPS-ATLAS
 nodes), against a typical value of 0.14.
@@ -807,7 +856,7 @@ star.}
 Law & Fixed & Free & Prior & $|\Delta b|$ & Spread\\
 \hline
 hybrid5 & 0.08 / 0.3 & 1.4 / 7.2 & 0.34 / 1.7 & 0.0004 & 0.5 (2.9)\\
-hybrid4 & 0.03 / 0.6 & 0.61 / 12 & 0.52 / 1.3 & 0.0005 & 0.7 (11)\\
+hybrid4 & 0.03 / 0.6 & 0.61 / 12 & 0.33 / 1.3 & 0.0005 & 0.7 (11)\\
 Four-term & 0.54 / 1.1 & 1.3 / 2.2 & 1.5 / 3.5 & 0.0003 & 1.3 (1.2)\\
 Power-2 & 2.1 / 8.9 & 8.3 / 58 & 2.7 / 62 & 0.005 & 10 (49)\\
 hybrid2 & 22 / 60 & 29 / 50 & 17 / 28 & 0.037 & 29 (32)\\
@@ -1059,7 +1108,8 @@ method ($r$ or $\mu$):
 \begin{itemize}
 \item $\teff$, $\log g$, [M/H], the passband, and the method;
 \item $\mu_{\rm cri}$ and the coefficients (for the hybrid laws also the
-sampling coordinates $q$ and the expanded form
+sampling coordinates $q$, for hybrid4 those of Sect.~\ref{sec:laws}, and the
+basis-free expanded form
 $c_0+c_2\mu^2+c_4\mu^4+\sum_k d_k(\mu^2+\varepsilon_k)^{-2}$);
 \item the weighted rms residual $\sigma$, in the fitting method's own
 weighting;
@@ -1196,7 +1246,11 @@ With its ladder parameter tuned for transits ($\alpha=25/16$), hybrid4, the
 four-parameter law with an elementary light curve, is as accurate as the
 four-term law. The poles reduce the error of an even
 polynomial by factors of 5--30. All hybrid coefficients are physical by
-construction, and linear interpolation preserves this.
+construction, and linear interpolation preserves this. In its basis of
+curvature-simplex vertices, hybrid4's simplex is complete: it is exactly the
+set of positive, monotonic hybrid4 profiles that are concave in $\mu^2$ with a
+convex slope, which every tabulated fit is, and its coordinates
+$q_1,\dots,q_4$ give a uniform prior over it.
 \item These law errors are comparable to the interpolation error and an order
 of magnitude smaller than the differences between model grids. With fixed
 coefficients the choice of atmosphere matters more than the choice of law,

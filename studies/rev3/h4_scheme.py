@@ -29,6 +29,10 @@ only 13% of the exact region P (h4_completeness.md). Two alternatives:
     is onto P and physical by construction, but not uniform.
 
     .venv/bin/python -W ignore studies/rev3/h4_scheme.py   -> h4_scheme.md
+
+Works in the monomial-pole basis (laws.hybrid4_monomial_law); ran at commit
+ecfa090, when the tables were w-simplex fits in that basis. Since 2026-10-14
+hybrid4 is tabulated in the curvature-simplex basis (ldhybrid.v1.HYBRID4_BASIS).
 """
 
 import os
@@ -147,7 +151,7 @@ def canon_inverse(w, n=161):
 
 # ------------------------------------------------------------ exact region P
 def region_P():
-    return fit._inequalities(laws.get("hybrid4"), "physical")
+    return fit._inequalities(laws.hybrid4_monomial_law(), "physical")
 
 
 def sample_P(n, C, d):
@@ -176,7 +180,7 @@ def task(job):
     fit._inequalities = _ineq
     from ldhybrid.profile import Profile
     mu, y, measure, do_lc = job
-    L = laws.get("hybrid4")
+    L = laws.hybrid4_monomial_law()
     pr = Profile(mu, y)
     out = {}
     for con in ("simplex", "physical", "sstar"):
@@ -260,7 +264,7 @@ def main():
           "| vertex | w1 | w2 | w3 | w4 | profile |", "|---|---|---|---|---|---|"]
     names = {}
     for v in V:
-        Ix = lambda x, v=v: 1 - (laws.get("hybrid4").T(np.sqrt(x)) @ v)
+        Ix = lambda x, v=v: 1 - (laws.hybrid4_monomial_law().T(np.sqrt(x)) @ v)
         tag = ("I = 1 (no darkening)" if np.allclose(v, 0, atol=1e-12) else
                "I = 1 - (1 - mu^2)^2" if np.allclose(v, [0, 1, 0, 0], atol=1e-12) else
                "I = mu^2" if np.allclose(v, [.5, .5, 0, 0], atol=1e-12) else
@@ -291,7 +295,7 @@ def main():
     for grid in ("phoenix", "mps1", "mps2"):
         D = t.table(grid, "hybrid4")
         for m in ("r", "mu"):
-            Wt = D["coeffs"][D["method"] == m]
+            Wt = laws.hybrid4_monomial(D["coeffs"][D["method"] == m])
             ins = np.all(Wt @ A.T <= b + 2e-6, axis=1)       # 2e-6: 6-decimal rounding
             L.append(f"| {grid} | {m} | {len(Wt)} | {100 * ins.mean():.4f}% | "
                      f"{-(Wt @ u1(xi).T).max():.4f} | {(Wt @ u2(xi).T).min():.4f} |")

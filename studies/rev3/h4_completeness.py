@@ -14,6 +14,10 @@ outside the simplex, and what that costs in light-curve accuracy.
     constraint, and compare weights and light-curve errors.
 
     .venv/bin/python -W ignore studies/rev3/h4_completeness.py   -> h4_completeness.md
+
+Works in the monomial-pole basis (laws.hybrid4_monomial_law); ran at commit
+ecfa090, when the tables were w-simplex fits in that basis. Since 2026-10-14
+hybrid4 is tabulated in the curvature-simplex basis (ldhybrid.v1.HYBRID4_BASIS).
 """
 
 import os
@@ -39,7 +43,7 @@ RNG = np.random.default_rng(20261014)
 
 # ---------------------------------------------------------------- (A) geometry
 def region(name):
-    L = laws.get(name)
+    L = laws.hybrid4_monomial_law() if name == "hybrid4" else laws.get(name)
     C, d = fit._inequalities(L, "physical")
     return L, C, d
 
@@ -87,14 +91,14 @@ def _lc():
         from ldhybrid import lightcurve as lc
         g = lc.LCGrid()
         _G["g"] = g
-        _G["cols"] = g.linear_columns(laws.get("hybrid4"))
+        _G["cols"] = g.linear_columns(laws.hybrid4_monomial_law())
     return _G["g"], _G["cols"]
 
 
 def task(job):
     from ldhybrid.profile import Profile
     mu, y, measure, w_tab, do_lc = job
-    L = laws.get("hybrid4")
+    L = laws.hybrid4_monomial_law()
     pr = Profile(mu, y)
     out = {}
     for con in ("simplex", "physical", "none"):
@@ -127,7 +131,7 @@ def bound_jobs():
             j = bands.index(d["band"][r])
             ok = np.isfinite(P["mu"][i, j])
             jobs.append((P["mu"][i, j][ok].astype(float), P["y"][i, j][ok].astype(float),
-                         method, d["coeffs"][r], r in lc_rows))
+                         method, laws.hybrid4_monomial(d["coeffs"][r]), r in lc_rows))
             meta.append((method, d["teff"][r], d["logg"][r], d["mh"][r], d["band"][r]))
     return jobs, meta
 

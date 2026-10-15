@@ -1,0 +1,542 @@
+== bands Wed Oct 14 18:28:39 EDT 2026
+phoenix: 43 chunks to update (0 done)
+  phoenix 20/43  1.5 min  eta 2 min
+  phoenix 40/43  2.4 min  eta 0 min
+  phoenix 43/43  2.4 min  eta 0 min
+mps1: 425 chunks to update (0 done)
+  mps1 20/425  1.3 min  eta 26 min
+  mps1 40/425  2.0 min  eta 19 min
+  mps1 60/425  2.7 min  eta 17 min
+  mps1 80/425  3.6 min  eta 16 min
+  mps1 100/425  4.4 min  eta 14 min
+  mps1 120/425  5.1 min  eta 13 min
+  mps1 140/425  6.0 min  eta 12 min
+  mps1 160/425  6.7 min  eta 11 min
+  mps1 180/425  7.5 min  eta 10 min
+  mps1 200/425  8.3 min  eta 9 min
+  mps1 220/425  9.0 min  eta 8 min
+  mps1 240/425  9.8 min  eta 8 min
+  mps1 260/425  10.6 min  eta 7 min
+  mps1 280/425  11.4 min  eta 6 min
+  mps1 300/425  12.1 min  eta 5 min
+  mps1 320/425  12.9 min  eta 4 min
+  mps1 340/425  13.7 min  eta 3 min
+  mps1 360/425  14.5 min  eta 3 min
+  mps1 380/425  15.2 min  eta 2 min
+  mps1 400/425  16.1 min  eta 1 min
+  mps1 420/425  16.8 min  eta 0 min
+  mps1 425/425  17.0 min  eta 0 min
+mps2: 425 chunks to update (0 done)
+  mps2 20/425  1.3 min  eta 26 min
+  mps2 40/425  2.0 min  eta 19 min
+  mps2 60/425  2.7 min  eta 17 min
+  mps2 80/425  3.6 min  eta 16 min
+  mps2 100/425  4.4 min  eta 14 min
+  mps2 120/425  5.1 min  eta 13 min
+  mps2 140/425  6.0 min  eta 12 min
+  mps2 160/425  6.7 min  eta 11 min
+  mps2 180/425  7.5 min  eta 10 min
+  mps2 200/425  8.3 min  eta 9 min
+  mps2 220/425  9.1 min  eta 8 min
+  mps2 240/425  9.9 min  eta 8 min
+== resumed Wed Oct 14 18:58:58 EDT 2026
+== bands Wed Oct 14 18:58:58 EDT 2026
+phoenix: 0 chunks to update (43 done)
+mps1: 0 chunks to update (425 done)
+mps2: 168 chunks to update (257 done)
+  mps2 20/168  1.3 min  eta 10 min
+  mps2 40/168  2.0 min  eta 7 min
+  mps2 60/168  2.8 min  eta 5 min
+  mps2 80/168  3.7 min  eta 4 min
+  mps2 100/168  4.5 min  eta 3 min
+  mps2 120/168  5.2 min  eta 2 min
+  mps2 140/168  6.1 min  eta 1 min
+  mps2 160/168  6.8 min  eta 0 min
+  mps2 168/168  7.1 min  eta 0 min
+ALL DONE
+== spectra Wed Oct 14 19:06:04 EDT 2026
+1682 spectra to update
+  200/1682
+  400/1682
+  600/1682
+  800/1682
+  1000/1682
+  1200/1682
+  1400/1682
+  1600/1682
+ALL DONE
+== corrections Wed Oct 14 19:06:19 EDT 2026
+F3_MH_00 1D partner (0.0, 6800, 4.0)
+G2_MH_00 1D partner (0.0, 5800, 4.4)
+G2_MH_m10 1D partner (-1.0, 5700, 4.4)
+G2_MH_p05 1D partner (0.5, 5800, 4.4)
+K0_MH_00 1D partner (0.0, 5200, 4.6)
+K4_MH_00 1D partner (0.0, 4500, 4.6)
+M0_MH_00 1D partner (0.0, 3700, 4.7)
+M2_MH_00 1D partner (0.0, 3500, 5.0)
+M4_MH_00 1D partner none
+Stagger/Kurucz -1.0 5000 4.0
+Stagger/Kurucz -1.0 5000 4.5
+Stagger/Kurucz -1.0 5000 5.0
+Stagger/Kurucz -1.0 5500 4.0
+Stagger/Kurucz -1.0 5500 4.5
+Stagger/Kurucz -1.0 5500 5.0
+Stagger/Kurucz -1.0 6000 4.0
+Stagger/Kurucz -1.0 6000 4.5
+Stagger/Kurucz -1.0 6500 4.0
+Stagger/Kurucz -1.0 6500 4.5
+Stagger/Kurucz -2.0 5000 4.0
+Stagger/Kurucz -2.0 5000 4.5
+Stagger/Kurucz -2.0 5000 5.0
+Stagger/Kurucz -2.0 5500 4.0
+Stagger/Kurucz -2.0 5500 4.5
+Stagger/Kurucz -2.0 5500 5.0
+Stagger/Kurucz -2.0 6000 4.0
+Stagger/Kurucz -2.0 6000 4.5
+Stagger/Kurucz -2.0 6500 4.0
+Stagger/Kurucz -2.0 6500 4.5
+Stagger/Kurucz 0.0 4500 4.0
+Stagger/Kurucz 0.0 4500 4.5
+Stagger/Kurucz 0.0 4500 5.0
+Stagger/Kurucz 0.0 5000 4.0
+Stagger/Kurucz 0.0 5000 4.5
+Stagger/Kurucz 0.0 5000 5.0
+Stagger/Kurucz 0.0 5500 4.0
+Stagger/Kurucz 0.0 5500 4.5
+Stagger/Kurucz 0.0 5500 5.0
+Stagger/Kurucz 0.0 6000 4.0
+Stagger/Kurucz 0.0 6000 4.5
+Stagger/Kurucz 0.0 6500 4.0
+Stagger/Kurucz 0.0 6500 4.5
+8976 rows -> /Users/dkipping/Storage1/Work/Documents/Transit_Work/CODES/LDhybrid/data/products/corrections.csv
+== assemble Wed Oct 14 19:08:32 EDT 2026
+phoenix 1682 models 40 bands
+   tables/phoenix/hybrid2_r.csv.gz
+   tables/phoenix/hybrid2_mu.csv.gz
+   tables/phoenix/hybrid4_r.csv.gz
+   tables/phoenix/hybrid4_mu.csv.gz
+   tables/phoenix/hybrid5_r.csv.gz
+   tables/phoenix/hybrid5_mu.csv.gz
+   tables/phoenix/quadratic_r.csv.gz
+   tables/phoenix/quadratic_mu.csv.gz
+   tables/phoenix/claret4_r.csv.gz
+   tables/phoenix/claret4_mu.csv.gz
+   tables/phoenix/power2_r.csv.gz
+   tables/phoenix/power2_mu.csv.gz
+mps1 16974 models 41 bands
+   tables/mps1/hybrid2_r.csv.gz
+   tables/mps1/hybrid2_mu.csv.gz
+   tables/mps1/hybrid4_r.csv.gz
+   tables/mps1/hybrid4_mu.csv.gz
+   tables/mps1/hybrid5_r.csv.gz
+   tables/mps1/hybrid5_mu.csv.gz
+   tables/mps1/quadratic_r.csv.gz
+   tables/mps1/quadratic_mu.csv.gz
+   tables/mps1/claret4_r.csv.gz
+   tables/mps1/claret4_mu.csv.gz
+   tables/mps1/power2_r.csv.gz
+   tables/mps1/power2_mu.csv.gz
+mps2 16974 models 41 bands
+   tables/mps2/hybrid2_r.csv.gz
+   tables/mps2/hybrid2_mu.csv.gz
+   tables/mps2/hybrid4_r.csv.gz
+   tables/mps2/hybrid4_mu.csv.gz
+   tables/mps2/hybrid5_r.csv.gz
+   tables/mps2/hybrid5_mu.csv.gz
+   tables/mps2/quadratic_r.csv.gz
+   tables/mps2/quadratic_mu.csv.gz
+   tables/mps2/claret4_r.csv.gz
+   tables/mps2/claret4_mu.csv.gz
+   tables/mps2/power2_r.csv.gz
+   tables/mps2/power2_mu.csv.gz
+== cds Wed Oct 14 19:38:09 EDT 2026
+corrections.dat              Lrecl 167  8976 records
+offsets.dat                  Lrecl 139  32 records
+systematics.dat              Lrecl 104  122400 records
+phoenix_hybrid2.dat          Lrecl 204  134560 records
+phoenix_hybrid4.dat          Lrecl 262  134560 records
+phoenix_hybrid5.dat          Lrecl 299  134560 records
+phoenix_quadratic.dat        Lrecl 120  134560 records
+phoenix_claret4.dat          Lrecl 142  134560 records
+phoenix_power2.dat           Lrecl 120  134560 records
+mps1_hybrid2.dat             Lrecl 204  1391868 records
+mps1_hybrid4.dat             Lrecl 262  1391868 records
+mps1_hybrid5.dat             Lrecl 299  1391868 records
+mps1_quadratic.dat           Lrecl 120  1391868 records
+mps1_claret4.dat             Lrecl 142  1391868 records
+mps1_power2.dat              Lrecl 120  1391868 records
+mps2_hybrid2.dat             Lrecl 204  1391868 records
+mps2_hybrid4.dat             Lrecl 262  1391868 records
+mps2_hybrid5.dat             Lrecl 299  1391868 records
+mps2_quadratic.dat           Lrecl 120  1391868 records
+mps2_claret4.dat             Lrecl 142  1391868 records
+mps2_power2.dat              Lrecl 120  1391868 records
+ReadMe written
+== g3 Wed Oct 14 19:48:01 EDT 2026
+physicality ok
+interpolation ok
+closure ok
+systematics ok
+{
+ "physical": {
+  "phoenix|hybrid2|r": {
+   "rows": 67280,
+   "unphysical": 0,
+   "bound": 39
+  },
+  "phoenix|hybrid2|mu": {
+   "rows": 67280,
+   "unphysical": 0,
+   "bound": 161
+  },
+  "phoenix|hybrid4|r": {
+   "rows": 67280,
+   "unphysical": 0,
+   "bound": 128
+  },
+  "phoenix|hybrid4|mu": {
+   "rows": 67280,
+   "unphysical": 0,
+   "bound": 12541
+  },
+  "phoenix|hybrid5|r": {
+   "rows": 67280,
+   "unphysical": 0,
+   "bound": 343
+  },
+  "phoenix|hybrid5|mu": {
+   "rows": 67280,
+   "unphysical": 0,
+   "bound": 6786
+  },
+  "phoenix|power2|r": {
+   "rows": 67280,
+   "unphysical": 14447,
+   "bound": 0
+  },
+  "phoenix|power2|mu": {
+   "rows": 67280,
+   "unphysical": 19408,
+   "bound": 0
+  },
+  "phoenix|quadratic|r": {
+   "rows": 67280,
+   "unphysical": 0,
+   "bound": 401
+  },
+  "phoenix|quadratic|mu": {
+   "rows": 67280,
+   "unphysical": 0,
+   "bound": 8491
+  },
+  "phoenix|claret4|r": {
+   "rows": 67280,
+   "unphysical": 0,
+   "bound": 4075
+  },
+  "phoenix|claret4|mu": {
+   "rows": 67280,
+   "unphysical": 0,
+   "bound": 4053
+  },
+  "mps1|hybrid2|r": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|hybrid2|mu": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|hybrid4|r": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|hybrid4|mu": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|hybrid5|r": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|hybrid5|mu": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|power2|r": {
+   "rows": 695934,
+   "unphysical": 26323,
+   "bound": 0
+  },
+  "mps1|power2|mu": {
+   "rows": 695934,
+   "unphysical": 20387,
+   "bound": 0
+  },
+  "mps1|quadratic|r": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps1|quadratic|mu": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 9029
+  },
+  "mps1|claret4|r": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 7574
+  },
+  "mps1|claret4|mu": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 29669
+  },
+  "mps2|hybrid2|r": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|hybrid2|mu": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|hybrid4|r": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|hybrid4|mu": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|hybrid5|r": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|hybrid5|mu": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|power2|r": {
+   "rows": 695934,
+   "unphysical": 23989,
+   "bound": 0
+  },
+  "mps2|power2|mu": {
+   "rows": 695934,
+   "unphysical": 19125,
+   "bound": 0
+  },
+  "mps2|quadratic|r": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 0
+  },
+  "mps2|quadratic|mu": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 9763
+  },
+  "mps2|claret4|r": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 9535
+  },
+  "mps2|claret4|mu": {
+   "rows": 695934,
+   "unphysical": 0,
+   "bound": 34838
+  }
+ },
+ "interpolation_ppm": {
+  "teff": {
+   "hybrid2": {
+    "median": 4.322476049164678,
+    "p90": 29.390646721397577,
+    "n": 4040
+   },
+   "hybrid4": {
+    "median": 4.202352195758694,
+    "p90": 28.361316829339152,
+    "n": 4040
+   },
+   "hybrid5": {
+    "median": 4.198336777793549,
+    "p90": 28.36727822666927,
+    "n": 4040
+   }
+  },
+  "logg": {
+   "hybrid2": {
+    "median": 15.332639532503624,
+    "p90": 65.4610518205834,
+    "n": 4040
+   },
+   "hybrid4": {
+    "median": 15.250968814151804,
+    "p90": 65.16160561147906,
+    "n": 4040
+   },
+   "hybrid5": {
+    "median": 15.298062800435385,
+    "p90": 65.18019035591844,
+    "n": 4040
+   }
+  },
+  "mh": {
+   "hybrid2": {
+    "median": 13.041580054258626,
+    "p90": 60.0070207153554,
+    "n": 4040
+   },
+   "hybrid4": {
+    "median": 12.991720111392782,
+    "p90": 59.9038233547235,
+    "n": 4040
+   },
+   "hybrid5": {
+    "median": 12.973412030826015,
+    "p90": 59.916017755728966,
+    "n": 4040
+   }
+  }
+ },
+ "spectra_closure": {
+  "max_abs_dw": 8.800966622146689e-10,
+  "physical": "448/450",
+  "note": "float32 storage of a_kj and I1"
+ },
+ "systematics": {
+  "points": 1020,
+  "rows": 122400,
+  "max_pairwise_lc_ppm": {
+   "hybrid2": {
+    "median": 87.65776991071297,
+    "p90": 282.2790448533964
+   },
+   "hybrid4": {
+    "median": 86.54310606420745,
+    "p90": 278.64366106458766
+   },
+   "hybrid5": {
+    "median": 86.689854852013,
+    "p90": 278.7707095136799
+   }
+  }
+ }
+}
+== stats Wed Oct 14 19:52:11 EDT 2026
+computing lc
+computing bound
+computing edge
+computing corr
+computing cds
+# Revision statistics from the rebuilt production files
+
+Generated by `production_stats.py`; r-weighted unless stated.
+
+## a. Light-curve error (ppm), median / 99th / max
+
+| grid | subset | hybrid2 | hybrid4 | hybrid5 | quadratic | claret4 | power2 |
+|---|---|---|---|---|---|---|---|
+| phoenix | all (n=67280) | 42.4 / 112 / 344 | 2.06 / 6.62 / 50.8 | 1.29 / 5.58 / 50.7 | 41.4 / 133 / 507 | 3.38 / 12.4 / 74.7 | 7.86 / 60.7 / 189 |
+| phoenix | NRS1+NRS2 (n=3364) | 29.1 / 81.9 / 114 | 1.62 / 5.92 / 11 | 0.77 / 2.98 / 3.91 | 35.3 / 94.5 / 131 | 4.04 / 12.3 / 17.8 | 3.39 / 15.1 / 22.4 |
+| mps1 | all (n=695934) | 43.3 / 83.4 / 112 | 1.56 / 5.63 / 7.36 | 0.834 / 4.28 / 6.87 | 50.7 / 100 / 133 | 1.13 / 5.52 / 11 | 6.8 / 32.9 / 120 |
+| mps1 | NRS1+NRS2 (n=33948) | 26.9 / 52.1 / 68.3 | 0.806 / 2.09 / 2.69 | 0.435 / 0.847 / 1.53 | 33.1 / 60.7 / 78.7 | 0.727 / 1.78 / 2.3 | 6.56 / 11.1 / 13.9 |
+| mps1 | MIRI LRS (n=16974) | 13.9 / 35.7 / 48.1 | 0.53 / 0.988 / 1.94 | 0.339 / 0.434 / 0.744 | 17.2 / 41.7 / 55.5 | 0.634 / 1.05 / 1.77 | 1.68 / 6.5 / 9.09 |
+| mps2 | all (n=695934) | 41.9 / 81.8 / 109 | 1.54 / 5.73 / 7.4 | 0.852 / 4.28 / 6.98 | 49.3 / 98.4 / 131 | 1.1 / 5.47 / 9.99 | 6.71 / 33 / 122 |
+| mps2 | NRS1+NRS2 (n=33948) | 26.4 / 52.1 / 65.3 | 0.789 / 2.05 / 2.4 | 0.447 / 0.816 / 1.07 | 32.6 / 60.5 / 75 | 0.743 / 1.72 / 2.26 | 6.33 / 10.9 / 12.3 |
+| mps2 | MIRI LRS (n=16974) | 13.7 / 36.2 / 42.7 | 0.524 / 1.04 / 1.37 | 0.326 / 0.426 / 0.52 | 16.9 / 42.1 / 50.3 | 0.609 / 1.1 / 1.32 | 1.66 / 6.26 / 9.4 |
+
+## b. Constraint active / unphysical (fraction of rows)
+
+| grid | law | bound r | bound μ | unphysical r | unphysical μ |
+|---|---|---|---|---|---|
+| phoenix | hybrid2 | 0.0006 | 0.0024 | 0.0000 | 0.0000 |
+| phoenix | hybrid4 | 0.0019 | 0.1864 | 0.0000 | 0.0000 |
+| phoenix | hybrid5 | 0.0051 | 0.1009 | 0.0000 | 0.0000 |
+| phoenix | quadratic | 0.0060 | 0.1262 | 0.0000 | 0.0000 |
+| phoenix | claret4 | 0.0606 | 0.0602 | 0.0000 | 0.0000 |
+| phoenix | power2 | 0.0000 | 0.0000 | 0.2147 | 0.2885 |
+| mps1 | hybrid2 | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| mps1 | hybrid4 | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| mps1 | hybrid5 | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| mps1 | quadratic | 0.0000 | 0.0130 | 0.0000 | 0.0000 |
+| mps1 | claret4 | 0.0109 | 0.0426 | 0.0000 | 0.0000 |
+| mps1 | power2 | 0.0000 | 0.0000 | 0.0378 | 0.0293 |
+| mps2 | hybrid2 | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| mps2 | hybrid4 | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| mps2 | hybrid5 | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| mps2 | quadratic | 0.0000 | 0.0140 | 0.0000 | 0.0000 |
+| mps2 | claret4 | 0.0137 | 0.0501 | 0.0000 | 0.0000 |
+| mps2 | power2 | 0.0000 | 0.0000 | 0.0345 | 0.0275 |
+
+## c. Chromatic stellar edge (PHOENIX, per model, (max−min)/mean of r_c)
+
+| bands | n | median | 90th | max | depth error for a 1% transit (ppm): med / 90th / max |
+|---|---|---|---|---|---|
+| JWST | 15 | 1.17e-04 | 3.92e-04 | 1.64e-03 | 2.35 / 7.83 / 32.77 |
+| all | 40 | 1.68e-04 | 5.45e-04 | 2.38e-03 | 3.35 / 10.90 / 47.55 |
+| NRS1-NRS2 | 2 | 3.72e-05 | 1.15e-04 | 3.38e-04 | 0.74 / 2.31 / 6.76 |
+
+## d. Δw corrections on MPS-ATLAS Set 2: fraction leaving the physical region
+
+* MURaM magnetic ssd|hybrid2: n=534888, unphysical=0, applied=MPS2 grid points with Teff in MURaM range, all log g and [M/H]
+* MURaM magnetic ssd|hybrid4: n=534888, unphysical=0, outside_simplex=0, applied=MPS2 grid points with Teff in MURaM range, all log g and [M/H]
+* MURaM magnetic ssd|hybrid5: n=534888, unphysical=0, outside_simplex=0, applied=MPS2 grid points with Teff in MURaM range, all log g and [M/H]
+* MURaM magnetic B100G|hybrid2: n=534888, unphysical=0, applied=MPS2 grid points with Teff in MURaM range, all log g and [M/H]
+* MURaM magnetic B100G|hybrid4: n=534888, unphysical=0, outside_simplex=0, applied=MPS2 grid points with Teff in MURaM range, all log g and [M/H]
+* MURaM magnetic B100G|hybrid5: n=534888, unphysical=0, outside_simplex=0, applied=MPS2 grid points with Teff in MURaM range, all log g and [M/H]
+* MURaM magnetic B200G|hybrid2: n=534888, unphysical=0, applied=MPS2 grid points with Teff in MURaM range, all log g and [M/H]
+* MURaM magnetic B200G|hybrid4: n=534888, unphysical=0, outside_simplex=0, applied=MPS2 grid points with Teff in MURaM range, all log g and [M/H]
+* MURaM magnetic B200G|hybrid5: n=534888, unphysical=0, outside_simplex=1.87e-06, applied=MPS2 grid points with Teff in MURaM range, all log g and [M/H]
+* MURaM magnetic B300G|hybrid2: n=534888, unphysical=0, applied=MPS2 grid points with Teff in MURaM range, all log g and [M/H]
+* MURaM magnetic B300G|hybrid4: n=534888, unphysical=0, outside_simplex=0, applied=MPS2 grid points with Teff in MURaM range, all log g and [M/H]
+* MURaM magnetic B300G|hybrid5: n=534888, unphysical=0, outside_simplex=0, applied=MPS2 grid points with Teff in MURaM range, all log g and [M/H]
+* MURaM 3D|hybrid2: n=304, unphysical_own_base=0
+* MURaM 3D|hybrid4: n=304, unphysical_own_base=0, outside_simplex_own_base=0
+* MURaM 3D|hybrid5: n=304, unphysical_own_base=0, outside_simplex_own_base=0
+* Stagger 3D|hybrid2: n=1320, unphysical_own_base=0, n_on_mps2=1320, unphysical_on_mps2=0
+* Stagger 3D|hybrid4: n=1320, unphysical_own_base=0, outside_simplex_own_base=0, n_on_mps2=1320, unphysical_on_mps2=0, outside_simplex_on_mps2=0
+* Stagger 3D|hybrid5: n=1320, unphysical_own_base=0, outside_simplex_own_base=0, n_on_mps2=1320, unphysical_on_mps2=0, outside_simplex_on_mps2=0
+
+Δw = fit(I_base · C) − fit(I_base), added to the 1D weights (I_corrected ≈ I_1D − Σ Δw_j T_j). Magnetic: C = I_B/I_hydro (MURaM, same code with and without field), I_base = MPS-ATLAS Set 2 band profile at the nearest grid point. MURaM 3D: C = I_hydro/I_MPS2 (MPS-ATLAS Set 2 = the code that synthesised the MURaM spectra; nearest grid point within 150 K). Stagger 3D: Δw = fit(Stagger) − fit(ATLAS9/Kurucz) at identical (Teff, log g, [M/H]) from the ExoTiC-LD bundle. MURaM ratios held constant below μ = 0.1.
+
+## e. Passbands and CDS records
+
+* phoenix (40): 2MASS_H, 2MASS_J, 2MASS_Ks, CHEOPS, Cousins_I, Cousins_R, Johnson_B, Johnson_V, Kepler, NGTS, Sloan_g, Sloan_i, Sloan_r, Sloan_z, TESS, Spitzer_IRAC1, Spitzer_IRAC1_full, Spitzer_IRAC2, Spitzer_IRAC2_full, HST_STIS_G430L, HST_STIS_G750L, HST_WFC3_G102, HST_WFC3_G141, HST_WFC3_G280n1, HST_WFC3_G280p1, JWST_NIRCam_F322W2, JWST_NIRCam_F444W, JWST_NIRISS_SOSS_o1, JWST_NIRISS_SOSS_o2, JWST_NIRSpec_G140H_F070LP, JWST_NIRSpec_G140H_F100LP, JWST_NIRSpec_G140M_F070LP, JWST_NIRSpec_G140M_F100LP, JWST_NIRSpec_G235H, JWST_NIRSpec_G235M, JWST_NIRSpec_G395H, JWST_NIRSpec_G395M, JWST_NIRSpec_PRISM, JWST_NIRSpec_G395H_NRS1, JWST_NIRSpec_G395H_NRS2
+* mps1 (41): 2MASS_H, 2MASS_J, 2MASS_Ks, CHEOPS, Cousins_I, Cousins_R, Johnson_B, Johnson_V, Kepler, NGTS, Sloan_g, Sloan_i, Sloan_r, Sloan_z, TESS, Spitzer_IRAC1, Spitzer_IRAC1_full, Spitzer_IRAC2, Spitzer_IRAC2_full, HST_STIS_G430L, HST_STIS_G750L, HST_WFC3_G102, HST_WFC3_G141, HST_WFC3_G280n1, HST_WFC3_G280p1, JWST_MIRI_LRS, JWST_NIRCam_F322W2, JWST_NIRCam_F444W, JWST_NIRISS_SOSS_o1, JWST_NIRISS_SOSS_o2, JWST_NIRSpec_G140H_F070LP, JWST_NIRSpec_G140H_F100LP, JWST_NIRSpec_G140M_F070LP, JWST_NIRSpec_G140M_F100LP, JWST_NIRSpec_G235H, JWST_NIRSpec_G235M, JWST_NIRSpec_G395H, JWST_NIRSpec_G395M, JWST_NIRSpec_PRISM, JWST_NIRSpec_G395H_NRS1, JWST_NIRSpec_G395H_NRS2
+* mps2 (41): 2MASS_H, 2MASS_J, 2MASS_Ks, CHEOPS, Cousins_I, Cousins_R, Johnson_B, Johnson_V, Kepler, NGTS, Sloan_g, Sloan_i, Sloan_r, Sloan_z, TESS, Spitzer_IRAC1, Spitzer_IRAC1_full, Spitzer_IRAC2, Spitzer_IRAC2_full, HST_STIS_G430L, HST_STIS_G750L, HST_WFC3_G102, HST_WFC3_G141, HST_WFC3_G280n1, HST_WFC3_G280p1, JWST_MIRI_LRS, JWST_NIRCam_F322W2, JWST_NIRCam_F444W, JWST_NIRISS_SOSS_o1, JWST_NIRISS_SOSS_o2, JWST_NIRSpec_G140H_F070LP, JWST_NIRSpec_G140H_F100LP, JWST_NIRSpec_G140M_F070LP, JWST_NIRSpec_G140M_F100LP, JWST_NIRSpec_G235H, JWST_NIRSpec_G235M, JWST_NIRSpec_G395H, JWST_NIRSpec_G395M, JWST_NIRSpec_PRISM, JWST_NIRSpec_G395H_NRS1, JWST_NIRSpec_G395H_NRS2
+
+* mps1_claret4.dat: 1391868
+* mps1_hybrid2.dat: 1391868
+* mps1_hybrid4.dat: 1391868
+* mps1_hybrid5.dat: 1391868
+* mps1_power2.dat: 1391868
+* mps1_quadratic.dat: 1391868
+* mps2_claret4.dat: 1391868
+* mps2_hybrid2.dat: 1391868
+* mps2_hybrid4.dat: 1391868
+* mps2_hybrid5.dat: 1391868
+* mps2_power2.dat: 1391868
+* mps2_quadratic.dat: 1391868
+* phoenix_claret4.dat: 134560
+* phoenix_hybrid2.dat: 134560
+* phoenix_hybrid4.dat: 134560
+* phoenix_hybrid5.dat: 134560
+* phoenix_power2.dat: 134560
+* phoenix_quadratic.dat: 134560
+
+== CHAIN DONE Wed Oct 14 19:52:42 EDT 2026

@@ -171,9 +171,11 @@ def fig_quality():
 
 
 def fig_basis():
-    """Shapes T_j(μ) of hybrid5 (and the hybrid2 pole), one column."""
+    """(a) Shapes T_j(μ) of hybrid5 and the hybrid2 pole; (b) the vertices of
+    hybrid4's curvature simplex as profiles, I = 1 − S_k. One column."""
     mu = np.linspace(0, 1, 1200)
-    fig, ax = plt.subplots(figsize=(COL, 2.4))
+    fig, axs = plt.subplots(2, 1, figsize=(COL, 4.6), gridspec_kw=dict(hspace=0.42))
+    ax = axs[0]
     L = laws.get("hybrid5")
     T = L.T(mu)
     labs = [r"$1-\mu^4$", r"$(1-\mu^2)^2$"] + [rf"$\Pi_{{{e:.4g}}}$" for e in v1.HYBRID5_EPS]
@@ -189,7 +191,24 @@ def fig_basis():
     ax.set_xlabel(r"$\mu$")
     ax.set_ylabel(r"$T_j(\mu)$")
     ax.legend(loc="lower left", fontsize=6.2, handlelength=2.0)
+    ax.set_title("(a) hybrid5 shapes and the hybrid2 pole", fontsize=7, loc="left")
     clean_x_grid(ax)
+    ax = axs[1]
+    S = laws.get("hybrid4").T(mu)
+    labs = [r"$1$", r"$\mu^2$ ($1-S_1$)", r"$1-(1-\mu^2)^2$ ($1-S_2$)",
+            r"$1-S_3$ (inner pole)", r"$1-S_4$ (outer pole)"]
+    prof = [np.ones_like(mu)] + [1 - S[:, k] for k in range(4)]
+    cols = [MUTED, INK2, INK2, RAMP[650], RAMP[350]]
+    sty = [(0, (1, 1.3)), "-", (0, (4, 1.5)), "-", "-"]
+    for y, c, ls_, lab in zip(prof, cols, sty, labs):
+        ax.plot(mu, y, color=c, ls=ls_, lw=1.4, label=lab)
+    ax.set_xlim(0, 1)
+    ax.set_ylim(-0.02, 1.05)
+    ax.set_xlabel(r"$\mu$")
+    ax.set_ylabel(r"$I(\mu)/I(1)$")
+    ax.legend(loc="lower right", fontsize=5.8, handlelength=2.0, labelspacing=0.25,
+              borderaxespad=0.2, framealpha=0.9)
+    ax.set_title("(b) hybrid4: the vertices of its region, as profiles", fontsize=7, loc="left")
     save(fig, "fig_basis")
 
 

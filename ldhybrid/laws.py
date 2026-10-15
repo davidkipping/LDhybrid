@@ -86,13 +86,47 @@ def hybrid2(eps: float = v1.HYBRID2_EPS) -> LinearLaw:
                         [sl.Law([1.0, -1.0]), sl.pole_shape(eps)])
 
 
+def _monomial_pole(eps):
+    return [sl.Law([1.0, 0.0, -1.0]), sl.Law([1.0, -2.0, 1.0])] + [sl.pole_shape(e) for e in eps]
+
+
 def hybrid(name: str) -> LinearLaw:
     if name == "hybrid2":
         return hybrid2()
-    eps = {"hybrid4": v1.HYBRID4_EPS, "hybrid5": v1.HYBRID5_EPS}[name]
-    shapes = [sl.Law([1.0, 0.0, -1.0]), sl.Law([1.0, -2.0, 1.0])] + [sl.pole_shape(e) for e in eps]
-    labels = ["w1:1-mu4", "w2:(1-mu2)^2"] + [f"w{3 + k}:pole{e:.4g}" for k, e in enumerate(eps)]
+    if name == "hybrid4":
+        # curvature-simplex basis: S_k = Σ_j B[k, j] T_j (ldhybrid.v1.HYBRID4_BASIS)
+        T = _monomial_pole(v1.HYBRID4_EPS)
+        shapes = []
+        for row in v1.HYBRID4_BASIS:
+            S = sl.Law([0.0])
+            for b, Tj in zip(row, T):
+                if b != 0.0:
+                    S = S + float(b) * Tj
+            shapes.append(S)
+        labels = ["w1:1-mu2", "w2:(1-mu2)^2", "w3:vertex-inner", "w4:vertex-outer"]
+        return _from_shapes(name, labels, shapes)
+    shapes = _monomial_pole(v1.HYBRID5_EPS)
+    labels = ["w1:1-mu4", "w2:(1-mu2)^2"] + [f"w{3 + k}:pole{e:.4g}" for k, e in enumerate(v1.HYBRID5_EPS)]
     return _from_shapes(name, labels, shapes)
+
+
+def hybrid4_monomial_law() -> LinearLaw:
+    """hybrid4 on the monomial-pole shapes (SquishierPlanet's basis; the LDhybrid
+    basis before 2026-10-14), for studies and conversions."""
+    eps = v1.HYBRID4_EPS
+    return _from_shapes("hybrid4_monomial",
+                        ["w1:1-mu4", "w2:(1-mu2)^2"] + [f"w{3 + k}:pole{e:.4g}" for k, e in enumerate(eps)],
+                        _monomial_pole(eps))
+
+
+def hybrid4_monomial(w):
+    """hybrid4 weights on SquishierPlanet's monomial-pole shapes
+    (1 − μ⁴, (1 − μ²)², Π_ε0, Π_ε1), from weights on the curvature-simplex basis."""
+    return np.asarray(w, float) @ v1.HYBRID4_BASIS
+
+
+def hybrid4_from_monomial(w_mp):
+    return np.linalg.solve(v1.HYBRID4_BASIS.T, np.asarray(w_mp, float).T).T
 
 
 def linear() -> LinearLaw:

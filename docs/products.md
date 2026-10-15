@@ -10,7 +10,7 @@ control laws computed identically. All products live in `data/products/`.
 | law | T_j | poles ε |
 |---|---|---|
 | hybrid2 | 1 − μ², Π_ε | 0.36 |
-| hybrid4 | 1 − μ⁴, (1 − μ²)², Π_ε0, Π_ε1 | 0.028601, 0.38582 (ladder α = 25/16) |
+| hybrid4 | 1 − μ², (1 − μ²)², S3, S4 (curvature-simplex basis; S3, S4 combine Π_ε0, Π_ε1 and the polynomials) | 0.028601, 0.38582 (ladder α = 25/16) |
 | hybrid5 | 1 − μ⁴, (1 − μ²)², Π_ε0, Π_ε1, Π_ε2 | 0.0015966, 0.041275, 0.38743 |
 
 with Π_ε(μ) = [(μ²+ε)⁻² − (1+ε)⁻²] / [ε⁻² − (1+ε)⁻²]. Each w_j is the share of
@@ -20,10 +20,15 @@ SquishierPlanet and Elómë (`elome`, formerly MetalPlanet), is
 
     I(μ)/I(1) = c0 + c2 μ² + c4 μ⁴ + Σ_k d_k (μ² + ε_k)⁻² .
 
-Physical regions: hybrid2, the exact triangle O–V_c–V_ℓ; hybrid4/5, the
-simplex w ≥ 0, Σ w ≤ 1 (sufficient, contains every model tested). The q
-columns map these regions to the unit hypercube (uniform priors):
-`squishierplanet.laws.hybrid2_from_q` and `simplex_from_q` invert them.
+Physical regions: hybrid2, the exact triangle O–V_c–V_ℓ; hybrid5, the
+simplex w ≥ 0, Σ w ≤ 1 (sufficient, contains every model tested); hybrid4,
+the simplex in its curvature-simplex basis, which is exactly the set of
+hybrid4 profiles that are positive, monotonic, concave in μ² and with a convex
+slope in μ² (`ldhybrid.v1.HYBRID4_BASIS`; adopted 2026-10-14; hybrid4 weights
+on the monomial-pole shapes are w @ HYBRID4_BASIS). The q columns map these
+regions to the unit hypercube (uniform priors): hybrid2 and hybrid5 as
+`squishierplanet.laws.hybrid2_from_q` and `simplex_from_q`; hybrid4 with
+q1 = (1 − I(0))⁴, the analogue of Kipping's q1 (`ldhybrid.qspace`).
 
 > **Note:** hybrid2 uses ε = 0.36 from v1.0 on, as do SquishierPlanet
 > (`HYBRID2_EPS`; the old 0.208 is `HYBRID2_EPS_V0`) and Elómë (`elome`;

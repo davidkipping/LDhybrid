@@ -16,7 +16,8 @@ from pathlib import Path
 import h5py
 import numpy as np
 
-from ldhybrid import v1
+from ldhybrid import laws, qspace, v1
+from ldhybrid.fit import snap_simplex
 from ldhybrid.paths import DATA
 from ldhybrid.products import LAWS, METHODS
 from squishierplanet.laws import hybrid2_vertices
@@ -31,8 +32,8 @@ COEF = {"hybrid2": ["w1", "w2"], "hybrid4": ["w1", "w2", "w3", "w4"],
         "claret4": ["a1", "a2", "a3", "a4"], "power2": ["c", "alpha"]}
 LAWDEF = {
     "hybrid2": "I/I(1) = 1 - w1(1-mu^2) - w2 P(mu; 0.36)",
-    "hybrid4": "I/I(1) = 1 - w1(1-mu^4) - w2(1-mu^2)^2 - w3 P(mu; e0) - w4 P(mu; e1), "
-               "e = 0.028601, 0.38582",
+    "hybrid4": "I/I(1) = 1 - w1(1-mu^2) - w2(1-mu^2)^2 - w3 S3(mu) - w4 S4(mu), with "
+               "S3, S4 the curvature-simplex vertex shapes of Note (15), poles e = 0.028601, 0.38582",
     "hybrid5": "I/I(1) = 1 - w1(1-mu^4) - w2(1-mu^2)^2 - sum_k w(3+k) P(mu; ek), "
                "e = 0.0015966, 0.041275, 0.38743",
     "quadratic": "I/I(1) = 1 - u1(1-mu) - u2(1-mu)^2",
@@ -73,11 +74,13 @@ def columns(law):
 def to_q(law, W):
     """Sampling coordinates q (vectorised ldhybrid.qspace.to_q)."""
     W = np.asarray(W, float)
+    if law == "hybrid4":
+        return qspace.hybrid4_to_q(W)
     if law == "hybrid2":
         Vc, Vl = hybrid2_vertices(v1.HYBRID2_EPS)
         st = np.linalg.solve(np.column_stack([Vc, Vl - Vc]), W.T).T
         s_, t_ = st[:, 0], st[:, 1]
-        return np.column_stack([s_ * s_, np.where(s_ != 0, t_ / np.where(s_ != 0, s_, 1), 0.0)])
+        return qspace._tidy(np.column_stack([s_ * s_, np.where(s_ != 0, t_ / np.where(s_ != 0, s_, 1), 0.0)]))
     n = W.shape[1]
     Q = np.empty_like(W)
     stick = np.ones(len(W))
@@ -85,12 +88,14 @@ def to_q(law, W):
         f = np.where(stick > 0, 1.0 - W[:, j] / np.where(stick > 0, stick, 1), 1.0)
         Q[:, j] = np.where(f >= 0, np.abs(f) ** (n - j), f)
         stick = np.where(f > 0, stick * f, 0.0)
-    return Q
+    return qspace._tidy(Q)
 
 
 def expanded(law, W):
     """I/I(1) = c0 + c2 mu^2 + c4 mu^4 + sum_k d_k (mu^2 + e_k)^-2 (linear in w)."""
     W = np.asarray(W, float)
+    if law == "hybrid4":
+        W = laws.hybrid4_monomial(W)                 # monomial-pole weights
     eps = np.array(POLES[law])
     N = eps ** -2 - (1 + eps) ** -2
     if law == "hybrid2":
@@ -120,6 +125,17 @@ def fmt(a, f, w):
     return s
 
 
+def round_simplex(W, dec=6):
+    """Round to the tabulated decimals without leaving the simplex: where the
+    rounded weights sum past 1, the excess units come off the largest weight
+    (so a zero-limb fit tabulates I(0) = 0, not -1e-6)."""
+    u = 10 ** dec
+    K = np.rint(np.asarray(W, float) * u).astype(np.int64)
+    excess = np.clip(K.sum(axis=1) - u, 0, None)
+    K[np.arange(len(K)), K.argmax(axis=1)] -= excess
+    return K / u
+
+
 def write_table(grid, law):
     h = h5py.File(SRC / f"{grid}.h5")
     bands = np.array([b.decode() for b in h["bands"][()]])
@@ -129,6 +145,8 @@ def write_table(grid, law):
     for m in METHODS:
         k = f"{law}|{m}"
         W = h[k + "|w"][()][i, j]
+        if law in ("hybrid4", "hybrid5"):
+            W = round_simplex(snap_simplex(W))      # binding fits exactly on their faces
         rc = h["r_c"][()][i, j]
         vals = [h["teff"][()][i], h["logg"][()][i], h["mh"][()][i], bands[j],
                 np.full(len(i), m), np.sqrt(np.clip(1 - rc ** 2, 0, None))]
@@ -442,8 +460,12 @@ def readme(entries, aux_entries):
     a("Note (7): hybrid laws only. Coordinates on the unit hypercube that map to the")
     a("    physical region with a uniform prior: hybrid2 w = sqrt(q1)[(1-q2)Vc + q2 Vl]")
     a("    on the exact triangle with vertices O, Vc = (-0.124615, 1.124615) and")
-    a("    Vl = (1.201039, -0.201039); hybrid4/5 stick-breaking of a flat Dirichlet,")
-    a("    w_j = (1 - q_j^(1/(n+1-j))) prod_(i<j) q_i^(1/(n+1-i)).")
+    a("    Vl = (1.201039, -0.201039). hybrid4 (the analogue of Kipping 2013's q1,")
+    a("    q2): s = w1+w2+w3+w4 = 1 - I(0)/I(1) = q1^(1/4), w1 = s(1 - q2^(1/3)),")
+    a("    w2 = s q2^(1/3)(1 - q3^(1/2)), w3 = s q2^(1/3) q3^(1/2)(1 - q4),")
+    a("    w4 = s q2^(1/3) q3^(1/2) q4; every q in [0,1]^4 is a profile of Note (15)")
+    a("    and every such profile has a q. hybrid5: stick-breaking of a flat")
+    a("    Dirichlet, w_j = (1 - q_j^(1/(n+1-j))) prod_(i<j) q_i^(1/(n+1-i)).")
     a("Note (8): hybrid laws only. The same law in expanded form,")
     a("    I/I(1) = c0 + c2 mu^2 + c4 mu^4 + sum_k d_k (mu^2 + e_k)^-2, with the")
     a("    pole positions e_k of the law (c4 = 0 for hybrid2).")
@@ -482,6 +504,18 @@ def readme(entries, aux_entries):
     a("Note (14): at the 1020 (Teff, log g, [M/H]) points shared by PHOENIX and")
     a("    both MPS-ATLAS sets (Teff >= 3500 K): the largest pairwise difference of")
     a("    the three grids' light curves (planet radius 0.1, as Note 6).")
+    B = v1.HYBRID4_BASIS
+    a("Note (15): hybrid4 basis. With T = (1-mu^4, (1-mu^2)^2, P(mu; e0), P(mu; e1)),")
+    a("    S_k = sum_j B_kj T_j; S1 = 1-mu^2 and S2 = (1-mu^2)^2 exactly, and")
+    for k in (2, 3):
+        a(f"    S{k + 1}: B = (" + ", ".join(f"{x:.10f}" for x in B[k]) + ")")
+    a("    With x = mu^2, the region w_k >= 0, sum w_k <= 1 is exactly the set of")
+    a("    hybrid4 profiles with I(0) >= 0, dI/dx >= 0, d2I/dx2 <= 0 and")
+    a("    d3I/dx3 >= 0 on 0 <= x <= 1 (positive, monotonic, concave in mu^2, with")
+    a("    a convex slope); I = 1 and I = 1 - S_k are its vertices. S3 has")
+    a("    I(0) = 0 and dI/dx = d2I/dx2 = d3I/dx3 = 0 at x = 1; S4 has I(0) = 0,")
+    a("    dI/dx = d2I/dx2 = 0 at x = 1 and d3I/dx3 = 0 at x = 0. Weights on T")
+    a("    (SquishierPlanet's hybrid4 basis) are w B.")
     a("")
     a("=" * 80)
     a("(End)")

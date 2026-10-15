@@ -19,7 +19,7 @@ the angle from disc centre (μ² = 1 − r²).
 | Law | Coefficients | Shapes T_j |
 |---|---|---|
 | `hybrid2` | w1, w2 | 1 − μ², Π(μ; 0.36) |
-| `hybrid4` | w1–w4 | 1 − μ⁴, (1 − μ²)², Π(μ; 0.028601), Π(μ; 0.38582) |
+| `hybrid4` | w1–w4 (and q1–q4) | 1 − μ², (1 − μ²)², S3(μ), S4(μ): the curvature-simplex basis, below |
 | `hybrid5` | w1–w5 | 1 − μ⁴, (1 − μ²)², Π(μ; 0.0015966), Π(μ; 0.041275), Π(μ; 0.38743) |
 | `quadratic` | u1, u2 | 1 − μ, (1 − μ)² |
 | `claret4` (four-term) | a1–a4 | 1 − μ^(k/2), k = 1–4 |
@@ -27,9 +27,35 @@ the angle from disc centre (μ² = 1 − r²).
 
 with the pole term Π(μ; ε) = [(μ² + ε)⁻² − (1 + ε)⁻²] / [ε⁻² − (1 + ε)⁻²].
 
-hybrid4 uses the pole ladder with α = 25/16 (since 2026-10-11). Do not combine its
-coefficients with hybrid4 code that still uses the α = 1 poles (0.01176, 0.3041).
-SquishierPlanet and Elómë ≥ v0.15.0 use the same poles as these tables.
+**hybrid4's basis (since 2026-10-14).** S3 and S4 are fixed combinations of the
+two poles Π(μ; 0.028601), Π(μ; 0.38582) and the polynomial shapes:
+
+    S3 = 1.020963 Π(0.028601) − 0.022993 Π(0.38582) + 0.001252 (1 − μ²) + 0.000778 (1 − μ²)²
+    S4 = 1.338604 Π(0.38582) − 0.000591 Π(0.028601) − 0.162320 (1 − μ²) − 0.175693 (1 − μ²)²
+
+(full precision: `H4_BASIS` in `ldhybrid/interpolate.py`, or Note 15 of the CDS
+ReadMe). They are chosen so that the simplex w ≥ 0, Σw ≤ 1 is *exactly* the set
+of hybrid4 profiles that are positive, monotonic (Kipping 2013's conditions),
+concave in μ², and with a convex slope in μ². Every weight vector in the simplex
+is such a profile, and every such profile is in the simplex. All tabulated
+fits satisfy the curvature conditions.
+
+**Sampling coordinates q1–q4** (the analogue of Kipping's q1, q2): with
+s = Σw = 1 − I(0) = q1^(1/4),
+
+    w1 = s (1 − q2^(1/3))           w2 = s q2^(1/3) (1 − q3^(1/2))
+    w3 = s q2^(1/3) q3^(1/2) (1 − q4)   w4 = s q2^(1/3) q3^(1/2) q4
+
+A uniform q in [0, 1]⁴ is a uniform prior over that region. The tables give q
+next to w; `from_q` and `to_q` in `ldhybrid/interpolate.py` (and in the
+standalone files) convert.
+
+**Using the coefficients with other codes.** SquishierPlanet and Elómë take
+hybrid4 weights on the monomial-pole shapes (1 − μ⁴, (1 − μ²)², Π(0.028601),
+Π(0.38582)). Convert with `w @ H4_BASIS` (or use the expanded-form columns
+c0, c2, c4, d1, d2 of the tables, which are basis-free). hybrid4 uses the pole
+ladder with α = 25/16 (since 2026-10-11): do not combine its coefficients with
+code that still uses the α = 1 poles (0.01176, 0.3041).
 
 **Which fit.** The headline coefficients (`method="r"`) are least-squares fits
 uniform in projected radius: the right choice for transit light curves. The
@@ -52,7 +78,8 @@ needed.
 from ldhybrid_hybrid4_mps2_tess import coefficients, intensity, is_physical
 
 r = coefficients(5600, 4.4, 0.0)                       # Teff [K], log g [cgs], [M/H]
-r["w"]          # (w1, w2, w3, w4)
+r["w"]          # (w1, w2, w3, w4), curvature-simplex basis
+r["q"]          # (q1, q2, q3, q4), sampling coordinates
 r["physical"]   # positive and monotonic?
 r["lc_ppm"]     # light-curve error of the tabulated fit (p = 0.1)
 
@@ -92,6 +119,7 @@ from ldhybrid.interpolate import LDTables
 t = LDTables("path/to/cds")
 r = t.coefficients("hybrid5", teff=5600, logg=4.4, mh=0.1, band="TESS", grid="mps2")
 r["coeffs"]      # {"w1": ..., ..., "w5": ...}
+r["q"]           # sampling coordinates (hybrid laws)
 r["physical"]    # positive and monotonic?
 r["mucri"]       # mu at the stellar edge (spherical models; 0 for MPS-ATLAS)
 r["lc_ppm"]      # light-curve error of the tabulated fit (p = 0.1)

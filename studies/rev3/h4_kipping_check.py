@@ -1,7 +1,11 @@
 """Double check: does any hybrid4 profile on the simplex (w >= 0, sum w <= 1)
 violate the Kipping (2013) physicality conditions,
   (I)  I(mu) >= 0 for 0 <= mu <= 1, and
-  (II) dI/dmu >= 0 (monotonically brighter towards the centre)?
+  (II) dI/dmu >= 0 (monotonically brighter towards the centre),
+or, since 2026-10-14 (curvature-simplex basis, ldhybrid.v1.HYBRID4_BASIS),
+the curvature conditions in xi = mu^2,
+  (III) d2I/dxi2 <= 0 (concave in mu^2), and
+  (IV)  d3I/dxi3 >= 0 (convex slope)?
 
 Checks: the shapes; dense random and extreme points of the simplex; the q-map;
 every tabulated hybrid4 row (all grids, both methods); every corrected set
@@ -15,9 +19,7 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
-from squishierplanet.laws import simplex_from_q
-
-from ldhybrid import laws, v1
+from ldhybrid import laws, qspace, v1
 from ldhybrid.interpolate import LDTables
 from ldhybrid.paths import DATA
 
@@ -28,23 +30,32 @@ mu = np.unique(np.r_[0.0, mu])
 xi = mu * mu
 T = L.T(mu)                     # (n_mu, 4)
 D = L.dT(xi)                    # dT/dxi; dI/dmu = -2 mu (D @ w)
+_a = np.array([1 / (e ** -2 - (1 + e) ** -2) for e in v1.HYBRID4_EPS])
+_e = np.array(v1.HYBRID4_EPS)
+D2 = np.column_stack([-2 + 0 * xi, 2 + 0 * xi] + [6 * a * (xi + e) ** -4 for a, e in zip(_a, _e)]) @ v1.HYBRID4_BASIS.T
+D3 = np.column_stack([0 * xi, 0 * xi] + [-24 * a * (xi + e) ** -5 for a, e in zip(_a, _e)]) @ v1.HYBRID4_BASIS.T
 out = []
 
 
 def check(W, label, tol=1e-12, chunk=500):
     W = np.atleast_2d(np.asarray(W, float))
-    neg, nonmono, minI, minD = [], [], np.inf, np.inf
+    neg, nonmono, cvx, slope, minI, minD = [], [], [], [], np.inf, np.inf
     for i in range(0, len(W), chunk):
         w = W[i:i + chunk]
         I = 1.0 - w @ T.T
         dIdxi = -(w @ D.T)
+        d2 = -(w @ D2.T)
+        d3 = -(w @ D3.T)
         neg.append((I < -tol).any(axis=1))
         nonmono.append((dIdxi < -tol).any(axis=1))
+        # relative tolerance: the pole terms reach ~1e3 (d2) and ~1e5 (d3) near xi = 0
+        cvx.append((d2 > tol * np.maximum(1, np.abs(d2))).any(axis=1))
+        slope.append((d3 < -tol * np.maximum(1, np.abs(d3))).any(axis=1))
         minI, minD = min(minI, I.min()), min(minD, dIdxi.min())
-    neg, nonmono = np.concatenate(neg), np.concatenate(nonmono)
-    out.append(f"{label}: {len(W)} sets; violate (I) {neg.sum()}, violate (II) {nonmono.sum()}; "
-               f"min I = {minI:.3g}, min dI/dxi = {minD:.3g}")
-    return neg | nonmono
+    neg, nonmono, cvx, slope = (np.concatenate(x) for x in (neg, nonmono, cvx, slope))
+    out.append(f"{label}: {len(W)} sets; violate (I) {neg.sum()}, (II) {nonmono.sum()}, "
+               f"(III) {cvx.sum()}, (IV) {slope.sum()}; min I = {minI:.3g}, min dI/dxi = {minD:.3g}")
+    return neg | nonmono | cvx | slope
 
 
 # 1. the shapes themselves
@@ -65,16 +76,20 @@ Z[np.arange(len(Z)), rng.integers(0, 4, len(Z))] = 0.0    # faces w_j = 0
 check(Z, "random points on the faces w_j = 0")
 # 3. q-map: q in [0,1]^4 -> simplex
 Q = np.vstack([rng.random((50000, 4)), np.array(list(product([0.0, 1.0], repeat=4)))])
-Wq = np.array([simplex_from_q(q) for q in Q])
+Wq = qspace.hybrid4_from_q(Q)
 out.append(f"q-map: min w = {Wq.min():.3g}, max sum w = {Wq.sum(1).max():.15f}")
 check(Wq, "q-map images of q in [0,1]^4 (incl. corners)")
 # 4. every tabulated row
-t = LDTables(DATA / "release" / "cds")
+t = LDTables(DATA / "release" / "cds", cache=False)
 for grid in ("phoenix", "mps1", "mps2"):
     d = t.table(grid, "hybrid4")
     W = d["coeffs"]
     out.append(f"{grid} table: {len(W)} rows; min w = {W.min():.3g}, max sum w = {W.sum(1).max():.6f}, "
                f"rows with sum w = 1 (zero limb intensity): {(W.sum(1) > 1 - 1e-6).sum()}")
+    Qt = d["q"]
+    out.append(f"{grid} table q columns: min {Qt.min():.6f}, max {Qt.max():.6f}, "
+               f"rows with any q outside [0, 1]: {((Qt < 0) | (Qt > 1)).any(1).sum()}, "
+               f"rows with a q exactly 0 or 1 (on a face): {((Qt == 0) | (Qt == 1)).any(1).sum()}")
     bad = check(W, f"{grid} tabulated hybrid4 (r and mu methods)", tol=1e-9)
 # 5. corrected sets: w(mps2) + Δw for every MURaM state, every grid point and band
 d = t.table("mps2", "hybrid4")
@@ -120,6 +135,6 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     check(Ws, "standalone files (random points)", tol=1e-9)
 
-txt = "# hybrid4 vs the Kipping (2013) conditions\n\n" + "\n".join(f"* {o}" for o in out) + "\n"
+txt = "# hybrid4 vs the Kipping (2013) and curvature conditions\n\n" + "\n".join(f"* {o}" for o in out) + "\n"
 (Path(__file__).parent / "h4_kipping_check.md").write_text(txt)
 print(txt)
