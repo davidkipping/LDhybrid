@@ -13,8 +13,10 @@ embedded, so no tables need downloading.
 
 ```python
 from ldhybrid_hybrid4_mps2_tess import coefficients, intensity
-r = coefficients(5600, 4.4, 0.0, correction="B100G")   # recommended for FGK
-r["w"], r["q"], r["physical"]          # weights, sampling coordinates q1-q4
+r = coefficients(5600, 4.4, 0.0, correction="B100G")   # Teff, log g, [M/H]; recommended for FGK
+r["w"], r["q"], r["physical"]          # weights, sampling coordinates q1-q4, positive and monotonic?
+r["lc_ppm"], r["mu_cri"], r["inside"]  # fit's light-curve error (p = 0.1), stellar edge, inside the grid?
+I = intensity(r["w"], [0.1, 0.5, 1.0]) # I(mu)/I(1)
 ```
 
 or `python ldhybrid_hybrid4_mps2_tess.py 5600 4.4 0.0`.

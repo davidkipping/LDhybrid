@@ -37,8 +37,12 @@ two poles Π(μ; 0.028601), Π(μ; 0.38582) and the polynomial shapes:
 ReadMe). They are chosen so that the simplex w ≥ 0, Σw ≤ 1 is *exactly* the set
 of hybrid4 profiles that are positive, monotonic (Kipping 2013's conditions),
 concave in μ², and with a convex slope in μ². Every weight vector in the simplex
-is such a profile, and every such profile is in the simplex. All tabulated
-fits satisfy the curvature conditions.
+is such a profile, and every such profile is in the simplex. The curvature
+conditions are an assumption about the profile, not a physical requirement:
+they keep 9% of the positive, monotonic hybrid4 profiles. All tabulated fits
+lie in the region, but some lie on its boundary, where a curvature condition
+binds: 0.19% of the PHOENIX r-weighted fits and 18.6% of the PHOENIX μ-weighted
+fits (mostly at 3–5 μm); never for MPS-ATLAS.
 
 **Sampling coordinates q1–q4** (the analogue of Kipping's q1, q2): with
 s = Σw = 1 − I(0) = q1^(1/4),
@@ -46,7 +50,10 @@ s = Σw = 1 − I(0) = q1^(1/4),
     w1 = s (1 − q2^(1/3))           w2 = s q2^(1/3) (1 − q3^(1/2))
     w3 = s q2^(1/3) q3^(1/2) (1 − q4)   w4 = s q2^(1/3) q3^(1/2) q4
 
-A uniform q in [0, 1]⁴ is a uniform prior over that region. The tables give q
+A uniform q in [0, 1]⁴ is a uniform prior over that region. It is not
+uninformative about the profile: it favours strong limb darkening (the density
+of s grows as s³), so in the infrared, where tabulated I(0) reaches 0.7–0.9, a
+prior centred on the tables is the better default. The tables give q
 next to w; `from_q` and `to_q` in `ldhybrid/interpolate.py` (and in the
 standalone files) convert.
 
@@ -61,7 +68,8 @@ code that still uses the α = 1 poles (0.01176, 0.3041).
 uniform in projected radius: the right choice for transit light curves. The
 `method="mu"` fits are uniform in μ and weight the limb more; use them for
 eclipsing binaries, interferometry or microlensing. With `mu`, hybrid4 is
-less accurate on PHOENIX; prefer hybrid5 or the four-term law there.
+less accurate on PHOENIX, and at 3–5 μm most of its PHOENIX `mu` fits are set
+by a curvature condition; prefer hybrid5 or the four-term law there.
 
 **Which grid.** For FGK stars the paper recommends MPS-ATLAS Set 2 with the
 MURaM 100 G correction (`grid="mps2", correction="B100G"`). Quiet Sun-like stars
@@ -108,8 +116,15 @@ It can be copied out of the repository and used on its own.
 **Getting the tables.** Until publication they are in the private GitHub draft
 release `v1.0-cds-draft` and in the draft Zenodo record. Put all files in one
 directory: the 18 `<grid>_<law>.dat.gz` tables, plus `corrections.dat` and
-`offsets.dat` for corrections and offsets. `SHA256SUMS` checks the download
-(`shasum -a 256 -c SHA256SUMS`).
+`offsets.dat` for corrections and offsets. `SHA256SUMS` checks the download:
+
+```bash
+gh release download v1.0-cds-draft --dir cds
+cd cds && shasum -a 256 -c SHA256SUMS
+```
+
+On first use each table is parsed and a cache (`<grid>_<law>.npz`) is written
+next to it (`LDTables(..., cache=False)` to disable).
 
 ### Coefficients
 
@@ -163,7 +178,7 @@ extrapolation.
 ### Priors for fitting
 
 ```python
-p = t.prior("hybrid4", 5600, 100, 4.4, 0.1, 0.1, 0.1, "TESS",
+p = t.prior("hybrid4", 5600, 100, 4.4, 0.1, 0.1, 0.1, "Kepler",
             grid="mps2", correction="B100G", systematic=True, cov_floor=0.01**2)
 p["mean"], p["cov"]
 ```
@@ -175,16 +190,27 @@ covariance of the coefficients.
 - `systematic=True` adds the spread between the PHOENIX, MPS-ATLAS Set 1 and
   Set 2 grids at the star. Below 3500 K only PHOENIX covers the star, and the
   spread at 3500 K is substituted (with a warning).
-- `cov_floor` sets a minimum variance for each coefficient. **Use it**: without it
-  the covariance is nearly singular in directions the stellar parameters don't
-  move, which would effectively fix those combinations at the model values.
+- `cov_floor` raises the variance of each coefficient to at least the floor
+  (scalar, or one value per coefficient). **Use it**: without it the covariance
+  is nearly singular in directions the stellar parameters don't move, which
+  would effectively fix those combinations at the model values. It acts on the
+  diagonal only, so correlated directions can stay narrower than the floor
+  (e.g. smallest eigen-direction s.d. 0.002–0.005 for the example above with
+  `systematic=True`); add `floor * np.eye(n)` to `p["cov"]` yourself if every
+  direction must be at least that wide.
+- The floor and any fixed prior width are per coefficient, so their meaning
+  depends on the basis (hybrid4's curvature basis differs from its
+  monomial-pole form); widths on h′₁, h′₂ and I(0) (`observables`) are
+  basis-independent.
 - Draws outside the grid are dropped with a warning; near a grid edge this
   biases the mean.
 
 ### Empirical offsets
 
 Measured offsets between model and observed limb darkening (Maxted 2023 for
-Kepler and TESS; Sing et al. 2026 for JWST) can update the prior:
+Kepler and TESS; Sing et al. 2026 for JWST) can update the prior. Use the
+regime that matches the prior's passband (the code checks the grid and
+correction state, not the band):
 
 ```python
 m, C = t.apply_offsets(p, regime="Kepler")    # or "TESS", "JWST_0.86-5.5um"

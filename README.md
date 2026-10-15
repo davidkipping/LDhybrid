@@ -1,61 +1,123 @@
 # LDhybrid
 
-Theoretical limb-darkening coefficient tables for the rational **hybrid2,
-hybrid4 and hybrid5** laws of [SquishierPlanet](../squishierplanet), regressed
-against simulated stellar specific intensities, with positivity and
-monotonicity imposed by construction. A sibling of SquishierPlanet and
-Elómë (`elome`, formerly MetalPlanet). The plan of work is in [`docs/plan.md`](docs/plan.md).
+Theoretical limb-darkening coefficients for the rational **hybrid2, hybrid4 and
+hybrid5** laws of SquishierPlanet, whose transit light curves are elementary,
+and, computed the same way, for the quadratic, power-2 and four-term laws. The
+coefficients are least-squares fits, uniform in projected radius, to the
+specific intensities of PHOENIX-ACES v3.0 (spherical, 2300–7400 K, 40 passbands)
+and MPS-ATLAS Sets 1 and 2 (plane-parallel, 3500–7500 K, 41 passbands) for
+dwarfs and subgiants, in the photometric, HST and JWST passbands used for
+transits. Every row carries its light-curve error, and the hybrid fits are
+physical by construction. This repository holds the tables' code, the
+interpolators and the paper (`paper/ldhybrid.tex`). Sibling projects:
+SquishierPlanet (closed-form light curves) and Elómë.
 
-## Status
+**Full user guide: [`docs/interpolator.md`](docs/interpolator.md).**
 
-**P0–P4 complete; Gates G0–G4 passed** (validation: `studies/p4/results.md`).
-**P5 (release) in progress:** CDS tables, user API and paper draft done. Products in `data/products/`
-(`docs/products.md`; G3 in `studies/g3/results.md`). v1.0 law and method
-definitions are frozen in `ldhybrid/v1.py` (hybrid2 ε = 0.36; r-weighted fits;
-M1 limb). Evidence: `docs/data.md`, `studies/g1/results.md`,
-`studies/p2/results.md`; first end-to-end run in `studies/p1/smoke.md`. Scope: FGKM dwarfs and subgiants
-(Teff 2300–7500 K, log g 3.5–5.5, [M/H] −2 to +1) in the passbands used for
-transit observations, with emphasis on HST WFC3 and JWST.
+## Quick start
 
-## Use
+### 1. Get the tables
 
-**Full guide: [`docs/interpolator.md`](docs/interpolator.md)** (laws,
-standalone files, table interpolator, priors, offsets, corrections, refits,
-light curves). The quickest route is a single file from [`standalone/`](standalone/)
-(hybrid4; PHOENIX or MPS-ATLAS Set 2; TESS or Kepler; numpy + scipy only):
+The v1.0 release (CDS format: 18 tables `<grid>_<law>.dat.gz`, `corrections.dat`,
+`offsets.dat`, `systematics.dat`, `ReadMe`, `SHA256SUMS`) is attached to the
+GitHub draft release `v1.0-cds-draft` and will be at the CDS on publication. The
+band profiles (for refits) and the PHOENIX coefficient spectra (for custom
+passbands) are in the Zenodo record (DOI: *to be added on publication*).
 
-```python
-from ldhybrid_hybrid4_mps2_tess import coefficients
-coefficients(5600, 4.4, 0.0, correction="B100G")["w"]
+```bash
+gh release download v1.0-cds-draft --dir cds
+cd cds && shasum -a 256 -c SHA256SUMS
 ```
 
+The grids are `phoenix`, `mps1` and `mps2`; the laws `hybrid2`, `hybrid4`,
+`hybrid5`, `quadratic`, `claret4` (four-term) and `power2`. The CDS `ReadMe`
+describes every column.
+
+### 2. Standalone single-file interpolators (no download)
+
+[`standalone/`](standalone/) holds four single files for **hybrid4** with the
+coefficient grid embedded (numpy + scipy only): `ldhybrid_hybrid4_{phoenix,mps2}_{tess,kepler}.py`.
+Copy one anywhere:
 
 ```python
-import ldhybrid as ld
-# tabulated coefficients (linear interpolation within one grid)
-r = ld.coefficients("hybrid5", teff=5600, logg=4.4, mh=0.1, band="TESS", grid="mps2")
-r["w"], r["q"], r["physical"]
-# recommended prior centre for FGK stars (P4): MPS-ATLAS Set 2 + MURaM 100 G
-r = ld.coefficients("hybrid5", 5600, 4.4, 0.1, "TESS", grid="mps2", correction="B100G")
-# any throughput or spectroscopic bin, from the PHOENIX coefficient spectra
-r = ld.coefficients_custom("hybrid4", 4500, 4.6, 0.0, lam_angstrom, throughput)
-law = ld.to_law("hybrid5", r["w"])   # squishierplanet.Law -> closed-form light curves
+from ldhybrid_hybrid4_mps2_tess import coefficients, intensity
+r = coefficients(5600, 4.4, 0.0, correction="B100G")   # Teff, log g, [M/H]; recommended for FGK
+r["w"], r["q"], r["physical"], r["lc_ppm"]               # weights, q1-q4, flags, fit's LC error
+I = intensity(r["w"], [0.1, 0.5, 1.0])                   # I(mu)/I(1)
 ```
 
-**From the published tables alone** (no other LDhybrid data needed), the
-self-contained `ldhybrid/interpolate.py` (numpy + scipy only) reads the CDS
-tables and interpolates them:
+or `python ldhybrid_hybrid4_mps2_tess.py 5600 4.4 0.0`.
+
+### 3. The table interpolator (`ldhybrid/interpolate.py`)
+
+One self-contained file (numpy + scipy) that reads the CDS tables, for all six
+laws, three grids and every passband. It can be copied out of the repository.
 
 ```python
-from ldhybrid.interpolate import LDTables
-t = LDTables("path/to/cds")       # the <grid>_<law>.dat[.gz] files
-r = t.coefficients("hybrid5", teff=5600, logg=4.4, mh=0.1, band="TESS", grid="mps2")
-r["coeffs"], r["physical"], r["lc_ppm"]
+from ldhybrid.interpolate import LDTables, from_q, to_q, light_curve
+t = LDTables("cds")                                      # the downloaded tables
+r = t.coefficients("hybrid4", teff=5600, logg=4.4, mh=0.1, band="JWST_NIRSpec_PRISM",
+                   grid="mps2", correction="B100G")
+r["coeffs"], r["q"], r["physical"], r["lc_ppm"]
+t.coefficients("claret4", 3300, 5.0, 0.0, "TESS", grid="phoenix")
+t.bands("mps2")                                          # passband names
+
+w = from_q("hybrid4", [0.5, 0.5, 0.5, 0.5])              # unit hypercube -> weights
+q = to_q("hybrid4", w)
+
+# prior for a fit: stellar-parameter draws + grid-to-grid spread + a variance floor
+p = t.prior("hybrid4", 5600, 100, 4.4, 0.1, 0.1, 0.1, "Kepler", grid="mps2",
+            correction="B100G", systematic=True, cov_floor=0.01**2)
+m, C = t.apply_offsets(p, regime="Kepler")               # empirical offsets (Maxted 2023)
+
+import numpy as np
+z = np.linspace(0, 1.2, 200)                             # sky separation / R_star
+F = light_curve("hybrid4", r["coeffs"], z, p=0.1)        # circular planet
 ```
 
 ```bash
-python -m ldhybrid.interpolate hybrid5 5600 4.4 0.1 TESS --grid mps2 --tables path/to/cds
+python -m ldhybrid.interpolate hybrid5 5600 4.4 0.1 TESS --grid mps2 --tables cds
 ```
+
+`cov_floor` raises each coefficient's variance to at least the floor; it does
+not lift the off-diagonal structure, so check the eigenvalues of `p["cov"]` if
+you need every direction to be at least that wide. Refits of interpolated
+profiles (`refit=True`) need the Zenodo band profiles and h5py; see the
+[guide](docs/interpolator.md).
+
+### 4. The full package
+
+With the repository installed (`pip install -e .`) and its `data/` products
+built or downloaded (band tables, coefficient spectra):
+
+```python
+import ldhybrid as ld
+r = ld.coefficients("hybrid5", 5600, 4.4, 0.1, "TESS", grid="mps2", correction="B100G")
+r = ld.coefficients_custom("hybrid4", 4500, 4.6, 0.0, lam_angstrom, throughput)  # any passband
+law = ld.to_law("hybrid5", r["w"])     # squishierplanet.Law (needs SquishierPlanet)
+```
+
+### hybrid4's basis
+
+hybrid4 (poles ε = 0.028601, 0.38582, from the α = 25/16 ladder) is tabulated
+on its **curvature-simplex basis**: w ≥ 0, Σw ≤ 1 is exactly the set of hybrid4
+profiles that are positive, monotonic, concave in μ² and of convex slope in μ²,
+and q1–q4 ∈ [0, 1] (q1 = (1 − I(0))⁴) map onto it uniformly. Codes that take
+weights on the monomial-pole shapes (1 − μ⁴, (1 − μ²)², Π_ε0, Π_ε1), such as
+SquishierPlanet and Elómë, need `w @ H4_BASIS` (`BASIS` in the standalone
+files); the expanded-form columns of the tables are basis-free. Weights or q
+from earlier hybrid4 versions (α = 1 poles, or the monomial-pole basis) are not
+interchangeable: recompute q from w. Details:
+[`docs/upstream/hybrid4_curvature_simplex.md`](docs/upstream/hybrid4_curvature_simplex.md).
+
+## For developers
+
+**Status.** P0–P5 complete: v1.0 CDS tables, interpolators, coefficient spectra
+and band profiles released (GitHub draft release and Zenodo draft); the paper
+is under internal (mock) referee review (`studies/review/`). v1.0 law and
+method definitions are frozen in `ldhybrid/v1.py` (hybrid2 ε = 0.36; hybrid4
+curvature basis with α = 25/16 poles; r-weighted fits; M1 limb). Validation:
+`studies/p4/results.md`, `studies/rev*/`. Plan of work: [`docs/plan.md`](docs/plan.md).
 
 Products are described in [`docs/products.md`](docs/products.md): band
 tables for PHOENIX (40 passbands) and MPS-ATLAS Sets 1 and 2 (41, including
