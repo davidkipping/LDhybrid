@@ -4,7 +4,7 @@ There are three ways to get coefficients, from lightest to fullest:
 
 | Route | Needs | Covers |
 |---|---|---|
-| [Standalone files](#1-standalone-single-file-interpolators) (`standalone/*.py`) | numpy, scipy | hybrid4; PHOENIX or MPS-ATLAS Set 2; TESS or Kepler |
+| [Standalone files](#1-standalone-single-file-interpolators) (`standalone/*.py`) | numpy (or mlx + numpy for the `_mlx` ports) | hybrid4 or hybrid5; PHOENIX or MPS-ATLAS Set 2; TESS or Kepler |
 | [Table interpolator](#2-the-table-interpolator-ldhybridinterpolatepy) (`ldhybrid/interpolate.py`) | numpy, scipy (+ h5py for refits); the CDS tables | all six laws, three grids, 40–41 passbands; priors, offsets, corrections, light curves |
 | [Full package](#3-the-full-package-ldhybridapi) (`ldhybrid.api`) | the whole repository and its `data/` products | everything above, plus custom passbands |
 
@@ -57,12 +57,14 @@ prior centred on the tables is the better default. The tables give q
 next to w; `from_q` and `to_q` in `ldhybrid/interpolate.py` (and in the
 standalone files) convert.
 
-**Using the coefficients with other codes.** SquishierPlanet and Elómë take
-hybrid4 weights on the monomial-pole shapes (1 − μ⁴, (1 − μ²)², Π(0.028601),
-Π(0.38582)). Convert with `w @ H4_BASIS` (or use the expanded-form columns
-c0, c2, c4, d1, d2 of the tables, which are basis-free). hybrid4 uses the pole
-ladder with γ = 25/16 (since 2026-10-11): do not combine its coefficients with
-code that still uses the α = 1 poles (0.01176, 0.3041).
+**Using the coefficients with other codes.** The current SquishierPlanet and
+Elómë take hybrid4 weights on this curvature basis, so the weights pass to them
+as they are (Elómë: `limb_dark="hybrid4"`, `u = w`). A code that takes weights
+on the monomial-pole shapes (1 − μ⁴, (1 − μ²)², Π(0.028601), Π(0.38582)), as
+earlier versions of both did, needs `w @ H4_BASIS` (or the expanded-form
+columns c0, c2, c4, d1, d2 of the tables, which are basis-free). hybrid4 uses
+the pole ladder with γ = 25/16 (since 2026-10-11): do not combine its
+coefficients with code that still uses the α = 1 poles (0.01176, 0.3041).
 
 **Which fit.** The headline coefficients (`method="r"`) are least-squares fits
 uniform in projected radius: the right choice for transit light curves. The
@@ -78,9 +80,10 @@ PHOENIX exists, and no grid has been validated against M-dwarf observations.
 
 ## 1. Standalone single-file interpolators
 
-`standalone/` holds one file per grid and passband for hybrid4, each with its
-coefficient grid embedded (58–460 kB). Copy the file anywhere; nothing else is
-needed.
+`standalone/` holds one file per law, grid and passband for hybrid4 and
+hybrid5, each with its coefficient grid embedded (64–548 kB), and an MLX port of
+each (`*_mlx.py`, below). Copy the file anywhere; it needs only numpy (the MLX
+ports: mlx and numpy).
 
 ```python
 from ldhybrid_hybrid4_mps2_tess import coefficients, intensity, is_physical
@@ -98,15 +101,65 @@ r = coefficients(9000, 4.5, 0.0, extrapolate=True)     # nearest model outside t
 
 From the shell: `python ldhybrid_hybrid4_mps2_tess.py 5600 4.4 0.0`.
 
+The hybrid5 files (`ldhybrid_hybrid5_*.py`) have the same functions, with five
+weights w1–w5 on the shapes of the table above and stick-breaking `from_q`/`to_q`.
+
 | File | Grid | Passband |
 |---|---|---|
-| `ldhybrid_hybrid4_phoenix_tess.py` | PHOENIX (2300–7400 K, log g 3.5–5.5) | TESS |
-| `ldhybrid_hybrid4_phoenix_kepler.py` | PHOENIX | Kepler |
-| `ldhybrid_hybrid4_mps2_tess.py` | MPS-ATLAS Set 2 (3500–7500 K, log g 3.5–5.0) | TESS |
-| `ldhybrid_hybrid4_mps2_kepler.py` | MPS-ATLAS Set 2 | Kepler |
+| `ldhybrid_{hybrid4,hybrid5}_phoenix_tess.py` | PHOENIX (2300–7400 K, log g 3.5–5.5) | TESS |
+| `ldhybrid_{hybrid4,hybrid5}_phoenix_kepler.py` | PHOENIX | Kepler |
+| `ldhybrid_{hybrid4,hybrid5}_mps2_tess.py` | MPS-ATLAS Set 2 (3500–7500 K, log g 3.5–5.0) | TESS |
+| `ldhybrid_{hybrid4,hybrid5}_mps2_kepler.py` | MPS-ATLAS Set 2 | Kepler |
+
+### MLX ports (`*_mlx.py`), for Elómë and other MLX codes
+
+Each standalone file has an MLX twin, `ldhybrid_<law>_<grid>_<band>_mlx.py`, with
+the same grid, interpolant and corrections. After import every function is MLX
+ops, so the coefficients can sit inside an MLX model: batched over any shape,
+differentiated with respect to Teff, log g and [M/H] (`mx.grad`, `mx.vjp`), and
+compiled (`mx.compile`).
+
+```python
+import mlx.core as mx
+from ldhybrid_hybrid4_mps2_tess_mlx import coefficients
+from elome.hybrid import flux_dev_hybrid
+
+teff, logg, mh = mx.array([5600.0, 5720.0]), mx.array([4.40, 4.35]), 0.1   # e.g. one per chain
+r = coefficients(teff, logg, mh, correction="B100G")
+r["w"]        # (2, 4) mx.array; Elómë takes these weights as they are
+r["inside"]   # (2,) bool; outside the grid w is NaN (extrapolate=True: nearest model)
+
+def chi2(teff, logg, mh):                                    # a gradient through the coefficients
+    w = coefficients(teff, logg, mh, correction="B100G")["w"]
+    F = 1 + flux_dev_hybrid(z, 0.1, w, "hybrid4")             # z: (2, n_points) separations
+    return (((F - data) / sigma) ** 2).sum()
+
+mx.grad(chi2, argnums=(0, 1, 2))(teff, logg, mh)
+```
+
+- **Precision follows the inputs**, as in Elómë: float32 arrays (mx or numpy)
+  compute in float32 on the default device (GPU); Python floats and float64
+  compute in float64 on the CPU stream, where the results equal the numpy
+  files to the last bit. float32 agrees with them to about 1e-7 in w. As in
+  MLX generally, `mx.grad` with respect to a float64 mx.array must be called
+  under `mx.stream(mx.cpu)`.
+- **Nothing raises inside a model**: outside the grid the outputs are NaN and
+  `inside` is False, so a call can be traced and compiled.
+  `extrapolate=True` uses the nearest model there (zero gradient). Bound the
+  stellar parameters to the grid in the sampler instead.
+- The coefficients are continuous and piecewise linear in the stellar
+  parameters, so their gradient is piecewise constant (it changes between grid
+  boxes and their tetrahedra).
+- MLX evaluates lazily: unused outputs (`q`, `physical`) cost nothing. For
+  1,000 stars, float32 coefficients take about 0.5 ms, and coefficients with
+  their gradient under `mx.compile` about 0.7 ms (M-series GPU).
+- `shapes`, `intensity`, `is_physical`, `from_q` and `to_q` are MLX versions
+  of the numpy files' functions (`from_q` has no clamp; Elómë's
+  `ld.hybrid4_from_q` and `ld.simplex_from_q` clamp q away from 0 for a finite
+  gradient).
 
 Other grid, passband or law combinations can be generated with
-`scripts/make_standalone.py`.
+`scripts/make_standalone.py`, which writes both versions.
 
 ## 2. The table interpolator (`ldhybrid/interpolate.py`)
 
@@ -152,10 +205,18 @@ t.intensity("hybrid5", r["coeffs"], mu)    # I(mu)/I(1)
 - Passband names: `TESS`, `Kepler`, `CHEOPS`, `NGTS`, `HST_WFC3_G141`,
   `JWST_NIRSpec_PRISM`, `JWST_NIRSpec_G395H_NRS1`, `JWST_NIRISS_SOSS_o1`, and so
   on (`t.bands(grid)` lists them).
-- Interpolation is linear on a Delaunay triangulation in (Teff/100 K,
-  log g/0.5, [M/H]/0.5). It bridges the gaps of the PHOENIX grid, is exact at
-  the models, and keeps hybrid coefficients physical. Do not use higher-order
-  interpolation on the hybrid coefficients: it can leave the physical region.
+- Interpolation is linear on the Kuhn simplices of the (Teff, log g, [M/H])
+  tensor grid (`GridSimplex`): every grid box is split into the same six
+  tetrahedra, so the coefficients are continuous in the stellar parameters
+  (safe for gradient-based samplers), exact at the models, and convex mixes of
+  four models, which keeps hybrid coefficients physical. The 68 missing
+  PHOENIX models are filled by linear interpolation between their neighbours
+  along one axis. Do not use higher-order interpolation on the hybrid
+  coefficients: it can leave the physical region.
+  (Until 2026-10-20 the interpolation used scipy's Delaunay triangulation,
+  which on these regular grids is discontinuous across some faces, by up to
+  0.01 in w; values between the models differ from that version by a median of
+  5e-5 (MPS-ATLAS) and 4e-4 (PHOENIX).)
 - Outside a grid, `coefficients` raises `ValueError` unless
   `extrapolate="nearest"`.
 

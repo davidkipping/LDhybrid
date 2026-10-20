@@ -2,9 +2,10 @@
 
 * weights(): linear interpolation of a law's tabulated weights at (Teff,
   log g, [M/H]) in one band, on scaled coordinates (Teff/100 K, log g/0.5,
-  [M/H]/0.5) with a Delaunay triangulation of the available models (so grid
-  holes are bridged, never filled from another grid). Linear interpolation
-  keeps hybrid weights inside their convex physical region.
+  [M/H]/0.5) on the Kuhn simplices of the tensor grid of the available
+  models (interpolate.GridSimplex: continuous; a missing model is filled from
+  its neighbours along one axis, never from another grid). Linear
+  interpolation keeps hybrid weights inside their convex physical region.
 * magnetic(): MURaM correction Δw, interpolated in Teff between its stars.
 * Law-agnostic statistics of a profile (Maxted 2023: h'1 = I(2/3)/I(1),
   h'2 = h'1 − I(1/3)/I(1)), and SPAM-style refits (Howarth 2011): the law a
@@ -18,10 +19,10 @@ from functools import lru_cache
 
 import h5py
 import numpy as np
-from scipy.interpolate import LinearNDInterpolator
 
 from . import laws
 from . import lightcurve as lc
+from .interpolate import GridSimplex
 from .paths import DATA
 
 P = DATA / "products"
@@ -41,11 +42,11 @@ def _interp(grid, law, method, band):
     X = np.column_stack([h["teff"][()], h["logg"][()], h["mh"][()]]) / SCALE
     ok = h["covered"][:, j]
     W = h[f"{law}|{method}|w"][:, j, :]
-    return LinearNDInterpolator(X[ok], W[ok]), X[ok].min(0), X[ok].max(0)
+    return GridSimplex(X[ok], W[ok]), X[ok].min(0), X[ok].max(0)
 
 
 def weights(grid, law, band, teff, logg, mh, method="r"):
-    """Interpolated weights, or NaN outside the grid's convex hull."""
+    """Interpolated weights, or NaN outside the grid."""
     f, lo, hi = _interp(grid, law, method, band)
     return np.asarray(f(np.array([teff, logg, mh]) / SCALE))[0]
 

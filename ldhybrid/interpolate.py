@@ -38,11 +38,13 @@ Command line:
 
     python -m ldhybrid.interpolate hybrid5 5600 4.4 0.1 TESS --grid mps2 --tables path/to/cds
 
-Interpolation is linear within one grid, on a Delaunay triangulation of the
-models in scaled coordinates (Teff/100 K, log g/0.5, [M/H]/0.5), so grid holes
-are bridged and the result is exact at the models. For the hybrid laws,
-linear interpolation keeps the weights inside their convex physical region.
-Points outside the grid raise ValueError unless extrapolate="nearest".
+Interpolation is linear within one grid, on the Kuhn simplices of its
+(Teff, log g, [M/H]) tensor grid (GridSimplex): continuous, exact at the
+models, and a convex mix of four models, so hybrid weights stay inside their
+convex physical region. Missing PHOENIX models are filled from their nearest
+neighbours along one axis. Points outside the grid raise ValueError unless
+extrapolate="nearest" (the nearest model in Teff/100 K, log g/0.5,
+[M/H]/0.5).
 
 hybrid4 is tabulated on its curvature-simplex basis (H4_BASIS): w ≥ 0,
 Σw ≤ 1 is exactly the set of hybrid4 profiles that are positive, monotonic,
@@ -61,7 +63,6 @@ import warnings
 from pathlib import Path
 
 import numpy as np
-from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
 
 GRIDS = ("phoenix", "mps1", "mps2")
 COEFFS = {"hybrid2": ("w1", "w2"), "hybrid4": ("w1", "w2", "w3", "w4"),
@@ -459,6 +460,113 @@ def quadrature_r(breaks, n=N_GL):
     return np.concatenate(mus), np.concatenate(qs)
 
 
+# ----------------------------------------------------------------- the interpolant
+
+class GridSimplex:
+    """Continuous linear interpolation on a tensor grid of models (Kuhn, or
+    Freudenthal, simplices): the box of the grid that contains x is split into
+    six tetrahedra by the order of x's fractional coordinates in the box, and
+    the value is the barycentric mix of the tetrahedron's four corners. The
+    split is the same in every box, so the interpolant is continuous across
+    boxes; it is exact at the models and for any function linear in the
+    coordinates, and every value is a convex mix of models (so hybrid weights
+    stay inside their convex physical region).
+
+    X (n, 3): model coordinates (any fixed scaling; SCALE units here); Y (n, k)
+    their values. The axes are the distinct values of each coordinate. A grid
+    node with no model (PHOENIX has 68) is filled by linear interpolation
+    between the nearest models on both sides along one axis, the axis with the
+    shortest such bracket in these coordinates; a node with no bracket on any
+    axis is left empty, and points whose tetrahedron uses it are outside the
+    grid (as are points outside the axes' ranges)."""
+
+    def __init__(self, X, Y=None):
+        X = np.asarray(X, float)
+        self.X = X
+        self.axes = [np.unique(np.round(X[:, k], 9)) for k in range(3)]
+        if min(len(a) for a in self.axes) < 2:
+            raise ValueError("every axis needs at least two distinct values")
+        self.shape = tuple(len(a) for a in self.axes)
+        ijk = np.stack([np.searchsorted(a, np.round(X[:, k], 9)) for k, a in enumerate(self.axes)], -1)
+        model = np.full(self.shape, -1)
+        model[tuple(ijk.T)] = np.arange(len(X))
+        # each node as (up to two) models and their weights; empty nodes: index -1
+        idx = np.stack([model, np.full(self.shape, -1)], -1)
+        wts = np.stack([(model >= 0).astype(float), np.zeros(self.shape)], -1)
+        for node in zip(*np.nonzero(model < 0)):
+            best = None
+            for k in range(3):
+                line = [slice(None) if j == k else node[j] for j in range(3)]
+                have = np.flatnonzero(model[tuple(line)] >= 0)
+                lo, hi = have[have < node[k]], have[have > node[k]]
+                if len(lo) and len(hi):
+                    a, b, c = self.axes[k][lo[-1]], self.axes[k][node[k]], self.axes[k][hi[0]]
+                    if best is None or c - a < best[0]:
+                        t = (b - a) / (c - a)
+                        n_lo, n_hi = list(node), list(node)
+                        n_lo[k], n_hi[k] = lo[-1], hi[0]
+                        best = (c - a, model[tuple(n_lo)], model[tuple(n_hi)], t)
+            if best is not None:
+                idx[node] = best[1:3]
+                wts[node] = (1 - best[3], best[3])
+        self.node_idx = idx.reshape(-1, 2)
+        self.node_w = wts.reshape(-1, 2)
+        self.valid = self.node_idx[:, 0] >= 0
+        self.n_filled = int(((model < 0).reshape(-1) & self.valid).sum())
+        self.n_empty = int((~self.valid).sum())
+        self.Y = None if Y is None else np.asarray(Y, float)
+
+    def corners(self, x):
+        """The tetrahedron of each point x (m, 3): grid-node indices (m, 4),
+        barycentric weights (m, 4) and the inside flag (m,)."""
+        x = np.atleast_2d(np.asarray(x, float))
+        i = np.stack([np.clip(np.searchsorted(a, x[:, k], side="right") - 1, 0, len(a) - 2)
+                      for k, a in enumerate(self.axes)], -1)
+        f = np.stack([(x[:, k] - a[i[:, k]]) / (a[i[:, k] + 1] - a[i[:, k]])
+                      for k, a in enumerate(self.axes)], -1)
+        tol = 1e-9
+        inside = np.all((f >= -tol) & (f <= 1 + tol), axis=1)
+        order = np.argsort(-f, axis=1, kind="stable")
+        fs = np.take_along_axis(f, order, axis=1)
+        lam = np.column_stack([1 - fs[:, 0], fs[:, 0] - fs[:, 1], fs[:, 1] - fs[:, 2], fs[:, 2]])
+        steps = np.zeros((len(x), 4, 3), int)
+        for j in range(3):
+            steps[:, j + 1:, :] += np.eye(3, dtype=int)[order[:, j]][:, None, :]
+        v = i[:, None, :] + steps
+        n1, n2 = self.shape[1], self.shape[2]
+        node = (v[..., 0] * n1 + v[..., 1]) * n2 + v[..., 2]
+        inside &= ~np.any((lam > tol) & ~self.valid[node], axis=1)
+        return node, lam, inside
+
+    def model_weights(self, x):
+        """The interpolant at one point as {model index: weight} (weights > 0,
+        summing to 1), or None outside the grid."""
+        node, lam, inside = self.corners(x)
+        if not inside[0]:
+            return None
+        out = {}
+        for n, l in zip(node[0], lam[0]):
+            if l > 1e-14:
+                for m, w in zip(self.node_idx[n], self.node_w[n]):
+                    if w > 0:
+                        out[int(m)] = out.get(int(m), 0.0) + float(l * w)
+        return out
+
+    def __call__(self, x):
+        """Interpolated Y at points x (m, 3); NaN rows outside the grid."""
+        node, lam, inside = self.corners(x)
+        Yn = (self.Y[np.maximum(self.node_idx, 0)] * self.node_w[..., None]).sum(1)
+        val = np.where((lam > 0)[..., None], lam[..., None] * Yn[node], 0.0).sum(1)
+        val[~inside] = np.nan
+        return val
+
+    def nearest(self, x):
+        """Y of the nearest model (Euclidean in these coordinates)."""
+        x = np.atleast_2d(np.asarray(x, float))
+        d2 = ((x[:, None, :] - self.X[None]) ** 2).sum(-1)
+        return self.Y[np.argmin(d2, axis=1)]
+
+
 # ----------------------------------------------------------------- the tables
 
 class LDTables:
@@ -529,8 +637,8 @@ class LDTables:
                 raise ValueError(f"no {grid} {law} rows for band {band!r}, method {method!r}")
             X = np.column_stack([d["teff"][m], d["logg"][m], d["mh"][m]]) / SCALE
             Y = np.column_stack([d["coeffs"][m], d["mucri"][m], d["LCppm"][m]])
-            f = LinearNDInterpolator(X, Y)
-            g = NearestNDInterpolator(X, Y) if extrapolate == "nearest" else None
+            f = GridSimplex(X, Y)
+            g = f.nearest if extrapolate == "nearest" else None
             self._interp[key] = (f, g)
         return self._interp[key]
 
@@ -772,16 +880,16 @@ class LDTables:
 
     def refit(self, law, teff, logg, mh, band, grid="mps2", mu_min=0.0):
         """Coefficients from interpolated *intensity profiles* rather than
-        interpolated coefficients: the profiles of the Delaunay corner models
-        are combined (PCHIP in μ, as in production) on the union of their nodes,
-        combined with the barycentric weights, and the law is refitted with
+        interpolated coefficients: the profiles of the models that the
+        interpolant mixes at this point (GridSimplex.model_weights) are
+        combined (PCHIP in μ, as in production) on the union of their nodes,
+        combined with those weights, and the law is refitted with
         the production weighting and constraint. Exact at the models (to the
         float32 storage of the profiles); between them it removes the part of
         the interpolation error that comes from interpolating coefficients.
         mu_min > 0 leaves the profile at μ < mu_min out of the fit (e.g. 0.02,
         roughly the outer pressure scale height, which the four-term and
         power-2 laws cannot follow and which costs them accuracy elsewhere)."""
-        from scipy.spatial import Delaunay
         P = self._profiles(grid)
         j = P["bands"].index(band)
         ok = np.isfinite(P["y"][:, j]).any(axis=1)
@@ -789,16 +897,12 @@ class LDTables:
         key = (grid, band)
         if key not in self._tri:
             X = np.column_stack([P["teff"][idx], P["logg"][idx], P["mh"][idx]]) / SCALE
-            self._tri[key] = Delaunay(X)
-        tri = self._tri[key]
-        x = np.array([teff, logg, mh]) / SCALE
-        s = int(tri.find_simplex(x))
-        if s < 0:
+            self._tri[key] = GridSimplex(X)
+        mw = self._tri[key].model_weights(np.array([teff, logg, mh]) / SCALE)
+        if mw is None:
             raise ValueError(f"({teff}, {logg}, {mh}) is outside the {grid} grid for {band}")
-        T = tri.transform[s]
-        b = T[:3] @ (x - T[3])
-        lam = np.r_[b, 1 - b.sum()]
-        corners = idx[tri.simplices[s]]
+        corners = idx[list(mw)]
+        lam = np.array(list(mw.values()))
         nodes = []
         for k in corners:
             m = np.isfinite(P["mu"][k, j])

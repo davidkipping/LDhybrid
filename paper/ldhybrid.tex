@@ -882,7 +882,7 @@ correction of \citet{kostogryz2026} reduces this to $-0.0023\pm0.0015$ and
 $-0.004\pm0.003$ ($1.5\sigma$ and $1.2\sigma$), as \citet{kostogryz2024}
 found. In TESS the uncorrected offsets are smaller and only marginally
 significant ($+0.0050\pm0.0033$ and $-0.0089\pm0.0045$), and the correction
-brings them to $-0.0039\pm0.0035$ and $-0.0003\pm0.0043$. Their field strength was inferred from these same Kepler measurements,
+brings them to $-0.0039\pm0.0035$ and $-0.0002\pm0.0043$. Their field strength was inferred from these same Kepler measurements,
 so this is a consistency check, not an independent validation. A 200\,G
 correction overshoots ($\Delta h'_1=-0.013$, $8\sigma$), and the small-scale
 dynamo alone is not enough. PHOENIX starts further off. The SPAM coefficients
@@ -1195,9 +1195,12 @@ star-to-star scatter.
 The CDS release (0.9\,GB compressed) holds the 18 coefficient tables and the
 three auxiliary tables. The interpolation code (Python, using numpy and scipy
 only) reads them and returns coefficients for given
-$(\teff,\log g,[{\rm M/H}])$, interpolating linearly on a Delaunay
-triangulation within one grid, which handles the gaps of the PHOENIX grid and
-the irregular MPS-ATLAS spacing. It applies the $\Delta w$ corrections, so
+$(\teff,\log g,[{\rm M/H}])$, interpolating linearly within one grid on the
+same split of every grid box into six tetrahedra (Kuhn simplices), so the
+coefficients are continuous in the stellar parameters and remain convex
+combinations of models. The 68 missing
+PHOENIX models are filled by linear interpolation between their neighbours
+along one axis. It applies the $\Delta w$ corrections, so
 the recommended MPS-ATLAS Set~2 + 100\,G coefficients can be built from the
 CDS files alone (except in UVIS G280 and MIRI LRS). It draws priors over the
 stellar-parameter uncertainties, optionally with the grid-to-grid covariance

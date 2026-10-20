@@ -1,6 +1,6 @@
 """LDhybrid v1.0 -- hybrid4 limb-darkening coefficients, MPS-ATLAS Set 2 (plane-parallel; Kostogryz et al. 2022), TESS passband.
 
-Standalone: needs only numpy and scipy; the coefficient grid is embedded.
+Standalone: needs only numpy; the coefficient grid is embedded.
 
     from ldhybrid_hybrid4_mps2_tess import coefficients, intensity
     r = coefficients(teff=5600, logg=4.4, mh=0.0)
@@ -25,10 +25,13 @@ uniform prior over the region. Weights on SquishierPlanet's monomial-pole
 hybrid4 shapes: w @ BASIS.
 
 Coefficients: least squares uniform in projected radius (the transit-optimised
-fit), constrained to that region. Interpolation is linear
-on a Delaunay triangulation in (Teff/100 K, log g/0.5, [M/H]/0.5), which keeps
-interpolated coefficients physical. Grid: 16974 models, Teff 3500-7500 K,
-log g 3.5-5.0, [M/H] -2.0 to +1.0 (with gaps for PHOENIX).
+fit), constrained to that region. Grid: 16974 models, Teff 3500-7500 K,
+log g 3.5-5.0, [M/H] -2.0 to +1.0.
+Interpolation is linear on the Kuhn simplices of the (Teff, log g, [M/H])
+tensor grid, as in ldhybrid.interpolate: continuous, exact at the models, and
+a convex mix of four models, so interpolated coefficients stay physical.
+Outside the grid, coefficients() raises unless extrapolate=True (the nearest
+model in Teff/100 K, log g/0.5, [M/H]/0.5).
 lc_ppm is the light-curve error of the tabulated fits (p = 0.1).
 
 correction: None (default) or a MURaM surface-field state, "ssd" (small-scale
@@ -45,13 +48,12 @@ import warnings
 import zlib
 
 import numpy as np
-from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
 
 GRID = "mps2"
 BAND = "TESS"
 EPS = (0.028601207249486824, 0.38582417584735224)
 SCALE = np.array([100.0, 0.5, 0.5])
-_N = 16974
+_N, NW = 16974, 4
 _GRID = (                               # teff, logg, mh (float64, exact)
     "eNp03TGv7V7XnvWnoDzFzNIuKFNQpkCioUyRkoIyBaWFXLqkcOnCpQs3IH8AS4EQwBBgTYRLF6bCQprSWzgiimYUC4FiIUeJ"
     "InbenLUZZ8z7Os2RLuk/1vk1T+Nbz/zLX77//N2/97f/8td/fv3++y/rX/7ooej/2/5v/pT9P/jrP3+j6P/Ff/5v/vwNuP8q"
@@ -4430,6 +4432,8 @@ _DATA = (                               # w1..w4, mu_cri, lc_ppm (float32)
     "Mf7kiYRxA+XFmrD8Gkfve0ywL96Q5W0XP1XHxrQYMky1QPELPSbv45CZEEUXX1jjnbcu9x5ZXhm+9fMpb5gtbhobsLiN+hJF"
     "+HgspjIpc1TbWbF9cdxdHrfyFtLeSkscLLNk8v8DqbOAug=="
 )
+_FILL = (                               # filled nodes: (node, model, model, t)
+)
 
 #: MURaM magnetic corrections Δw (added to w), [M/H] = 0 MURaM stars; linear in
 #: Teff, clamped outside 3196-6807 K, applied at all log g and [M/H]
@@ -4447,10 +4451,53 @@ def _unpack(s, shape, dtype):
     return np.frombuffer(zlib.decompress(base64.b64decode(s)), dtype).astype(float).reshape(shape)
 
 
-_X = _unpack(_GRID, (_N, 3), "<f8") / SCALE
-_Y = _unpack(_DATA, (_N, 6), "<f4")
-_LIN = LinearNDInterpolator(_X, _Y)
-_NEAR = None
+def _grid():
+    """The tensor grid: the models (scaled), their rows, the axes, and the value
+    of every grid node (a model, the mix of two models in _FILL, or NaN)."""
+    X = _unpack(_GRID, (_N, 3), "<f8") / SCALE
+    Y = _unpack(_DATA, (_N, NW + 2), "<f4")
+    axes = [np.unique(np.round(X[:, k], 9)) for k in range(3)]
+    shape = tuple(len(a) for a in axes)
+    ijk = np.stack([np.searchsorted(a, np.round(X[:, k], 9)) for k, a in enumerate(axes)], -1)
+    Yn = np.full((int(np.prod(shape)), Y.shape[1]), np.nan)
+    Yn[np.ravel_multi_index(tuple(ijk.T), shape)] = Y
+    for node, a, b, t in _FILL:
+        Yn[node] = (1 - t) * Y[a] + t * Y[b]
+    return X, Y, axes, shape, Yn
+
+
+_X, _Y, _AXES, _SHAPE, _YN = _grid()
+_VALID = np.isfinite(_YN[:, 0])
+_YN0 = np.where(_VALID[:, None], _YN, 0.0)
+
+
+def _corners(x):
+    """The Kuhn tetrahedron of each scaled point x (m, 3): its grid nodes (m, 4),
+    barycentric weights (m, 4) and the inside flag (m,). The box containing x
+    is split by the order of x's fractional coordinates in it, the same split
+    in every box, so the interpolant is continuous."""
+    i = np.stack([np.clip(np.searchsorted(a, x[:, k], side="right") - 1, 0, len(a) - 2)
+                  for k, a in enumerate(_AXES)], -1)
+    f = np.stack([(x[:, k] - a[i[:, k]]) / (a[i[:, k] + 1] - a[i[:, k]])
+                  for k, a in enumerate(_AXES)], -1)
+    inside = np.all((f >= -1e-9) & (f <= 1 + 1e-9), axis=1)
+    order = np.argsort(-f, axis=1, kind="stable")
+    fs = np.take_along_axis(f, order, axis=1)
+    lam = np.column_stack([1 - fs[:, 0], fs[:, 0] - fs[:, 1], fs[:, 1] - fs[:, 2], fs[:, 2]])
+    v = np.repeat(i[:, None, :], 4, axis=1)
+    for j in range(3):
+        v[:, j + 1:, :] += np.eye(3, dtype=int)[order[:, j]][:, None, :]
+    node = (v[..., 0] * _SHAPE[1] + v[..., 1]) * _SHAPE[2] + v[..., 2]
+    inside &= ~np.any((lam > 1e-9) & ~_VALID[node], axis=1)
+    return node, lam, inside
+
+
+def _interpolate(x):
+    """Interpolated rows at scaled points x (m, 3); NaN outside the grid."""
+    node, lam, inside = _corners(x)
+    y = (lam[..., None] * _YN0[node]).sum(1)
+    y[~inside] = np.nan
+    return y
 
 
 def _pole(mu, e):
@@ -4518,17 +4565,14 @@ def coefficients(teff, logg, mh, extrapolate=False, correction=None):
 
     extrapolate=True uses the nearest model outside the grid (else ValueError).
     Returns dict(w, q, physical, mu_cri, lc_ppm, inside, correction)."""
-    global _NEAR
-    x = np.array([[teff, logg, mh]]) / SCALE
-    y = _LIN(x)[0]
+    x = np.array([[teff, logg, mh]], float) / SCALE
+    y = _interpolate(x)[0]
     inside = bool(np.all(np.isfinite(y)))
     if not inside:
         if not extrapolate:
             raise ValueError(f"({teff}, {logg}, {mh}) is outside the {GRID} grid; "
                              "pass extrapolate=True to use the nearest model")
-        if _NEAR is None:
-            _NEAR = NearestNDInterpolator(_X, _Y)
-        y = _NEAR(x)[0]
+        y = _Y[np.argmin(((_X - x) ** 2).sum(1))]
     w = y[:4].copy()
     if correction is not None:
         if correction not in _CORR:

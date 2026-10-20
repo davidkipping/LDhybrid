@@ -3,8 +3,9 @@ correction state, the route of the model value, the passbands, and the
 correlation of the per-star h'1 and h'2 offsets.
 
   Kepler/TESS (Maxted 2023, b < 0.65): hybrid5 predictions (studies/p4/p4b);
-      offset = weighted mean ± error, scatter = fitted external scatter,
-      rho = correlation of the per-star (h'1, h'2) offsets.
+      offset = weighted mean ± error, scatter = fitted external scatter (all
+      three from p4b_maxted.json), rho = correlation of the per-star (h'1,
+      h'2) offsets.
   JWST (Sing et al. 2026, μ_min = 0.2): per-star inverse-variance means over
       bins (studies/p4/p4d); offset = mean over stars, offset_err = SEM,
       scatter = star-to-star s.d. Two routes: hybrid5 (statistic of the
@@ -31,6 +32,8 @@ def main():
     rows_b = pd.read_csv(P4 / "p4b_maxted_rows.csv")
     rows_b = rows_b[(rows_b.law == "hybrid5") & (rows_b.b < 0.65)]
     state = {"none": "none", "MURaM_B100G": "B100G"}
+    means = {(m["band"], m["grid"], m["state"]): m for m in json.loads((P4 / "p4b_maxted.json").read_text())
+             if m["law"] == "hybrid5"}
     out = []
     for r in old:
         if r["regime"] not in ("Kepler", "TESS"):
@@ -38,10 +41,13 @@ def main():
         T = rows_b[(rows_b.band == r["regime"]) & (rows_b.grid == r["grid"]) &
                    (rows_b.state == state[r["correction"]])]
         rho = float(np.corrcoef(T.d1, T.d2)[0, 1]) if len(T) > 2 else ""
+        m = means[(r["regime"], r["grid"], state[r["correction"]])]
+        mean, err, sd = m["dh1" if r["statistic"] == "h1p" else "dh2"]
+        assert m["N"] == len(T)
         out.append(dict(regime=r["regime"], bands=r["regime"], grid=r["grid"],
                         correction=r["correction"], route="hybrid5", statistic=r["statistic"],
-                        offset=r["offset"], offset_err=r["offset_err"], scatter=r["scatter"],
-                        rho_h1h2=f"{rho:+.3f}" if rho != "" else "", N=r["N"],
+                        offset=f"{mean:+.4f}", offset_err=f"{err:.4f}", scatter=f"{sd:.4f}",
+                        rho_h1h2=f"{rho:+.3f}" if rho != "" else "", N=m["N"],
                         source="Maxted 2023 (b<0.65)"))
     sj = json.loads((P4 / "p4d_sing.json").read_text())
     cases = [("mps2|hybrid5", "mps2", "none", "hybrid5"),

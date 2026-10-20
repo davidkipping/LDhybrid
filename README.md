@@ -35,8 +35,11 @@ describes every column.
 
 ### 2. Standalone single-file interpolators (no download)
 
-[`standalone/`](standalone/) holds four single files for **hybrid4** with the
-coefficient grid embedded (numpy + scipy only): `ldhybrid_hybrid4_{phoenix,mps2}_{tess,kepler}.py`.
+[`standalone/`](standalone/) holds eight single files for **hybrid4** and **hybrid5** with
+the coefficient grid embedded (numpy only): `ldhybrid_{hybrid4,hybrid5}_{phoenix,mps2}_{tess,kepler}.py`,
+and an **MLX** port of each (`*_mlx.py`; mlx + numpy) whose coefficients can be
+batched, differentiated with respect to Teff, log g and [M/H], and compiled
+inside an MLX model such as Elómë's.
 Copy one anywhere:
 
 ```python
@@ -46,7 +49,13 @@ r["w"], r["q"], r["physical"], r["lc_ppm"]               # weights, q1-q4, flags
 I = intensity(r["w"], [0.1, 0.5, 1.0])                   # I(mu)/I(1)
 ```
 
-or `python ldhybrid_hybrid4_mps2_tess.py 5600 4.4 0.0`.
+or `python ldhybrid_hybrid4_mps2_tess.py 5600 4.4 0.0`. In MLX:
+
+```python
+import mlx.core as mx
+from ldhybrid_hybrid4_mps2_tess_mlx import coefficients
+w = coefficients(mx.array([5600.0, 5720.0]), 4.4, 0.1, correction="B100G")["w"]  # (2, 4), differentiable
+```
 
 ### 3. The table interpolator (`ldhybrid/interpolate.py`)
 
@@ -104,9 +113,10 @@ hybrid4 (poles ε = 0.028601, 0.38582, from the γ = 25/16 ladder) is tabulated
 on its **curvature-simplex basis**: w ≥ 0, Σw ≤ 1 is exactly the set of hybrid4
 profiles that are positive, monotonic, concave in μ² and of convex slope in μ²,
 and q1–q4 ∈ [0, 1] (q1 = (1 − I(0))⁴) map onto it uniformly. Codes that take
-weights on the monomial-pole shapes (1 − μ⁴, (1 − μ²)², Π_ε0, Π_ε1), such as
-SquishierPlanet and Elómë, need `w @ H4_BASIS` (`BASIS` in the standalone
-files); the expanded-form columns of the tables are basis-free. Weights or q
+weights on this basis, as the current SquishierPlanet and Elómë do, use the
+weights as they are; codes that take weights on the monomial-pole shapes
+(1 − μ⁴, (1 − μ²)², Π_ε0, Π_ε1) need `w @ H4_BASIS` (`BASIS` in the standalone
+files), and the expanded-form columns of the tables are basis-free. Weights or q
 from earlier hybrid4 versions (α = 1 poles, or the monomial-pole basis) are not
 interchangeable: recompute q from w. Details:
 [`docs/upstream/hybrid4_curvature_simplex.md`](docs/upstream/hybrid4_curvature_simplex.md).

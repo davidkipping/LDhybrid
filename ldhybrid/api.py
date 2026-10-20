@@ -171,7 +171,8 @@ def coefficients_custom(law: str, teff: float, logg: float, mh: float, lam, thro
     trilinearly between grid models (missing corners dropped and the weights
     renormalised).
     grid="mps1"/"mps2": any law, with the production method. The MPS-ATLAS
-    models at the corners of the Delaunay simplex containing the star are read
+    models that the table interpolant mixes at the star (interpolate.GridSimplex)
+    are read
     from the MPS-ATLAS archive (Kostogryz et al. 2022, Edmond doi
     10.17617/3.NJ56TR; set1.zip and set2.zip, ~9.5 GB each, expected in
     data/raw/mpsatlas; scripts/fetch_archives.py mpsatlas), band-integrated over
@@ -206,13 +207,13 @@ def coefficients_custom(law: str, teff: float, logg: float, mh: float, lam, thro
 
 
 @lru_cache(maxsize=2)
-def _mps_triangulation(set_name):
-    from scipy.spatial import Delaunay
+def _mps_grid(set_name):
     from .grids import mpsatlas
+    from .interpolate import GridSimplex
     cat = [(t, g, m) for m, t, g in mpsatlas.catalogue(set_name)
            if 3500 <= t <= 7500 and 3.5 <= g <= 5.0 and -2.0 - 1e-9 <= m <= 1.0 + 1e-9]
     X = np.array(cat, float) / predict.SCALE
-    return Delaunay(X), cat
+    return GridSimplex(X), cat
 
 
 def _custom_mps(law, teff, logg, mh, lam, S, grid):
@@ -221,16 +222,12 @@ def _custom_mps(law, teff, logg, mh, lam, S, grid):
     from .products import constraint_for
     from .profile import Profile
     set_name = "set" + grid[-1]
-    tri, cat = _mps_triangulation(set_name)
-    x = np.array([teff, logg, mh]) / predict.SCALE
-    k = int(tri.find_simplex(x))
-    if k < 0:
+    gs, cat = _mps_grid(set_name)
+    mw = gs.model_weights(np.array([teff, logg, mh]) / predict.SCALE)
+    if mw is None:
         raise ValueError(f"({teff}, {logg}, {mh}) is outside the {grid} grid")
-    T = tri.transform[k]
-    b = T[:3] @ (x - T[3])
-    lam_w = np.r_[b, 1 - b.sum()]
     mu, y, corners = None, 0.0, []
-    for wgt, c in zip(lam_w, tri.simplices[k]):
+    for c, wgt in mw.items():
         if wgt <= 1e-12:
             continue
         t_, g_, m_ = cat[c]

@@ -38,12 +38,12 @@ mean ± error (external scatter):
 |---|---|---|---|---|---|
 | Kepler (24) | MPS-ATLAS 2 | Claret 4-term | — | +0.0080 ± 0.0016 | −0.0131 ± 0.0033 |
 | | MPS-ATLAS 2 | hybrid5 | — | +0.0080 ± 0.0017 | −0.0132 ± 0.0033 |
-| | MPS-ATLAS 2 | hybrid5 | MURaM 100 G | **−0.0023 ± 0.0015** | **−0.0039 ± 0.0033** |
+| | MPS-ATLAS 2 | hybrid5 | MURaM 100 G | **−0.0023 ± 0.0015** | **−0.0038 ± 0.0033** |
 | | MPS-ATLAS 1 | hybrid5 | MURaM 100 G | −0.0054 ± 0.0016 | −0.0033 ± 0.0033 |
-| | PHOENIX v3.0 | hybrid5 | — | +0.0231 ± 0.0022 | −0.0210 ± 0.0038 |
-| | PHOENIX v3.0 | hybrid5 | MURaM 200 G | +0.0022 ± 0.0015 | −0.0016 ± 0.0034 |
+| | PHOENIX v3.0 | hybrid5 | — | +0.0234 ± 0.0022 | −0.0207 ± 0.0038 |
+| | PHOENIX v3.0 | hybrid5 | MURaM 200 G | +0.0025 ± 0.0015 | −0.0012 ± 0.0034 |
 | TESS (10) | MPS-ATLAS 2 | hybrid5 | — | +0.0050 ± 0.0033 | −0.0089 ± 0.0045 |
-| | MPS-ATLAS 2 | hybrid5 | MURaM 100 G | **−0.0039 ± 0.0035** | **−0.0003 ± 0.0043** |
+| | MPS-ATLAS 2 | hybrid5 | MURaM 100 G | **−0.0039 ± 0.0035** | **−0.0002 ± 0.0043** |
 
 * **Pipeline check:** our Claret 4-term predictions from the MPS-ATLAS spectra
   reproduce Maxted's published MPS-ATLAS offsets (Kepler Set 1/2: +0.006/−0.012,
@@ -112,7 +112,10 @@ s.d.:
 ## G4 — conclusions and recommended offsets
 
 Status: **passed** (2026-10-10). Offsets fixed in
-`data/products/empirical_offsets.csv`.
+`data/products/empirical_offsets.csv`. Rerun 2026-10-20 with the continuous
+(Kuhn-simplex) interpolant, which moved the Kepler/TESS offsets by ≤ 0.0005
+(P4b, P4c); the table above and `empirical_offsets.csv` (now built from
+`p4b_maxted.json` by `studies/rev2/code_offsets.py`) carry the rerun values.
 
 1. **The laws are not the limitation.** hybrid5 represents the observed Sun
    to 3–5 ppm and inherits exactly the model offsets of the 4-term law in
