@@ -4,7 +4,7 @@ There are three ways to get coefficients, from lightest to fullest:
 
 | Route | Needs | Covers |
 |---|---|---|
-| [Standalone files](#1-standalone-single-file-interpolators) (`standalone/*.py`) | numpy (or mlx + numpy for the `_mlx` ports) | all six laws; PHOENIX, MPS-ATLAS Set 1 or Set 2; TESS or Kepler |
+| [Standalone files](#1-standalone-single-file-interpolators) (`standalone/*.py`) | numpy (or mlx + numpy for the `_mlx` ports) | hybrid2, hybrid4 or hybrid5; PHOENIX, MPS-ATLAS Set 1 or Set 2; TESS or Kepler |
 | [Table interpolator](#2-the-table-interpolator-ldhybridinterpolatepy) (`ldhybrid/interpolate.py`) | numpy, scipy (+ h5py for refits); the CDS tables | all six laws, three grids, 40–41 passbands; priors, offsets, corrections, light curves |
 | [Full package](#3-the-full-package-ldhybridapi) (`ldhybrid.api`) | the whole repository and its `data/` products | everything above, plus custom passbands |
 
@@ -80,38 +80,37 @@ PHOENIX exists, and no grid has been validated against M-dwarf observations.
 
 ## 1. Standalone single-file interpolators
 
-`standalone/` holds one file per law, grid and passband (all six laws; PHOENIX,
-MPS-ATLAS Set 1 and Set 2; TESS and Kepler: 36 files), each with its
-coefficient grid embedded (46–552 kB), and an MLX port of each (`*_mlx.py`,
-below). Copy the file anywhere; it needs only numpy (the MLX
+`standalone/` holds one file per hybrid law, grid and passband (hybrid2,
+hybrid4, hybrid5; PHOENIX, MPS-ATLAS Set 1 and Set 2; TESS and Kepler: 18
+files), each with its coefficient grid embedded (48–552 kB), and an MLX port of
+each (`*_mlx.py`, below). Copy the file anywhere; it needs only numpy (the MLX
 ports: mlx and numpy).
 
 ```python
 from ldhybrid_hybrid4_mps2_tess import coefficients, intensity, is_physical
 
 r = coefficients(5600, 4.4, 0.0)                       # Teff [K], log g [cgs], [M/H]
-r["coeffs"]     # (w1, w2, w3, w4), curvature-simplex basis (hybrid files: also r["w"])
-r["q"]          # (q1, q2, q3, q4), sampling coordinates (hybrids and quadratic)
+r["w"]          # (w1, w2, w3, w4), curvature-simplex basis (also r["coeffs"])
+r["q"]          # (q1, q2, q3, q4), sampling coordinates
 r["physical"]   # positive and monotonic?
 r["lc_ppm"]     # light-curve error of the tabulated fit (p = 0.1)
 
-r = coefficients(5600, 4.4, 0.0, correction="B100G")   # hybrid MPS-ATLAS Set 2 files only
-I = intensity(r["coeffs"], mu)                         # I(mu)/I(1)
+r = coefficients(5600, 4.4, 0.0, correction="B100G")   # MPS-ATLAS Set 2 files only
+I = intensity(r["w"], mu)                              # I(mu)/I(1)
 r = coefficients(9000, 4.5, 0.0, extrapolate=True)     # nearest model outside the grid
 ```
 
 From the shell: `python ldhybrid_hybrid4_mps2_tess.py 5600 4.4 0.0`.
 
 The files are `ldhybrid_<law>_<grid>_<band>.py` with `<law>` one of `hybrid2`,
-`hybrid4`, `hybrid5`, `quadratic`, `power2`, `claret4`; `<grid>` one of
-`phoenix` (2300–7400 K, log g 3.5–5.5), `mps1` and `mps2` (3500–7500 K, log g
-3.5–5.0); `<band>` `tess` or `kepler`. All have the same functions
-(`coefficients`, `intensity`, `is_physical`), with the coefficients of the
-table above. The linear laws also have `shapes`. The hybrids and quadratic
-have `from_q`/`to_q` (quadratic: Kipping's q1, q2). The power-2 fits are
-unconstrained and some are unphysical (c > 1), which `physical` flags. The
-MURaM corrections are defined on Set 2 for the hybrid laws, so only those
-files take `correction=`. `standalone/README.md` lists them all.
+`hybrid4`, `hybrid5`; `<grid>` one of `phoenix` (2300–7400 K, log g 3.5–5.5),
+`mps1` and `mps2` (3500–7500 K, log g 3.5–5.0); `<band>` `tess` or `kepler`.
+All have the same functions, with the weights of the table above (hybrid5:
+stick-breaking `from_q`/`to_q`; hybrid2: its exact triangle). The MURaM
+corrections are defined on Set 2, so only those files take `correction=`.
+The comparison laws (quadratic, power-2, four-term) have no standalone files:
+published tables exist for them, and the table interpolator below serves
+LDhybrid's fits of them (`make_standalone.py --all-laws` writes them).
 
 ### MLX ports (`*_mlx.py`), for Elómë and other MLX codes
 
@@ -128,7 +127,7 @@ from elome.hybrid import flux_dev_hybrid
 
 teff, logg, mh = mx.array([5600.0, 5720.0]), mx.array([4.40, 4.35]), 0.1   # e.g. one per chain
 r = coefficients(teff, logg, mh, correction="B100G")
-r["coeffs"]   # (2, 4) mx.array; Elómë takes these weights as they are (also r["w"])
+r["w"]        # (2, 4) mx.array; Elómë takes these weights as they are
 r["inside"]   # (2,) bool; outside the grid w is NaN (extrapolate=True: nearest model)
 
 def chi2(teff, logg, mh):                                    # a gradient through the coefficients
@@ -142,8 +141,7 @@ mx.grad(chi2, argnums=(0, 1, 2))(teff, logg, mh)
 - **Precision follows the inputs**, as in Elómë: float32 arrays (mx or numpy)
   compute in float32 on the default device (GPU); Python floats and float64
   compute in float64 on the CPU stream, where the results equal the numpy
-  files to the last bit. float32 agrees with them to about 1e-7 (Claret-4:
-  1e-6). As in
+  files to the last bit. float32 agrees with them to about 1e-7 in w. As in
   MLX generally, `mx.grad` with respect to a float64 mx.array must be called
   under `mx.stream(mx.cpu)`.
 - **Nothing raises inside a model**: outside the grid the outputs are NaN and
@@ -160,10 +158,8 @@ mx.grad(chi2, argnums=(0, 1, 2))(teff, logg, mh)
   of the numpy files' functions (`from_q` has no clamp; Elómë's
   `ld.hybrid4_from_q` and `ld.simplex_from_q` clamp q away from 0 for a finite
   gradient).
-- With Elómë: the hybrid files' `coeffs` are its `u` for `limb_dark="hybrid2"`,
-  `"hybrid4"` or `"hybrid5"`; the quadratic files' are its (u1, u2)
-  (`elome.flux.flux_dev`), and their q are the q1, q2 it samples. Elómë has no
-  power-2 or Claret-4 law.
+- With Elómë: the weights are its `u` for `limb_dark="hybrid2"`, `"hybrid4"`
+  or `"hybrid5"`.
 
 Other passbands can be generated with `scripts/make_standalone.py` (add them
 to `BANDS`), which writes both versions.

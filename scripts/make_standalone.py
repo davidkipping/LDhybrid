@@ -1,9 +1,11 @@
-"""Write lightweight, single-file interpolators for every law (hybrid2, hybrid4,
-hybrid5, quadratic, power2, claret4) and grid (PHOENIX, MPS-ATLAS Set 1 and
-Set 2), one passband each (TESS, Kepler), with the coefficient grid embedded
-(numpy only).
+"""Write lightweight, single-file interpolators for the hybrid laws (hybrid2,
+hybrid4, hybrid5) on every grid (PHOENIX, MPS-ATLAS Set 1 and Set 2), one
+passband each (TESS, Kepler), with the coefficient grid embedded (numpy only).
 
     .venv/bin/python scripts/make_standalone.py      -> standalone/*.py
+    .venv/bin/python scripts/make_standalone.py --all-laws   (also quadratic,
+        power2 and claret4, the comparison laws; not shipped, as published
+        tables exist for them and LDTables serves them)
 
 and their MLX ports (*_mlx.py; scripts/make_standalone_mlx.py).
 
@@ -31,8 +33,9 @@ GRIDS = {"phoenix": "PHOENIX-ACES-AGSS-COND SpecInt v3.0 (spherical; Husser et a
          "mps1": "MPS-ATLAS Set 1 (plane-parallel; Kostogryz et al. 2022)",
          "mps2": "MPS-ATLAS Set 2 (plane-parallel; Kostogryz et al. 2022)"}
 STATES = ("ssd", "B100G", "B200G", "B300G")
-LAWS = ("hybrid2", "hybrid4", "hybrid5", "quadratic", "power2", "claret4")
 HYBRID = ("hybrid2", "hybrid4", "hybrid5")
+#: every tabulated law (--all-laws); the default writes HYBRID only
+LAWS = HYBRID + ("quadratic", "power2", "claret4")
 #: laws with sampling coordinates q (from_q/to_q)
 HAS_Q = HYBRID + ("quadratic",)
 #: laws linear in their coefficients (shapes())
@@ -474,11 +477,11 @@ def law_fmt(law, A):
                 q_print='\n          "q =", " ".join(f"{v:.6f}" for v in r["q"]),' if hasq else "")
 
 
-def main():
+def main(laws=HYBRID):
     import make_standalone_mlx
     OUT.mkdir(exist_ok=True)
     t = I.LDTables(CDS, cache=False)
-    for law in LAWS:
+    for law in laws:
         nw = len(I.COEFFS[law])
         for grid, gridname in GRIDS.items():
             d = t.table(grid, law)
@@ -527,4 +530,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    main(LAWS if "--all-laws" in sys.argv[1:] else HYBRID)

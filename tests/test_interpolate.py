@@ -103,7 +103,7 @@ def _standalone(name):
     return m
 
 
-STANDALONE_LAWS = ["hybrid2", "hybrid4", "hybrid5", "quadratic", "power2", "claret4"]
+STANDALONE_LAWS = ["hybrid2", "hybrid4", "hybrid5"]
 
 
 @pytest.mark.data

@@ -35,10 +35,10 @@ describes every column.
 
 ### 2. Standalone single-file interpolators (no download)
 
-[`standalone/`](standalone/) holds a single file for every law and grid in TESS and
-Kepler, with the coefficient grid embedded (numpy only):
-`ldhybrid_<law>_<grid>_<band>.py` for the six laws, the grids `phoenix`, `mps1`,
-`mps2` and the bands `tess`, `kepler` (36 files). Each has an **MLX** port
+[`standalone/`](standalone/) holds a single file for each hybrid law and grid in
+TESS and Kepler, with the coefficient grid embedded (numpy only):
+`ldhybrid_<law>_<grid>_<band>.py` for `hybrid2`, `hybrid4`, `hybrid5`, the grids
+`phoenix`, `mps1`, `mps2` and the bands `tess`, `kepler` (18 files). Each has an **MLX** port
 (`*_mlx.py`; mlx + numpy) whose coefficients can be batched, differentiated with
 respect to Teff, log g and [M/H], and compiled inside an MLX model such as
 Elómë's. Copy one anywhere:
@@ -46,16 +46,16 @@ Elómë's. Copy one anywhere:
 ```python
 from ldhybrid_hybrid4_mps2_tess import coefficients, intensity
 r = coefficients(5600, 4.4, 0.0, correction="B100G")   # Teff, log g, [M/H]; recommended for FGK
-r["coeffs"], r["q"], r["physical"], r["lc_ppm"]          # coefficients, q1-q4, flags, fit's LC error
-I = intensity(r["coeffs"], [0.1, 0.5, 1.0])              # I(mu)/I(1)
+r["w"], r["q"], r["physical"], r["lc_ppm"]               # weights, q1-q4, flags, fit's LC error
+I = intensity(r["w"], [0.1, 0.5, 1.0])                   # I(mu)/I(1)
 ```
 
-or `python ldhybrid_quadratic_phoenix_kepler.py 3200 5.0 0.0`. In MLX:
+or `python ldhybrid_hybrid2_phoenix_kepler.py 3200 5.0 0.0`. In MLX:
 
 ```python
 import mlx.core as mx
 from ldhybrid_hybrid4_mps2_tess_mlx import coefficients
-w = coefficients(mx.array([5600.0, 5720.0]), 4.4, 0.1, correction="B100G")["coeffs"]  # (2, 4), differentiable
+w = coefficients(mx.array([5600.0, 5720.0]), 4.4, 0.1, correction="B100G")["w"]  # (2, 4), differentiable
 ```
 
 ### 3. The table interpolator (`ldhybrid/interpolate.py`)
