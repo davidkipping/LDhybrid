@@ -88,22 +88,41 @@ def test_offsets_check_the_passband():
     t.apply_offsets(p, "Kepler", force=True)
 
 
-@pytest.mark.data
-@pytest.mark.skipif(not (CDS / "mps2_hybrid5.dat.gz").exists(), reason="CDS tables not built")
-@pytest.mark.parametrize("law", ["hybrid4", "hybrid5"])
-def test_standalone_files_reproduce_the_tables(law):
+@pytest.fixture(scope="module")
+def cds_tables():
+    return LDTables(CDS, cache=False)
+
+
+def _standalone(name):
     import importlib.util
     from pathlib import Path
     spec = importlib.util.spec_from_file_location(
-        "sa", Path(__file__).resolve().parents[1] / "standalone" / f"ldhybrid_{law}_mps2_tess.py")
-    sa = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(sa)
-    t = LDTables(CDS, cache=False)
+        name, Path(__file__).resolve().parents[1] / "standalone" / f"{name}.py")
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+STANDALONE_LAWS = ["hybrid2", "hybrid4", "hybrid5", "quadratic", "power2", "claret4"]
+
+
+@pytest.mark.data
+@pytest.mark.skipif(not (CDS / "mps2_hybrid5.dat.gz").exists(), reason="CDS tables not built")
+@pytest.mark.parametrize("grid", ["phoenix", "mps1", "mps2"])
+@pytest.mark.parametrize("law", STANDALONE_LAWS)
+def test_standalone_files_reproduce_the_tables(law, grid, cds_tables):
+    sa = _standalone(f"ldhybrid_{law}_{grid}_tess")
+    corr = "B100G" if law.startswith("hybrid") and grid == "mps2" else None
+    kw = dict(correction=corr) if corr else {}
     for x in [(5600, 4.4, 0.1), (4321, 4.37, -0.13), (6789, 4.1, -0.6)]:
-        a = t.coefficients(law, *x, "TESS", grid="mps2", correction="B100G")
-        b = sa.coefficients(*x, correction="B100G")
-        assert np.allclose(list(a["coeffs"].values()), b["w"], atol=1e-7)   # float32 storage
-        assert np.allclose(a["q"], b["q"], atol=1e-7) and a["physical"] == b["physical"]
+        a = cds_tables.coefficients(law, *x, "TESS", grid=grid, correction=corr)
+        b = sa.coefficients(*x, **kw)
+        assert np.allclose(list(a["coeffs"].values()), b["coeffs"], atol=1e-7)   # float32 storage
+        assert a["physical"] == b["physical"]
+        if "q" in a:
+            assert np.allclose(a["q"], b["q"], atol=1e-7) and b["w"] == b["coeffs"]
+    if not hasattr(sa, "from_q"):
+        return
     q = np.random.default_rng(0).uniform(size=(100, len(COEFFS[law])))
     w = sa.from_q(q)
     assert np.allclose([sa.to_q(v) for v in w], q, atol=1e-12)
@@ -149,31 +168,26 @@ def test_tables_interpolant_continuous_at_grid_midpoints():
 
 @pytest.mark.data
 @pytest.mark.skipif(not (CDS / "mps2_hybrid5.dat.gz").exists(), reason="CDS tables not built")
-@pytest.mark.parametrize("law", ["hybrid4", "hybrid5"])
+@pytest.mark.parametrize("law", STANDALONE_LAWS)
 def test_mlx_standalone_matches_numpy_and_differentiates(law):
     mx = pytest.importorskip("mlx.core")
-    import importlib.util
-    from pathlib import Path
-
-    def load(name):
-        spec = importlib.util.spec_from_file_location(
-            name, Path(__file__).resolve().parents[1] / "standalone" / f"{name}.py")
-        m = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(m)
-        return m
-    sa, sm = load(f"ldhybrid_{law}_mps2_tess"), load(f"ldhybrid_{law}_mps2_tess_mlx")
+    sa, sm = _standalone(f"ldhybrid_{law}_mps2_tess"), _standalone(f"ldhybrid_{law}_mps2_tess_mlx")
+    kw = dict(correction="B100G") if law.startswith("hybrid") else {}
     rng = np.random.default_rng(2)
     P = rng.uniform([3400, 3.4, -2.1], [7600, 5.1, 1.1], size=(300, 3))
-    r = sm.coefficients(P[:, 0], P[:, 1], P[:, 2], correction="B100G")   # float64
-    w, inside = np.array(r["w"]), np.array(r["inside"])
+    r = sm.coefficients(P[:, 0], P[:, 1], P[:, 2], **kw)   # float64
+    w, inside = np.array(r["coeffs"]), np.array(r["inside"])
     assert not inside.all() and np.isnan(w[~inside]).all()
-    ref = np.array([sa.coefficients(*p, correction="B100G")["w"] for p in P[inside]])
+    ref = np.array([sa.coefficients(*p, **kw)["coeffs"] for p in P[inside]])
     assert np.abs(w[inside] - ref).max() < 1e-14
-    assert np.allclose(np.array(r["q"])[inside], [sa.to_q(v) for v in ref], atol=1e-12)
+    assert (np.array(r["physical"])[inside] == [sa.is_physical(v) for v in ref]).all()
+    if "q" in r:
+        assert np.allclose(np.array(r["q"])[inside], [sa.to_q(v) for v in ref], atol=1e-12)
     # float32 gradient in Teff against float64 central differences
     T, g, m = rng.uniform(4000, 7000, 64), 4.37, -0.13
     c = rng.normal(size=sm.NW)
-    gT = mx.grad(lambda t: (sm.coefficients(t, g, m)["w"] * mx.array(c.astype(np.float32))).sum())(
+    gT = mx.grad(lambda t: (sm.coefficients(t, g, m)["coeffs"] * mx.array(c.astype(np.float32))).sum())(
         mx.array(T.astype(np.float32)))
-    fd = (np.array(sm.coefficients(T + 1e-3, g, m)["w"]) - np.array(sm.coefficients(T - 1e-3, g, m)["w"])) @ c / 2e-3
+    f = lambda t: np.array(sm.coefficients(t, g, m)["coeffs"])
+    fd = (f(T + 1e-3) - f(T - 1e-3)) @ c / 2e-3
     assert np.median(np.abs(np.array(gT) - fd) / np.abs(fd)) < 1e-3

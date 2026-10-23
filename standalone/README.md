@@ -1,34 +1,42 @@
-# Standalone hybrid4 and hybrid5 interpolators (numpy and MLX)
+# Standalone interpolators (numpy and MLX)
 
-Single-file interpolators for the LDhybrid v1.0 **hybrid4** and **hybrid5**
-coefficients in one grid and passband. The coefficient grid is embedded, so no
-tables need downloading. Each file comes in two versions: numpy only
-(`ldhybrid_<law>_<grid>_<band>.py`) and an MLX port for MLX codes such as
+Single-file interpolators for the LDhybrid v1.0 coefficients of every law and
+atmosphere grid, in the TESS and Kepler passbands. The coefficient grid is
+embedded, so no tables need downloading. Each file comes in two versions: numpy
+only (`ldhybrid_<law>_<grid>_<band>.py`) and an MLX port for MLX codes such as
 Elómë (`..._mlx.py`; mlx and numpy).
 
-| Law | Grid | Passband | numpy file | MLX file |
-|---|---|---|---|---|
-| hybrid4 | PHOENIX-ACES v3.0 (2300–7400 K) | TESS | `ldhybrid_hybrid4_phoenix_tess.py` (64 kB) | `ldhybrid_hybrid4_phoenix_tess_mlx.py` (68 kB) |
-| hybrid4 | PHOENIX-ACES v3.0 (2300–7400 K) | Kepler | `ldhybrid_hybrid4_phoenix_kepler.py` (65 kB) | `ldhybrid_hybrid4_phoenix_kepler_mlx.py` (69 kB) |
-| hybrid4 | MPS-ATLAS Set 2 (3500–7500 K) | TESS | `ldhybrid_hybrid4_mps2_tess.py` (462 kB) | `ldhybrid_hybrid4_mps2_tess_mlx.py` (466 kB) |
-| hybrid4 | MPS-ATLAS Set 2 (3500–7500 K) | Kepler | `ldhybrid_hybrid4_mps2_kepler.py` (463 kB) | `ldhybrid_hybrid4_mps2_kepler_mlx.py` (468 kB) |
-| hybrid5 | PHOENIX-ACES v3.0 (2300–7400 K) | TESS | `ldhybrid_hybrid5_phoenix_tess.py` (72 kB) | `ldhybrid_hybrid5_phoenix_tess_mlx.py` (75 kB) |
-| hybrid5 | PHOENIX-ACES v3.0 (2300–7400 K) | Kepler | `ldhybrid_hybrid5_phoenix_kepler.py` (72 kB) | `ldhybrid_hybrid5_phoenix_kepler_mlx.py` (76 kB) |
-| hybrid5 | MPS-ATLAS Set 2 (3500–7500 K) | TESS | `ldhybrid_hybrid5_mps2_tess.py` (543 kB) | `ldhybrid_hybrid5_mps2_tess_mlx.py` (548 kB) |
-| hybrid5 | MPS-ATLAS Set 2 (3500–7500 K) | Kepler | `ldhybrid_hybrid5_mps2_kepler.py` (548 kB) | `ldhybrid_hybrid5_mps2_kepler_mlx.py` (552 kB) |
+| Law | Coefficients | q (sampling) | Elómë |
+|---|---|---|---|
+| `hybrid2` | w1, w2 | q1, q2 (exact triangle) | `limb_dark="hybrid2"`, `u = r["w"]` |
+| `hybrid4` | w1–w4 (curvature basis) | q1–q4 | `limb_dark="hybrid4"`, `u = r["w"]` |
+| `hybrid5` | w1–w5 | q1–q5 (stick-breaking) | `limb_dark="hybrid5"`, `u = r["w"]` |
+| `quadratic` | u1, u2 | Kipping's q1, q2 | `flux_dev(z, r, u1, u2)`; `limb_dark="quadratic"` samples the same q |
+| `power2` | c, alpha | — | not in Elómë |
+| `claret4` | a1–a4 | — | not in Elómë |
+
+| Grid | Models | Teff, log g, [M/H] | numpy / MLX file size |
+|---|---|---|---|
+| `phoenix`: PHOENIX-ACES v3.0 | 1,682 (+68 filled) | 2300–7400 K, 3.5–5.5, −2.0 to +1.0 | 46–77 kB |
+| `mps1`: MPS-ATLAS Set 1 | 16,974 | 3500–7500 K, 3.5–5.0, −2.0 to +1.0 | 297–547 kB |
+| `mps2`: MPS-ATLAS Set 2 | 16,974 | 3500–7500 K, 3.5–5.0, −2.0 to +1.0 | 296–552 kB |
+
+Bands: `tess`, `kepler`. So 36 numpy files and 36 MLX files, e.g.
+`ldhybrid_quadratic_phoenix_kepler.py` or `ldhybrid_hybrid4_mps2_tess_mlx.py`.
 
 ## numpy
 
 ```python
 from ldhybrid_hybrid4_mps2_tess import coefficients, intensity
 r = coefficients(5600, 4.4, 0.0, correction="B100G")   # Teff, log g, [M/H]; recommended for FGK
-r["w"], r["q"], r["physical"]          # weights, sampling coordinates q, positive and monotonic?
+r["coeffs"], r["q"], r["physical"]     # coefficients (hybrids: also r["w"]), q, positive and monotonic?
 r["lc_ppm"], r["mu_cri"], r["inside"]  # fit's light-curve error (p = 0.1), stellar edge, inside the grid?
-I = intensity(r["w"], [0.1, 0.5, 1.0]) # I(mu)/I(1)
+I = intensity(r["coeffs"], [0.1, 0.5, 1.0])   # I(mu)/I(1)
 ```
 
-The hybrid5 files have the same functions; `w` and `q` have five entries.
-From the shell: `python ldhybrid_hybrid5_mps2_tess.py 5600 4.4 0.0`.
+Every file has `coefficients`, `intensity` and `is_physical`; the linear laws
+also have `shapes`, and the laws with sampling coordinates `from_q`/`to_q`.
+From the shell: `python ldhybrid_power2_phoenix_tess.py 3200 5.0 0.0`.
 Outside a grid, `coefficients` raises `ValueError`; `extrapolate=True` uses
 the nearest model instead.
 
@@ -38,36 +46,41 @@ the nearest model instead.
 import mlx.core as mx
 from ldhybrid_hybrid4_mps2_tess_mlx import coefficients
 r = coefficients(mx.array([5600.0, 5720.0]), mx.array([4.40, 4.35]), 0.1, correction="B100G")
-r["w"]                                  # (2, 4) mx.array: Elómë's u for limb_dark="hybrid4"
-mx.grad(lambda t: coefficients(t, 4.4, 0.1)["w"].sum())(mx.array([5600.0]))   # d/dTeff
+r["coeffs"]                             # (2, 4) mx.array: Elómë's u for limb_dark="hybrid4"
+mx.grad(lambda t: coefficients(t, 4.4, 0.1)["coeffs"].sum())(mx.array([5600.0]))   # d/dTeff
 ```
 
 - The inputs broadcast against each other (numbers, numpy or mx arrays), and
-  every output has their shape (`w` and `q` with a trailing axis of 4 or 5).
-  The functions can be differentiated with respect to Teff, log g and [M/H],
-  and compiled with `mx.compile`.
+  every output has their shape (`coeffs` and `q` with a trailing axis of the
+  number of coefficients). The functions can be differentiated with respect
+  to Teff, log g and [M/H], and compiled with `mx.compile`.
 - Precision follows the inputs, as in Elómë. float32 runs on the default
   device. Anything else runs in float64 on the CPU stream, where it equals the
-  numpy file to the last bit. float32 agrees with that to about 1e-7 in w.
+  numpy file to the last bit. float32 agrees with that to about 1e-7
+  (Claret-4: 1e-6, its coefficients are large and partly cancel).
 - Nothing raises inside a model. Outside the grid the outputs are NaN and
   `inside` is False; with `extrapolate=True` the nearest model is used (zero
   gradient).
 
-## Both
+## All files
 
-- The MPS-ATLAS files carry the MURaM magnetic corrections (`correction=`
-  `"ssd"`, `"B100G"`, `"B200G"`, `"B300G"`). The PHOENIX files have no
-  `correction` argument.
+- **Corrections.** The MURaM magnetic corrections (`correction=` `"ssd"`,
+  `"B100G"`, `"B200G"`, `"B300G"`) exist for the hybrid laws on MPS-ATLAS Set 2,
+  so only those six files (and their MLX twins) have a `correction` argument.
 - **Interpolation.** It is linear on the Kuhn simplices of the (Teff, log g,
   [M/H]) tensor grid, as in `ldhybrid.interpolate.LDTables`: every grid box is
   split into the same six tetrahedra.
   - The coefficients are continuous in the stellar parameters.
   - They are exact at the models.
-  - Every value is a convex mix of four models, so it stays physical.
+  - Every value is a convex mix of four models. Every law's physical region is
+    convex, so a mix of physical models is physical.
   - The 68 missing PHOENIX models are filled from their neighbours along one
     axis.
-  - The files reproduce `LDTables.coefficients` (r-weighted method) to 1e-8 in
-    the weights.
+  - The files reproduce `LDTables.coefficients` (r-weighted method) to 5e-8.
+- **Fits.** hybrid2, hybrid4, hybrid5 and quadratic are fitted within their
+  sampling region, Claret-4 within the positive, monotonic profiles. power-2 is
+  fitted unconstrained, as usual for that law, and 3–22% of its models have
+  c > 1 (I(0) < 0, most in PHOENIX); `physical` flags them.
 - **hybrid4.** The weights are on hybrid4's curvature-simplex basis (1 − μ²,
   (1 − μ²)², S3, S4; `BASIS` in each file). In this basis w ≥ 0, Σw ≤ 1 is
   exactly the set of hybrid4 profiles that are positive, monotonic, concave in
@@ -85,5 +98,10 @@ mx.grad(lambda t: coefficients(t, 4.4, 0.1)["w"].sum())(mx.array([5600.0]))   # 
     sufficient for a positive, monotonic profile.
   - `from_q`/`to_q` are stick-breaking of a flat Dirichlet, so a uniform q1–q5
     is a uniform prior over the simplex.
+- **hybrid2 and quadratic.** Their positive, monotonic profiles are exactly a
+  triangle, and `from_q` maps the unit square uniformly onto it (quadratic:
+  Kipping 2013, the same q as Elómë's `q_to_u`). `to_q` keeps the sign of the
+  depth in q1, so coefficients outside the triangle give q outside [0, 1].
 
-Regenerate both versions with `.venv/bin/python scripts/make_standalone.py`.
+Regenerate both versions with `.venv/bin/python scripts/make_standalone.py`
+(other passbands: add them to `BANDS` there).

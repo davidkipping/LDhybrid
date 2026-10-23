@@ -10,12 +10,12 @@ model:
     from ldhybrid_hybrid4_mps2_kepler_mlx import coefficients, intensity
     r = coefficients(mx.array([5600.0, 5650.0]), 4.4, 0.0)
     r = coefficients(5600.0, 4.4, 0.0, correction="B100G")
-    r["w"]           # (..., 4): (w1, w2, w3, w4)
+    r["coeffs"]      # (..., 4): (w1, w2, w3, w4); also r["w"]
     r["q"]           # (..., 4): (q1, q2, q3, q4), sampling coordinates in [0, 1]
     r["inside"]      # (...): inside the grid? (outside: NaN, or the nearest model)
     r["physical"]    # (...): positive and monotonic?
-    intensity(r["w"], mu)                       # I(mu)/I(1), shape (..., len(mu))
-    from_q(q), to_q(w)                          # unit hypercube <-> weights
+    intensity(r["coeffs"], mu)                  # I(mu)/I(1), shape (..., len(mu))
+    from_q(q), to_q(c)                          # unit hypercube <-> coefficients
 
 The weights are on hybrid4's curvature basis, the basis Elómë and
 SquishierPlanet take: with Elómë, limb_dark="hybrid4" and u = r["w"]
@@ -42,7 +42,8 @@ lc_ppm is the light-curve error of the tabulated fits (p = 0.1).
 Interpolation is linear on the Kuhn simplices of the (Teff, log g, [M/H])
 tensor grid, as in ldhybrid_hybrid4_mps2_kepler.py and ldhybrid.interpolate: continuous and
 piecewise linear in the stellar parameters (so the gradient is piecewise
-constant), exact at the models, and a convex mix of four models.
+constant), exact at the models, and a convex mix of four models (the law's
+physical region is convex, so a mix of physical models is physical).
 Outside the grid the outputs are NaN and inside is False, with no exception,
 so a call can be traced; extrapolate=True uses the nearest model (in
 Teff/100 K, log g/0.5, [M/H]/0.5) there instead, with zero gradient.
@@ -50,9 +51,10 @@ Teff/100 K, log g/0.5, [M/H]/0.5) there instead, with zero gradient.
 Precision follows the inputs, as in Elómë: float32 (mx.arrays or numpy) is
 computed in float32 on the default device; anything else (Python floats,
 float64) in float64 on the CPU stream, which matches ldhybrid_hybrid4_mps2_kepler.py
-to 1e-12. float32 agrees to about 1e-6 in w. mx.grad with respect to a float64
+to 1e-12. float32 agrees to about 1e-6 in the coefficients. mx.grad with respect to a float64
 mx.array must itself be called under mx.stream(mx.cpu) (an MLX rule). MLX
-evaluates lazily, so outputs that are never used (q, physical) cost nothing.
+evaluates lazily, so outputs that are never used (such as physical) cost
+nothing.
 
 correction: None (default) or a MURaM surface-field state, "ssd" (small-scale
 dynamo), "B100G", "B200G", "B300G". For FGK stars LDhybrid recommends
@@ -74,6 +76,7 @@ import numpy as np
 GRID = "mps2"
 BAND = "Kepler"
 LAW = "hybrid4"
+NAMES = ("w1", "w2", "w3", "w4")
 EPS = (0.028601207249486824, 0.38582417584735224)
 SCALE = np.array([100.0, 0.5, 0.5])
 NW = 4
@@ -682,7 +685,7 @@ _GRID = (                               # teff, logg, mh (float64, exact)
     "XeG6wnWF6wrXFa7QS6nzbpHX35ev+L58xfflK74vX/F9+Yrvy9fatYNrB9cOrh1cO7h2cO3g2sG1g2uGa4ZrhmuGa4ZrhmuG"
     "a4Zrhiv0Uuq8W+SlK/RScl66Qi8l56Ur9FLqd/5/1/8HCZfBnA=="
 )
-_DATA = (                               # w1..w4, mu_cri, lc_ppm (float32)
+_DATA = (                               # w1, w2, w3, w4, mu_cri, lc_ppm (float32)
     "eNqUXGVYlFu0toNQujukQUVAhPXOB0wxMHQbiN3dycwwdChiiwF2dzf2sTuOHrtbj+05d+B8s+fen5dfPPv5nj17rb16vXtZ"
     "fm4Djw6FVNt4CJ5u7YBGmr8vnr8EK3e1xeIeRXT82TD8Cu7UsL58xG+BoHNbjGldQEfzRuLiteCG9aTd/wj+3GMEtC6lw1Uj"
     "Qb7/fW+2sSXnEWCC6v6llD92NB6t/O970mvJea8xxZW8MqrsMQYfW3RuWO/XrwW3M9oc8+rK6arhGMzvHdqwvtuhORf8wgKt"
@@ -4538,6 +4541,7 @@ def _basis():
 #: hybrid4's curvature basis (numpy): S = BASIS @ (1 - mu^4, (1 - mu^2)^2, P_e0, P_e1)
 BASIS = _basis()
 _BASIS_T = BASIS.T
+_LAW_CONST = {}
 
 
 def _const(dt):
@@ -4546,7 +4550,8 @@ def _const(dt):
         f = lambda a: mx.array(np.asarray(a, float), dtype=dt)
         _CONST[dt] = dict(X0=f(_X0), lo=f(_X.min(0)), Y=f(_Y), YN=f(_YN0), valid=mx.array(_VALID),
                           axes=[f(a) for a in _AXES], scale=f(SCALE), basis=f(_BASIS_T),
-                          mu=f(_MU), eps=[float(e) for e in EPS])
+                          mu=f(_MU), eps=[float(e) for e in EPS],
+                          **{k: f(v) for k, v in _LAW_CONST.items()})
     return _CONST[dt]
 
 
@@ -4581,23 +4586,23 @@ def _shapes(mu, K):
     T = mx.stack([1 - mu ** 4, (1 - mu ** 2) ** 2, _pole(mu, e0), _pole(mu, e1)], axis=-1)
     return T @ K["basis"]
 
+def _intensity(c, mu, K):
+    return 1.0 - c @ mx.transpose(_shapes(mu, K))
 
-def _intensity(w, mu, K):
-    return 1.0 - w @ mx.transpose(_shapes(mu, K))
 
-
-def _is_physical(w, K, dt):
+def _is_physical(c, K, dt):
     tol = 1e-10 if dt == mx.float64 else 1e-6           # float32 rounding of I near mu = 1
-    I = _intensity(w, K["mu"], K)
-    return (I[..., 0] >= -tol) & mx.all(I[..., 1:] - I[..., :-1] >= -tol, axis=-1)
+    I = _intensity(c, K["mu"], K)
+    return (mx.all(mx.isfinite(I), axis=-1) & (I[..., 0] >= -tol)
+            & mx.all(I[..., 1:] - I[..., :-1] >= -tol, axis=-1))
 
 
-def _from_q(q):
+def _from_q(q, K):
     s, a, b = mx.power(q[..., 0], 0.25), mx.power(q[..., 1], 1 / 3), mx.sqrt(q[..., 2])
     return mx.stack([s * (1 - a), s * a * (1 - b), s * a * b * (1 - q[..., 3]), s * a * b * q[..., 3]], -1)
 
 
-def _to_q(w):
+def _to_q(w, K):
     s = w.sum(-1)
     f = w / mx.where(s == 0, 1.0, s)[..., None]
     r1 = 1 - f[..., 0]
@@ -4646,11 +4651,11 @@ def _interpolate(x, extrapolate, K, dt):
 
 
 def coefficients(teff, logg, mh, extrapolate=False, correction=None):
-    """Interpolated hybrid4 weights at (Teff [K], log g [cgs], [M/H]): numbers,
-    numpy or mx arrays, broadcast against each other. Returns dict(w, q,
-    physical, mu_cri, lc_ppm, inside, correction) of mx.arrays, w and q with a
-    trailing axis of 4. Outside the grid the outputs are NaN (inside False)
-    unless extrapolate=True, which uses the nearest model."""
+    """Interpolated hybrid4 coefficients at (Teff [K], log g [cgs], [M/H]):
+    numbers, numpy or mx arrays, broadcast against each other. Returns
+    dict(coeffs, w, q, physical, mu_cri, lc_ppm, inside, correction) of mx.arrays,
+    coeffs, w, q with a trailing axis of 4. Outside the grid the outputs are
+    NaN (inside False) unless extrapolate=True, which uses the nearest model."""
     if correction is not None:
         if correction not in _CORR:
             raise ValueError(f"correction must be one of {tuple(_CORR)}")
@@ -4664,23 +4669,24 @@ def coefficients(teff, logg, mh, extrapolate=False, correction=None):
         shape = t.shape
         x = mx.stack([t.reshape(-1), g.reshape(-1), m.reshape(-1)], axis=-1) / K["scale"]
         y, inside = _interpolate(x, extrapolate, K, dt)
-        w = y[:, :NW]
+        c = y[:, :NW]
         if correction is not None:
-            w = w + _delta_w(t.reshape(-1), correction, dt)
-        return dict(w=w.reshape(shape + (NW,)), q=_to_q(w).reshape(shape + (NW,)),
-                    physical=_is_physical(w, K, dt).reshape(shape), mu_cri=y[:, NW].reshape(shape),
+            c = c + _delta_w(t.reshape(-1), correction, dt)
+        cs = c.reshape(shape + (NW,))
+        return dict(coeffs=cs, w=cs, q=_to_q(c, K).reshape(shape + (NW,)),
+                    physical=_is_physical(c, K, dt).reshape(shape), mu_cri=y[:, NW].reshape(shape),
                     lc_ppm=y[:, NW + 1].reshape(shape), inside=inside.reshape(shape), correction=correction)
 
 
 def shapes(mu):
-    """S_k(mu), shape (..., 4)."""
+    """The law's shapes at mu (m,): shape (m, NW)."""
     dt = _dtype(mu)
     with _stream(dt):
         return _shapes(_as(mu, dt), _const(dt))
 
 
 def intensity(w, mu):
-    """I(mu)/I(1) for hybrid4 weights w (..., 4) at mu (m,): shape (..., m)."""
+    """I(mu)/I(1) for hybrid4 coefficients w (..., 4) at mu (m,): shape (..., m)."""
     dt = _dtype(w, mu)
     with _stream(dt):
         return _intensity(_as(w, dt), _as(mu, dt), _const(dt))
@@ -4694,26 +4700,26 @@ def is_physical(w):
 
 
 def from_q(q):
-    """Weights (..., 4) from sampling coordinates q in [0, 1]^4 (no clamp: the
-    gradient is infinite where a q_j is 0; Elómë's from_q clamps it)."""
+    """Coefficients (..., NW) from sampling coordinates q in [0, 1]^NW (no clamp:
+    the gradient is infinite where a q_j is 0; Elómë's from_q clamps it)."""
     dt = _dtype(q)
     with _stream(dt):
-        return _from_q(_as(q, dt))
+        return _from_q(_as(q, dt), _const(dt))
 
 
-def to_q(w):
-    """Sampling coordinates (..., 4) of weights w (outside [0, 1] if outside the region)."""
-    dt = _dtype(w)
+def to_q(c):
+    """Sampling coordinates (..., NW) of coefficients c (outside [0, 1] if outside the region)."""
+    dt = _dtype(c)
     with _stream(dt):
-        return _to_q(_as(w, dt))
+        return _to_q(_as(c, dt), _const(dt))
 
 
 if __name__ == "__main__":
     import sys
     t, g, m = (float(v) for v in sys.argv[1:4]) if len(sys.argv) >= 4 else (5600.0, 4.4, 0.0)
     r = coefficients(t, g, m, extrapolate=True)
-    print(f"hybrid4 {GRID} {BAND} Teff={t:g} logg={g:g} [M/H]={m:+g}: w =",
-          " ".join(f"{v:.6f}" for v in r["w"].tolist()), "q =",
-          " ".join(f"{v:.6f}" for v in r["q"].tolist()),
+    print(f"hybrid4 {GRID} {BAND} Teff={t:g} logg={g:g} [M/H]={m:+g}:",
+          " ".join(f"{k}={v:.6f}" for k, v in zip(NAMES, r["coeffs"].tolist())),
+          "q =", " ".join(f"{v:.6f}" for v in r["q"].tolist()),
           "physical" if r["physical"].item() else "UNPHYSICAL",
           "" if r["inside"].item() else "(nearest model; outside grid)")

@@ -10,12 +10,12 @@ model:
     from ldhybrid_hybrid5_mps2_tess_mlx import coefficients, intensity
     r = coefficients(mx.array([5600.0, 5650.0]), 4.4, 0.0)
     r = coefficients(5600.0, 4.4, 0.0, correction="B100G")
-    r["w"]           # (..., 5): (w1, w2, w3, w4, w5)
+    r["coeffs"]      # (..., 5): (w1, w2, w3, w4, w5); also r["w"]
     r["q"]           # (..., 5): (q1, q2, q3, q4, q5), sampling coordinates in [0, 1]
     r["inside"]      # (...): inside the grid? (outside: NaN, or the nearest model)
     r["physical"]    # (...): positive and monotonic?
-    intensity(r["w"], mu)                       # I(mu)/I(1), shape (..., len(mu))
-    from_q(q), to_q(w)                          # unit hypercube <-> weights
+    intensity(r["coeffs"], mu)                  # I(mu)/I(1), shape (..., len(mu))
+    from_q(q), to_q(c)                          # unit hypercube <-> coefficients
 
 The weights are on the hybrid5 shapes Elómë and SquishierPlanet take:
 with Elómë, limb_dark="hybrid5" and u = r["w"] (flux_dev_hybrid takes
@@ -33,14 +33,15 @@ a flat Dirichlet, w_j = (1 - q_j^(1/(6-j))) prod_(i<j) q_i^(1/(6-i)),
 j = 1..5; uniform q is a uniform prior over the simplex.
 
 Coefficients: least squares uniform in projected radius (the transit-optimised
-fit), constrained to that region. Grid: 16974 models, Teff 3500-7500 K,
+fit), constrained to that simplex. Grid: 16974 models, Teff 3500-7500 K,
 log g 3.5-5.0, [M/H] -2.0 to +1.0.
 lc_ppm is the light-curve error of the tabulated fits (p = 0.1).
 
 Interpolation is linear on the Kuhn simplices of the (Teff, log g, [M/H])
 tensor grid, as in ldhybrid_hybrid5_mps2_tess.py and ldhybrid.interpolate: continuous and
 piecewise linear in the stellar parameters (so the gradient is piecewise
-constant), exact at the models, and a convex mix of four models.
+constant), exact at the models, and a convex mix of four models (the law's
+physical region is convex, so a mix of physical models is physical).
 Outside the grid the outputs are NaN and inside is False, with no exception,
 so a call can be traced; extrapolate=True uses the nearest model (in
 Teff/100 K, log g/0.5, [M/H]/0.5) there instead, with zero gradient.
@@ -48,9 +49,10 @@ Teff/100 K, log g/0.5, [M/H]/0.5) there instead, with zero gradient.
 Precision follows the inputs, as in Elómë: float32 (mx.arrays or numpy) is
 computed in float32 on the default device; anything else (Python floats,
 float64) in float64 on the CPU stream, which matches ldhybrid_hybrid5_mps2_tess.py
-to 1e-12. float32 agrees to about 1e-6 in w. mx.grad with respect to a float64
+to 1e-12. float32 agrees to about 1e-6 in the coefficients. mx.grad with respect to a float64
 mx.array must itself be called under mx.stream(mx.cpu) (an MLX rule). MLX
-evaluates lazily, so outputs that are never used (q, physical) cost nothing.
+evaluates lazily, so outputs that are never used (such as physical) cost
+nothing.
 
 correction: None (default) or a MURaM surface-field state, "ssd" (small-scale
 dynamo), "B100G", "B200G", "B300G". For FGK stars LDhybrid recommends
@@ -72,6 +74,7 @@ import numpy as np
 GRID = "mps2"
 BAND = "TESS"
 LAW = "hybrid5"
+NAMES = ("w1", "w2", "w3", "w4", "w5")
 EPS = (0.0015965451792942786, 0.04127504477274302, 0.38743471584956696)
 SCALE = np.array([100.0, 0.5, 0.5])
 NW = 5
@@ -680,7 +683,7 @@ _GRID = (                               # teff, logg, mh (float64, exact)
     "XeG6wnWF6wrXFa7QS6nzbpHX35ev+L58xfflK74vX/F9+Yrvy9fatYNrB9cOrh1cO7h2cO3g2sG1g2uGa4ZrhmuGa4ZrhmuG"
     "a4Zrhiv0Uuq8W+SlK/RScl66Qi8l56Ur9FLqd/5/1/8HCZfBnA=="
 )
-_DATA = (                               # w1..w5, mu_cri, lc_ppm (float32)
+_DATA = (                               # w1, w2, w3, w4, w5, mu_cri, lc_ppm (float32)
     "eNqcfHdcju8bdlsR7b0UhUppaR7n3U57k5GREUlkRqU9qMjeK8mWWSLtXShEVjbha+8R78PvcT3v++/7/Ht+rvu+zuPc13U8"
     "97yhDvjevg+/17pS5mIix892JMT7TVidyo2NAh6P2o/CBle6Ge9EV0bSX1nfG2nc9J/2ONtTiOS3ThQe5EYB1o5/ZToZs7lw"
     "dQ5G3Qcw18SPNsg4UXcox54pe8wRQ3YfhHK2H2lEutDoG05/ZaMeLOPWHXTGz9GHceKHHy3c5ErlY13+ygrnJXIb3rpig+dR"
@@ -5300,6 +5303,7 @@ _X0 = _X - _X.min(0)                    # the nearest-model search, in small num
 _CONST = {}
 _MU = np.linspace(0.0, 1.0, 2001)
 _BASIS_T = np.eye(NW)
+_LAW_CONST = {}
 
 
 def _const(dt):
@@ -5308,7 +5312,8 @@ def _const(dt):
         f = lambda a: mx.array(np.asarray(a, float), dtype=dt)
         _CONST[dt] = dict(X0=f(_X0), lo=f(_X.min(0)), Y=f(_Y), YN=f(_YN0), valid=mx.array(_VALID),
                           axes=[f(a) for a in _AXES], scale=f(SCALE), basis=f(_BASIS_T),
-                          mu=f(_MU), eps=[float(e) for e in EPS])
+                          mu=f(_MU), eps=[float(e) for e in EPS],
+                          **{k: f(v) for k, v in _LAW_CONST.items()})
     return _CONST[dt]
 
 
@@ -5341,18 +5346,18 @@ def _pole(mu, e):
 def _shapes(mu, K):
     return mx.stack([1 - mu ** 4, (1 - mu ** 2) ** 2] + [_pole(mu, e) for e in K["eps"]], axis=-1)
 
+def _intensity(c, mu, K):
+    return 1.0 - c @ mx.transpose(_shapes(mu, K))
 
-def _intensity(w, mu, K):
-    return 1.0 - w @ mx.transpose(_shapes(mu, K))
 
-
-def _is_physical(w, K, dt):
+def _is_physical(c, K, dt):
     tol = 1e-10 if dt == mx.float64 else 1e-6           # float32 rounding of I near mu = 1
-    I = _intensity(w, K["mu"], K)
-    return (I[..., 0] >= -tol) & mx.all(I[..., 1:] - I[..., :-1] >= -tol, axis=-1)
+    I = _intensity(c, K["mu"], K)
+    return (mx.all(mx.isfinite(I), axis=-1) & (I[..., 0] >= -tol)
+            & mx.all(I[..., 1:] - I[..., :-1] >= -tol, axis=-1))
 
 
-def _from_q(q):
+def _from_q(q, K):
     n, out, stick = q.shape[-1], [], 1.0
     for j in range(n):
         r = mx.power(q[..., j], 1.0 / (n - j))
@@ -5361,7 +5366,7 @@ def _from_q(q):
     return mx.stack(out, -1)
 
 
-def _to_q(w):
+def _to_q(w, K):
     n, out, stick = w.shape[-1], [], mx.ones(w.shape[:-1], dtype=w.dtype)
     for j in range(n):
         live = stick > 0
@@ -5408,11 +5413,11 @@ def _interpolate(x, extrapolate, K, dt):
 
 
 def coefficients(teff, logg, mh, extrapolate=False, correction=None):
-    """Interpolated hybrid5 weights at (Teff [K], log g [cgs], [M/H]): numbers,
-    numpy or mx arrays, broadcast against each other. Returns dict(w, q,
-    physical, mu_cri, lc_ppm, inside, correction) of mx.arrays, w and q with a
-    trailing axis of 5. Outside the grid the outputs are NaN (inside False)
-    unless extrapolate=True, which uses the nearest model."""
+    """Interpolated hybrid5 coefficients at (Teff [K], log g [cgs], [M/H]):
+    numbers, numpy or mx arrays, broadcast against each other. Returns
+    dict(coeffs, w, q, physical, mu_cri, lc_ppm, inside, correction) of mx.arrays,
+    coeffs, w, q with a trailing axis of 5. Outside the grid the outputs are
+    NaN (inside False) unless extrapolate=True, which uses the nearest model."""
     if correction is not None:
         if correction not in _CORR:
             raise ValueError(f"correction must be one of {tuple(_CORR)}")
@@ -5426,23 +5431,24 @@ def coefficients(teff, logg, mh, extrapolate=False, correction=None):
         shape = t.shape
         x = mx.stack([t.reshape(-1), g.reshape(-1), m.reshape(-1)], axis=-1) / K["scale"]
         y, inside = _interpolate(x, extrapolate, K, dt)
-        w = y[:, :NW]
+        c = y[:, :NW]
         if correction is not None:
-            w = w + _delta_w(t.reshape(-1), correction, dt)
-        return dict(w=w.reshape(shape + (NW,)), q=_to_q(w).reshape(shape + (NW,)),
-                    physical=_is_physical(w, K, dt).reshape(shape), mu_cri=y[:, NW].reshape(shape),
+            c = c + _delta_w(t.reshape(-1), correction, dt)
+        cs = c.reshape(shape + (NW,))
+        return dict(coeffs=cs, w=cs, q=_to_q(c, K).reshape(shape + (NW,)),
+                    physical=_is_physical(c, K, dt).reshape(shape), mu_cri=y[:, NW].reshape(shape),
                     lc_ppm=y[:, NW + 1].reshape(shape), inside=inside.reshape(shape), correction=correction)
 
 
 def shapes(mu):
-    """S_k(mu), shape (..., 5)."""
+    """The law's shapes at mu (m,): shape (m, NW)."""
     dt = _dtype(mu)
     with _stream(dt):
         return _shapes(_as(mu, dt), _const(dt))
 
 
 def intensity(w, mu):
-    """I(mu)/I(1) for hybrid5 weights w (..., 5) at mu (m,): shape (..., m)."""
+    """I(mu)/I(1) for hybrid5 coefficients w (..., 5) at mu (m,): shape (..., m)."""
     dt = _dtype(w, mu)
     with _stream(dt):
         return _intensity(_as(w, dt), _as(mu, dt), _const(dt))
@@ -5456,26 +5462,26 @@ def is_physical(w):
 
 
 def from_q(q):
-    """Weights (..., 5) from sampling coordinates q in [0, 1]^5 (no clamp: the
-    gradient is infinite where a q_j is 0; Elómë's from_q clamps it)."""
+    """Coefficients (..., NW) from sampling coordinates q in [0, 1]^NW (no clamp:
+    the gradient is infinite where a q_j is 0; Elómë's from_q clamps it)."""
     dt = _dtype(q)
     with _stream(dt):
-        return _from_q(_as(q, dt))
+        return _from_q(_as(q, dt), _const(dt))
 
 
-def to_q(w):
-    """Sampling coordinates (..., 5) of weights w (outside [0, 1] if outside the region)."""
-    dt = _dtype(w)
+def to_q(c):
+    """Sampling coordinates (..., NW) of coefficients c (outside [0, 1] if outside the region)."""
+    dt = _dtype(c)
     with _stream(dt):
-        return _to_q(_as(w, dt))
+        return _to_q(_as(c, dt), _const(dt))
 
 
 if __name__ == "__main__":
     import sys
     t, g, m = (float(v) for v in sys.argv[1:4]) if len(sys.argv) >= 4 else (5600.0, 4.4, 0.0)
     r = coefficients(t, g, m, extrapolate=True)
-    print(f"hybrid5 {GRID} {BAND} Teff={t:g} logg={g:g} [M/H]={m:+g}: w =",
-          " ".join(f"{v:.6f}" for v in r["w"].tolist()), "q =",
-          " ".join(f"{v:.6f}" for v in r["q"].tolist()),
+    print(f"hybrid5 {GRID} {BAND} Teff={t:g} logg={g:g} [M/H]={m:+g}:",
+          " ".join(f"{k}={v:.6f}" for k, v in zip(NAMES, r["coeffs"].tolist())),
+          "q =", " ".join(f"{v:.6f}" for v in r["q"].tolist()),
           "physical" if r["physical"].item() else "UNPHYSICAL",
           "" if r["inside"].item() else "(nearest model; outside grid)")

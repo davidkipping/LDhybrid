@@ -1,5 +1,7 @@
-"""Write lightweight, single-file hybrid4 and hybrid5 interpolators for one grid
-and one passband, with the coefficient grid embedded (numpy only).
+"""Write lightweight, single-file interpolators for every law (hybrid2, hybrid4,
+hybrid5, quadratic, power2, claret4) and grid (PHOENIX, MPS-ATLAS Set 1 and
+Set 2), one passband each (TESS, Kepler), with the coefficient grid embedded
+(numpy only).
 
     .venv/bin/python scripts/make_standalone.py      -> standalone/*.py
 
@@ -8,8 +10,8 @@ and their MLX ports (*_mlx.py; scripts/make_standalone_mlx.py).
 Each file reproduces ldhybrid.interpolate.LDTables.coefficients for that grid
 and band (r-weighted method): linear interpolation on the Kuhn simplices of
 the tensor grid (interpolate.GridSimplex), with the grid's filled nodes
-embedded. The MPS-ATLAS files also embed the MURaM magnetic Δw corrections
-for the band.
+embedded. The hybrid MPS-ATLAS Set 2 files also embed the MURaM magnetic Δw
+corrections for the band (they are defined on Set 2, for the hybrid laws).
 """
 
 import base64
@@ -26,9 +28,18 @@ OUT = ROOT / "standalone"
 CDS = DATA / "release" / "cds"
 BANDS = {"TESS": "tess", "Kepler": "kepler"}
 GRIDS = {"phoenix": "PHOENIX-ACES-AGSS-COND SpecInt v3.0 (spherical; Husser et al. 2013)",
+         "mps1": "MPS-ATLAS Set 1 (plane-parallel; Kostogryz et al. 2022)",
          "mps2": "MPS-ATLAS Set 2 (plane-parallel; Kostogryz et al. 2022)"}
 STATES = ("ssd", "B100G", "B200G", "B300G")
-LAWS = ("hybrid4", "hybrid5")
+LAWS = ("hybrid2", "hybrid4", "hybrid5", "quadratic", "power2", "claret4")
+HYBRID = ("hybrid2", "hybrid4", "hybrid5")
+#: laws with sampling coordinates q (from_q/to_q)
+HAS_Q = HYBRID + ("quadratic",)
+#: laws linear in their coefficients (shapes())
+LINEAR = HYBRID + ("quadratic", "claret4")
+#: corrections.dat has MURaM Δw for these laws, measured against this grid
+CORR_LAWS, CORR_GRID = HYBRID, "mps2"
+LAWNAME = {"quadratic": "quadratic", "power2": "power-2", "claret4": "Claret four-parameter"}
 
 
 def pack(a, dtype="<f4"):
@@ -39,22 +50,20 @@ def wrap(s, n=96):
     return "\n".join(f'    "{s[i:i + n]}"' for i in range(0, len(s), n))
 
 
-TEMPLATE = '''"""LDhybrid v1.0 -- {law} limb-darkening coefficients, {gridname}, {band} passband.
+TEMPLATE = '''"""LDhybrid v1.0 -- {lawname} limb-darkening coefficients, {gridname}, {band} passband.
 
 Standalone: needs only numpy; the coefficient grid is embedded.
 
     from {mod} import coefficients, intensity
     r = coefficients(teff=5600, logg=4.4, mh=0.0){corr_example}
-    r["w"]           # ({wnames})
-    r["q"]           # ({qnames}): sampling coordinates in [0, 1]
-    r["physical"]    # positive and monotonic?
-    intensity(r["w"], mu)                       # I(mu)/I(1)
-    from_q(q), to_q(w)                          # unit hypercube <-> weights
-
+    r["coeffs"]      # ({wnames}){w_alias}
+{q_example}    r["physical"]    # positive and monotonic?
+    intensity(r["coeffs"], mu)                  # I(mu)/I(1)
+{q_fn_example}
 {law_doc}
 
 Coefficients: least squares uniform in projected radius (the transit-optimised
-fit), constrained to that region. Grid: {n} models, Teff {tmin:.0f}-{tmax:.0f} K,
+fit), {fit_constraint}. Grid: {n} models, Teff {tmin:.0f}-{tmax:.0f} K,
 log g {gmin:.1f}-{gmax:.1f}, [M/H] {mmin:+.1f} to {mmax:+.1f}.
 {interp_doc}
 lc_ppm is the light-curve error of the tabulated fits (p = 0.1).
@@ -71,13 +80,15 @@ import numpy as np
 
 GRID = "{grid}"
 BAND = "{band}"
+LAW = "{law}"
+NAMES = ({names})
 EPS = ({eps})
 SCALE = np.array([100.0, 0.5, 0.5])
 _N, NW = {n}, {nw}
 _GRID = (                               # teff, logg, mh (float64, exact)
 {gridpts}
 )
-_DATA = (                               # w1..w{nw}, mu_cri, lc_ppm (float32)
+_DATA = (                               # {wnames}, mu_cri, lc_ppm (float32)
 {data}
 )
 {fill_block}{corr_block}
@@ -102,22 +113,23 @@ def _pole(mu, e):
 {law_code}
 
 
-def intensity(w, mu):
-    """I(mu)/I(1) for {law} weights w."""
-    return 1 - shapes(mu) @ np.asarray(w, float)
+def intensity({cv}, mu):
+    """I(mu)/I(1) for {lawname} coefficients {cv}."""
+{intensity_body}
 
 
-def is_physical(w, n=2001):
+def is_physical({cv}, n=2001):
     """Positive and non-increasing towards the limb on a dense grid."""
-    I = intensity(w, np.linspace(0.0, 1.0, n))
-    return bool(I[0] >= -1e-10 and np.all(np.diff(I) >= -1e-10))
+    with np.errstate(all="ignore"):
+        I = intensity({cv}, np.linspace(0.0, 1.0, n))
+    return bool(np.all(np.isfinite(I)) and I[0] >= -1e-10 and np.all(np.diff(I) >= -1e-10))
 
 
 def coefficients(teff, logg, mh, extrapolate=False{corr_arg}):
-    """Interpolated {law} weights at (Teff [K], log g [cgs], [M/H]).
+    """Interpolated {lawname} coefficients at (Teff [K], log g [cgs], [M/H]).
 
     extrapolate=True uses the nearest model outside the grid (else ValueError).
-    Returns dict(w, q, physical, mu_cri, lc_ppm, inside{corr_key})."""
+    Returns dict(coeffs{w_key}{q_key}, physical, mu_cri, lc_ppm, inside{corr_key})."""
     x = np.array([[teff, logg, mh]], float) / SCALE
     y = _interpolate(x)[0]
     inside = bool(np.all(np.isfinite(y)))
@@ -126,17 +138,18 @@ def coefficients(teff, logg, mh, extrapolate=False{corr_arg}):
             raise ValueError(f"({{teff}}, {{logg}}, {{mh}}) is outside the {{GRID}} grid; "
                              "pass extrapolate=True to use the nearest model")
         y = _Y[np.argmin(((_X - x) ** 2).sum(1))]
-    w = y[:{nw}].copy()
-{corr_apply}    return dict(w=tuple(float(v) for v in w), q=to_q(w), physical=is_physical(w), mu_cri=float(y[{nw}]),
-                lc_ppm=float(y[{nw1}]), inside=inside{corr_ret})
+    c = y[:NW].copy()
+{corr_apply}    c = tuple(float(v) for v in c)
+    return dict(coeffs=c{w_ret}{q_ret}, physical=is_physical(c), mu_cri=float(y[NW]),
+                lc_ppm=float(y[NW + 1]), inside=inside{corr_ret})
 
 
 if __name__ == "__main__":
     import sys
     t, g, m = (float(v) for v in sys.argv[1:4]) if len(sys.argv) >= 4 else (5600.0, 4.4, 0.0)
     r = coefficients(t, g, m, extrapolate=True)
-    print(f"{law} {{GRID}} {{BAND}} Teff={{t:g}} logg={{g:g}} [M/H]={{m:+g}}: w =",
-          " ".join(f"{{v:.6f}}" for v in r["w"]), "q =", " ".join(f"{{v:.6f}}" for v in r["q"]),
+    print(f"{law} {{GRID}} {{BAND}} Teff={{t:g}} logg={{g:g}} [M/H]={{m:+g}}:",
+          " ".join(f"{{k}}={{v:.6f}}" for k, v in zip(NAMES, r["coeffs"])),{q_print}
           "physical" if r["physical"] else "UNPHYSICAL",
           "" if r["inside"] else "(nearest model; outside grid)")
 '''
@@ -157,7 +170,7 @@ CORR_APPLY = '''    if correction is not None:
         if not _CORR_TEFF[0] <= teff <= _CORR_TEFF[-1]:
             warnings.warn("Teff outside the MURaM range: correction clamped", stacklevel=2)
         D = np.array(_CORR[correction])
-        w = w + np.array([np.interp(teff, _CORR_TEFF, D[:, k]) for k in range(%d)])
+        c = c + np.array([np.interp(teff, _CORR_TEFF, D[:, k]) for k in range(%d)])
 '''
 
 CORR_DOC = """
@@ -214,7 +227,8 @@ def _corners(x):
 
 INTERP_DOC = """Interpolation is linear on the Kuhn simplices of the (Teff, log g, [M/H])
 tensor grid, as in ldhybrid.interpolate: continuous, exact at the models, and
-a convex mix of four models, so interpolated coefficients stay physical.{fill}
+a convex mix of four models (the law's physical region is convex, so a mix of
+physical models is physical).{fill}
 Outside the grid, coefficients() raises unless extrapolate=True (the nearest
 model in Teff/100 K, log g/0.5, [M/H]/0.5)."""
 
@@ -334,8 +348,130 @@ def to_q(w):
 H5_TAIL = """The poles are the v1.0 values; check that any other hybrid5 implementation
 uses the same three before passing these weights to it."""
 
+H2_DOC = '''Law (hybrid2):
+    I(mu)/I(1) = 1 - w1 (1 - mu^2) - w2 P(mu; e)
+    P(mu; e) = [(mu^2 + e)^-2 - (1 + e)^-2] / [e^-2 - (1 + e)^-2],  e = {eps0}
+The positive, monotonic hybrid2 profiles are exactly the triangle with
+vertices O, V_c = {vc} and V_l = {vl} (VERTICES). Sampling
+coordinates: w = sqrt(q1) [(1 - q2) V_c + q2 V_l]; uniform q is a uniform
+prior over the triangle. to_q keeps the sign of the depth in q1, so weights
+outside the triangle give q outside [0, 1].'''
+
+H2_CODE = '''VERTICES = ({vc}, {vl})   # V_c, V_l
+
+
+def shapes(mu):
+    """(1 - mu^2, P_e), shape (len(mu), 2)."""
+    mu = np.asarray(mu, float)
+    return np.stack([1 - mu ** 2, _pole(mu, EPS[0])], axis=-1)
+
+
+def from_q(q):
+    """Weights from sampling coordinates q in [0, 1]^2 (vectorised over rows)."""
+    q = np.asarray(q, float)
+    Vc, Vl = (np.array(v) for v in VERTICES)
+    s = np.sqrt(q[..., 0])[..., None]
+    return s * ((1 - q[..., 1])[..., None] * Vc + q[..., 1][..., None] * Vl)
+
+
+def to_q(w):
+    """Sampling coordinates of one set of weights (outside [0, 1] if outside the triangle)."""
+    Vc, Vl = (np.array(v) for v in VERTICES)
+    s, t = np.linalg.solve(np.column_stack([Vc, Vl - Vc]), np.asarray(w, float))
+    q = np.array([s * abs(s), t / s if s != 0 else 0.0])   # s|s|: a negative depth gives q1 < 0
+    q = np.where((q < 0) & (q > -1e-9), 0.0, q)            # rounding noise onto the bound
+    return tuple(float(v) for v in np.where((q > 1) & (q < 1 + 1e-9), 1.0, q))'''
+
+H2_TAIL = """The pole is the v1.0 value; check that any other hybrid2 implementation
+uses the same one before passing these weights to it."""
+
+QUAD_DOC = '''Law (quadratic):
+    I(mu)/I(1) = 1 - u1 (1 - mu) - u2 (1 - mu)^2
+The positive, monotonic profiles are exactly Kipping's (2013) triangle
+u1 + u2 <= 1, u1 >= 0, u1 + 2 u2 >= 0. Sampling coordinates (Kipping 2013):
+q1 = (u1 + u2)^2, q2 = u1 / (2 (u1 + u2)); u1 = 2 sqrt(q1) q2,
+u2 = sqrt(q1) (1 - 2 q2); uniform q is a uniform prior over the triangle.
+to_q keeps the sign of u1 + u2 in q1, so coefficients outside the triangle
+give q outside [0, 1].'''
+
+QUAD_CODE = '''def shapes(mu):
+    """(1 - mu, (1 - mu)^2), shape (len(mu), 2)."""
+    mu = np.asarray(mu, float)
+    return np.stack([1 - mu, (1 - mu) ** 2], axis=-1)
+
+
+def from_q(q):
+    """(u1, u2) from Kipping's q in [0, 1]^2 (vectorised over rows)."""
+    q = np.asarray(q, float)
+    s = np.sqrt(q[..., 0])
+    return np.stack([2 * s * q[..., 1], s * (1 - 2 * q[..., 1])], -1)
+
+
+def to_q(c):
+    """Kipping's (q1, q2) of one (u1, u2) (outside [0, 1] if outside the triangle)."""
+    u1, u2 = (float(v) for v in c)
+    s = u1 + u2
+    q = np.array([s * abs(s), u1 / (2 * s) if s != 0 else 0.5])   # s|s|: keeps the sign
+    q = np.where((q < 0) & (q > -1e-9), 0.0, q)            # rounding noise onto the bound
+    return tuple(float(v) for v in np.where((q > 1) & (q < 1 + 1e-9), 1.0, q))'''
+
+C4_DOC = '''Law (Claret 2000, four-parameter):
+    I(mu)/I(1) = 1 - a1 (1 - mu^(1/2)) - a2 (1 - mu) - a3 (1 - mu^(3/2)) - a4 (1 - mu^2)
+The fits are constrained to positive, monotonic profiles (I(0) >= 0,
+dI/dmu >= 0 on [0, 1]).'''
+
+C4_CODE = '''def shapes(mu):
+    """1 - mu^(k/2), k = 1..4, shape (len(mu), 4)."""
+    mu = np.asarray(mu, float)
+    return np.stack([1 - mu ** (k / 2) for k in (1, 2, 3, 4)], axis=-1)'''
+
+P2_DOC = '''Law (power-2; Hestroffer 1997, Maxted 2018):
+    I(mu)/I(1) = 1 - c (1 - mu^alpha)
+Its physical region is 0 <= c <= 1, alpha >= 0. The fits are unconstrained:
+{nbad} of the {n} models are outside the region (c > 1, I(0) < 0), and
+physical says whether a result is inside.'''
+
+LINEAR_INTENSITY = '''    return 1 - shapes(mu) @ np.asarray({cv}, float)'''
+P2_INTENSITY = '''    c = np.asarray(c, float)
+    return 1 - c[..., :1] * (1 - np.asarray(mu, float) ** c[..., 1:2])'''
+
+FIT_CONSTRAINT = {"hybrid2": "constrained to that triangle", "hybrid4": "constrained to that region",
+                  "hybrid5": "constrained to that simplex", "quadratic": "constrained to that triangle",
+                  "claret4": "constrained to positive, monotonic profiles",
+                  "power2": "unconstrained, as is usual for this law"}
+
 #: per law: (docstring, code, closing note)
-LAW_TEXT = {"hybrid4": (H4_DOC, H4_CODE, H4_TAIL), "hybrid5": (H5_DOC, H5_CODE, H5_TAIL)}
+LAW_TEXT = {"hybrid2": (H2_DOC, H2_CODE, H2_TAIL), "hybrid4": (H4_DOC, H4_CODE, H4_TAIL),
+            "hybrid5": (H5_DOC, H5_CODE, H5_TAIL), "quadratic": (QUAD_DOC, QUAD_CODE, ""),
+            "claret4": (C4_DOC, C4_CODE, ""), "power2": (P2_DOC, "", "")}
+
+
+def law_fmt(law, A):
+    """The law-dependent fields of the templates (both versions); A: the table rows."""
+    nw = len(I.COEFFS[law])
+    eps = [repr(e) for e in I.POLES.get(law, ())]
+    vc, vl = (repr(tuple(v)) for v in I.H2_VERTICES)
+    doc, code, tail = LAW_TEXT[law]
+    cv = "w" if law in HYBRID else "c"
+    nbad = sum(not I.is_physical(law, r) for r in A[:, 3:3 + nw]) if law == "power2" else 0
+    hasq = law in HAS_Q
+    qn = ", ".join(f"q{k + 1}" for k in range(nw))
+    return dict(law=law, lawname=LAWNAME.get(law, law), nw=nw, nw1=nw + 1, cv=cv, hasq=hasq, vc=vc, vl=vl,
+                eps=", ".join(eps) + ("," if len(eps) == 1 else ""),
+                names=", ".join(f'"{k}"' for k in I.COEFFS[law]),
+                wnames=", ".join(I.COEFFS[law]), qnames=qn,
+                law_doc=doc.format(**{f"eps{k}": e for k, e in enumerate(eps)}, vc=vc, vl=vl,
+                                   nbad=nbad, n=len(A)),
+                law_code=code.format(vc=vc, vl=vl) if law == "hybrid2" else code, tail_doc=tail,
+                fit_constraint=FIT_CONSTRAINT[law],
+                intensity_body=LINEAR_INTENSITY.format(cv=cv) if law in LINEAR else P2_INTENSITY,
+                w_alias='; also r["w"]' if law in HYBRID else "",
+                w_key=", w" if law in HYBRID else "", w_ret=", w=c" if law in HYBRID else "",
+                q_key=", q" if hasq else "", q_ret=", q=to_q(c)" if hasq else "",
+                q_example=f'    r["q"]           # ({qn}): sampling coordinates in [0, 1]\n' if hasq else "",
+                q_fn_example=("    from_q(q), to_q(c)                          # unit hypercube <-> "
+                              "coefficients\n") if hasq else "",
+                q_print='\n          "q =", " ".join(f"{v:.6f}" for v in r["q"]),' if hasq else "")
 
 
 def main():
@@ -344,8 +480,6 @@ def main():
     t = I.LDTables(CDS, cache=False)
     for law in LAWS:
         nw = len(I.COEFFS[law])
-        eps = [repr(e) for e in I.POLES[law]]
-        doc, code, tail = LAW_TEXT[law]
         for grid, gridname in GRIDS.items():
             d = t.table(grid, law)
             for band, tag in BANDS.items():
@@ -355,19 +489,14 @@ def main():
                 mod = f"ldhybrid_{law}_{grid}_{tag}"
                 G = I.GridSimplex(A[:, :3] / I.SCALE)
                 assert G.n_empty == 0
-                fmt = dict(law=law, gridname=gridname, band=band, mod=mod, grid=grid, n=len(A),
+                fill = FILL_DOC.format(k=G.n_filled) if G.n_filled else ""
+                fmt = dict(law_fmt(law, A), gridname=gridname, band=band, mod=mod, grid=grid, n=len(A),
                            grid_code=GRID_SETUP + CORNERS_NP, fill_block=fill_block(G),
-                           fill_doc=FILL_DOC.format(k=G.n_filled) if G.n_filled else "",
-                           interp_doc=INTERP_DOC.format(fill=FILL_DOC.format(k=G.n_filled) if G.n_filled else ""),
-                           nw=nw, nw1=nw + 1, ncol=nw + 2, eps=", ".join(eps),
-                           wnames=", ".join(f"w{k + 1}" for k in range(nw)),
-                           qnames=", ".join(f"q{k + 1}" for k in range(nw)),
-                           law_doc=doc.format(**{f"eps{k}": e for k, e in enumerate(eps)}),
-                           law_code=code, tail_doc=tail,
+                           fill_doc=fill, interp_doc=INTERP_DOC.format(fill=fill),
                            tmin=A[:, 0].min(), tmax=A[:, 0].max(), gmin=A[:, 1].min(), gmax=A[:, 1].max(),
                            mmin=A[:, 2].min(), mmax=A[:, 2].max(),
                            gridpts=wrap(pack(A[:, :3], "<f8")), data=wrap(pack(A[:, 3:])))
-                if grid.startswith("mps"):
+                if law in CORR_LAWS and grid == CORR_GRID:
                     rows = [r for r in t.corrections() if r["Source"] == "MURaM" and r["Kind"] == "magnetic"
                             and r["Law"] == law and r["Band"] == band and float(r["mh"]) == 0.0]
                     T = sorted({float(r["Teff"]) for r in rows})

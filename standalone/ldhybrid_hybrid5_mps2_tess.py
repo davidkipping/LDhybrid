@@ -5,11 +5,11 @@ Standalone: needs only numpy; the coefficient grid is embedded.
     from ldhybrid_hybrid5_mps2_tess import coefficients, intensity
     r = coefficients(teff=5600, logg=4.4, mh=0.0)
     r = coefficients(5600, 4.4, 0.0, correction="B100G")
-    r["w"]           # (w1, w2, w3, w4, w5)
+    r["coeffs"]      # (w1, w2, w3, w4, w5); also r["w"]
     r["q"]           # (q1, q2, q3, q4, q5): sampling coordinates in [0, 1]
     r["physical"]    # positive and monotonic?
-    intensity(r["w"], mu)                       # I(mu)/I(1)
-    from_q(q), to_q(w)                          # unit hypercube <-> weights
+    intensity(r["coeffs"], mu)                  # I(mu)/I(1)
+    from_q(q), to_q(c)                          # unit hypercube <-> coefficients
 
 Law (hybrid5):
     I(mu)/I(1) = 1 - w1 (1 - mu^4) - w2 (1 - mu^2)^2 - w3 P(mu; e0) - w4 P(mu; e1) - w5 P(mu; e2)
@@ -23,11 +23,12 @@ a flat Dirichlet, w_j = (1 - q_j^(1/(6-j))) prod_(i<j) q_i^(1/(6-i)),
 j = 1..5; uniform q is a uniform prior over the simplex.
 
 Coefficients: least squares uniform in projected radius (the transit-optimised
-fit), constrained to that region. Grid: 16974 models, Teff 3500-7500 K,
+fit), constrained to that simplex. Grid: 16974 models, Teff 3500-7500 K,
 log g 3.5-5.0, [M/H] -2.0 to +1.0.
 Interpolation is linear on the Kuhn simplices of the (Teff, log g, [M/H])
 tensor grid, as in ldhybrid.interpolate: continuous, exact at the models, and
-a convex mix of four models, so interpolated coefficients stay physical.
+a convex mix of four models (the law's physical region is convex, so a mix of
+physical models is physical).
 Outside the grid, coefficients() raises unless extrapolate=True (the nearest
 model in Teff/100 K, log g/0.5, [M/H]/0.5).
 lc_ppm is the light-curve error of the tabulated fits (p = 0.1).
@@ -49,6 +50,8 @@ import numpy as np
 
 GRID = "mps2"
 BAND = "TESS"
+LAW = "hybrid5"
+NAMES = ("w1", "w2", "w3", "w4", "w5")
 EPS = (0.0015965451792942786, 0.04127504477274302, 0.38743471584956696)
 SCALE = np.array([100.0, 0.5, 0.5])
 _N, NW = 16974, 5
@@ -656,7 +659,7 @@ _GRID = (                               # teff, logg, mh (float64, exact)
     "XeG6wnWF6wrXFa7QS6nzbpHX35ev+L58xfflK74vX/F9+Yrvy9fatYNrB9cOrh1cO7h2cO3g2sG1g2uGa4ZrhmuGa4ZrhmuG"
     "a4Zrhiv0Uuq8W+SlK/RScl66Qi8l56Ur9FLqd/5/1/8HCZfBnA=="
 )
-_DATA = (                               # w1..w5, mu_cri, lc_ppm (float32)
+_DATA = (                               # w1, w2, w3, w4, w5, mu_cri, lc_ppm (float32)
     "eNqcfHdcju8bdlsR7b0UhUppaR7n3U57k5GREUlkRqU9qMjeK8mWWSLtXShEVjbha+8R78PvcT3v++/7/Ht+rvu+zuPc13U8"
     "97yhDvjevg+/17pS5mIix892JMT7TVidyo2NAh6P2o/CBle6Ge9EV0bSX1nfG2nc9J/2ONtTiOS3ThQe5EYB1o5/ZToZs7lw"
     "dQ5G3Qcw18SPNsg4UXcox54pe8wRQ3YfhHK2H2lEutDoG05/ZaMeLOPWHXTGz9GHceKHHy3c5ErlY13+ygrnJXIb3rpig+dR"
@@ -5328,21 +5331,22 @@ def to_q(w):
 
 
 def intensity(w, mu):
-    """I(mu)/I(1) for hybrid5 weights w."""
+    """I(mu)/I(1) for hybrid5 coefficients w."""
     return 1 - shapes(mu) @ np.asarray(w, float)
 
 
 def is_physical(w, n=2001):
     """Positive and non-increasing towards the limb on a dense grid."""
-    I = intensity(w, np.linspace(0.0, 1.0, n))
-    return bool(I[0] >= -1e-10 and np.all(np.diff(I) >= -1e-10))
+    with np.errstate(all="ignore"):
+        I = intensity(w, np.linspace(0.0, 1.0, n))
+    return bool(np.all(np.isfinite(I)) and I[0] >= -1e-10 and np.all(np.diff(I) >= -1e-10))
 
 
 def coefficients(teff, logg, mh, extrapolate=False, correction=None):
-    """Interpolated hybrid5 weights at (Teff [K], log g [cgs], [M/H]).
+    """Interpolated hybrid5 coefficients at (Teff [K], log g [cgs], [M/H]).
 
     extrapolate=True uses the nearest model outside the grid (else ValueError).
-    Returns dict(w, q, physical, mu_cri, lc_ppm, inside, correction)."""
+    Returns dict(coeffs, w, q, physical, mu_cri, lc_ppm, inside, correction)."""
     x = np.array([[teff, logg, mh]], float) / SCALE
     y = _interpolate(x)[0]
     inside = bool(np.all(np.isfinite(y)))
@@ -5351,23 +5355,25 @@ def coefficients(teff, logg, mh, extrapolate=False, correction=None):
             raise ValueError(f"({teff}, {logg}, {mh}) is outside the {GRID} grid; "
                              "pass extrapolate=True to use the nearest model")
         y = _Y[np.argmin(((_X - x) ** 2).sum(1))]
-    w = y[:5].copy()
+    c = y[:NW].copy()
     if correction is not None:
         if correction not in _CORR:
             raise ValueError(f"correction must be one of {tuple(_CORR)}")
         if not _CORR_TEFF[0] <= teff <= _CORR_TEFF[-1]:
             warnings.warn("Teff outside the MURaM range: correction clamped", stacklevel=2)
         D = np.array(_CORR[correction])
-        w = w + np.array([np.interp(teff, _CORR_TEFF, D[:, k]) for k in range(5)])
-    return dict(w=tuple(float(v) for v in w), q=to_q(w), physical=is_physical(w), mu_cri=float(y[5]),
-                lc_ppm=float(y[6]), inside=inside, correction=correction)
+        c = c + np.array([np.interp(teff, _CORR_TEFF, D[:, k]) for k in range(5)])
+    c = tuple(float(v) for v in c)
+    return dict(coeffs=c, w=c, q=to_q(c), physical=is_physical(c), mu_cri=float(y[NW]),
+                lc_ppm=float(y[NW + 1]), inside=inside, correction=correction)
 
 
 if __name__ == "__main__":
     import sys
     t, g, m = (float(v) for v in sys.argv[1:4]) if len(sys.argv) >= 4 else (5600.0, 4.4, 0.0)
     r = coefficients(t, g, m, extrapolate=True)
-    print(f"hybrid5 {GRID} {BAND} Teff={t:g} logg={g:g} [M/H]={m:+g}: w =",
-          " ".join(f"{v:.6f}" for v in r["w"]), "q =", " ".join(f"{v:.6f}" for v in r["q"]),
+    print(f"hybrid5 {GRID} {BAND} Teff={t:g} logg={g:g} [M/H]={m:+g}:",
+          " ".join(f"{k}={v:.6f}" for k, v in zip(NAMES, r["coeffs"])),
+          "q =", " ".join(f"{v:.6f}" for v in r["q"]),
           "physical" if r["physical"] else "UNPHYSICAL",
           "" if r["inside"] else "(nearest model; outside grid)")
