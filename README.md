@@ -1,9 +1,10 @@
 # LDhybrid
 
 Theoretical limb-darkening coefficients for the rational **hybrid2, hybrid4 and
-hybrid5** laws of SquishierPlanet, whose transit light curves are elementary,
-and, computed the same way, for the quadratic, power-2 and four-term laws. The
-coefficients are least-squares fits, uniform in projected radius, to the
+hybrid5** laws of SquishierPlanet, whose transit light curves are elementary.
+The quadratic, power-2 and four-term laws are fitted the same way only as a
+baseline for comparison; for those laws the published tables remain the usual
+source. The coefficients are least-squares fits, uniform in projected radius, to the
 specific intensities of PHOENIX-ACES v3.0 (spherical, 2300–7400 K, 40 passbands)
 and MPS-ATLAS Sets 1 and 2 (plane-parallel, 3500–7500 K, 41 passbands) for
 dwarfs and subgiants, in the photometric, HST and JWST passbands used for

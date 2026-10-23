@@ -43,9 +43,9 @@ planets.}
 plane-parallel MPS-ATLAS models (two sets) over 41 passbands with photon
 weighting. We placed the limb of the spherical models at the maximum intensity
 gradient and fitted the laws by constrained least squares, uniform in
-projected radius. Quadratic, power-2, and four-term coefficients were computed
-in the same way. Every fit is scored by the error of the transit light curve
-it produces.}
+projected radius. As a baseline, we fitted the quadratic, power-2, and
+four-term laws in the same way. Every fit is scored by the error of the
+transit light curve it produces.}
 {Fitting uniformly in radius rather than in $\mu$, as in the weighted-$r$
 method of Morello et al., reduces the median light-curve error by factors of
 3--9 for spherical and 1.9--3.5 for plane-parallel models (up to 15 and 6 for
@@ -67,9 +67,9 @@ energy instead of photons changes them by up to 260\ppm. Against Kepler and
 TESS measurements, a 100\,G MURaM correction removes the offset of the
 MPS-ATLAS predictions, as found by Kostogryz et al.; against JWST it does not
 significantly reduce it.}
-{The coefficients, coefficient spectra for arbitrary bandpasses, magnetic and
-3D corrections, and an interpolation code with a prior recipe are made
-available.}
+{The hybrid-law coefficients, coefficient spectra for arbitrary bandpasses,
+magnetic and 3D corrections, and an interpolation code with a prior recipe
+are made available, with the baseline fits for reproducibility.}
 
 \keywords{stars: atmospheres -- planets and satellites: general --
 techniques: photometric -- methods: numerical}
@@ -137,16 +137,17 @@ also concave in $\mu^2$ with a convex slope, two conditions the model profiles
 meet away from the extreme limb, and it maps to the unit hypercube like the
 $q_1$, $q_2$ of \citet{kipping2013}. With
 tabulated coefficients, their four- and five-parameter members are as accurate
-as the four-term law. For circular-planet users the broader value of this paper may
-lie in the uniform, transit-optimised tables of all six laws, the error budget,
-and the analysis of conventions that comes with them.
+as the four-term law.
 
-This paper provides, for these laws, what Claret's papers provide for the
+This paper provides, for the hybrid laws, what Claret's papers provide for the
 standard ones: coefficients for a broad range of stellar parameters and for the
-passbands of transit work, with quantified fit quality. We computed the
-standard laws in the same way, so that the tables are also a uniform
-reference for them. Appendix~\ref{app:validation} validates the pipeline
-against published coefficients.
+passbands of transit work, with quantified fit quality. We fitted the
+quadratic, power-2, and four-term laws in the same way only as a baseline:
+comparing laws on the same profiles with the same fit separates the error of a
+law from that of a fitting method. Their tables are released so that the
+comparison can be reproduced, not to replace the published tables for those
+laws. Appendix~\ref{app:validation} validates the pipeline against published
+coefficients.
 
 %======================================================================
 \section{The laws}\label{sec:laws}
@@ -1084,8 +1085,8 @@ the integration to be modelled.
 %======================================================================
 \section{The tables}\label{sec:tables}
 %======================================================================
-The coefficients are given in 18 tables at the CDS, one per grid and law
-(Table~\ref{tab:cds}). Each record holds, for one model, passband, and fitting
+The hybrid coefficients are given in nine tables at the CDS, one per grid
+and law, with nine tables of the baseline laws (Table~\ref{tab:cds}). Each record holds, for one model, passband, and fitting
 method ($r$ or $\mu$), $\mu_{\rm cri}$, the coefficients (for the hybrid laws
 also the sampling coordinates $q$ and the basis-free expanded form
 $c_0+c_2\mu^2+c_4\mu^4+\sum_k d_k(\mu^2+\varepsilon_k)^{-2}$), the fit
@@ -1108,8 +1109,9 @@ and basis \tbd{confirm}.
 
 \begin{table*}
 \caption{Tables available at the CDS. Each grid has one file
-\texttt{<grid>\_<law>.dat} for each law (hybrid2, hybrid4, hybrid5, quadratic,
-four-term \texttt{claret4}, and power-2 \texttt{power2}).}
+\texttt{<grid>\_<law>.dat} for each hybrid law (hybrid2, hybrid4, hybrid5)
+and each baseline law (quadratic, four-term \texttt{claret4}, and power-2
+\texttt{power2}).}
 \label{tab:cds}
 \centering
 \begin{tabular}{llllllr}
@@ -1192,8 +1194,8 @@ remains physical), and no hybrid4 set leaves its curvature simplex; the
 code checks this. The empirical offsets of Sect.~\ref{sec:obs} are tabulated with their
 star-to-star scatter.
 
-The CDS release (0.9\,GB compressed) holds the 18 coefficient tables and the
-three auxiliary tables. The interpolation code (Python, using numpy and scipy
+The CDS release (0.9\,GB compressed) holds the nine hybrid and nine baseline
+coefficient tables and the three auxiliary tables. The interpolation code (Python, using numpy and scipy
 only) reads them and returns coefficients for given
 $(\teff,\log g,[{\rm M/H}])$, interpolating linearly within one grid on the
 same split of every grid box into six tetrahedra (Kuhn simplices), so the
@@ -1208,7 +1210,10 @@ stellar-parameter uncertainties, optionally with the grid-to-grid covariance
 empirical offsets as a joint Gaussian update of $h'_1$ and $h'_2$ (or $\ell$),
 refusing an offset measured in a different correction state. It also refits
 interpolated profiles, optionally ignoring $\mu<0.02$, and computes the
-transit light curve of any tabulated law for a circular planet. It is
+transit light curve of any tabulated law for a circular planet.
+Single-file versions for the hybrid laws in the Kepler and TESS bands embed
+the grid and need only numpy; their MLX versions are differentiable in the
+stellar parameters, for gradient-based samplers. The code is
 archived at \tbd{Zenodo DOI} under \tbd{licence}. The elementary
 light-curve code for the hybrid laws, for circular and elliptical planets, is
 that of the companion paper \citep{squishier} (\tbd{language, gradients,
