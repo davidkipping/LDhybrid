@@ -1,6 +1,6 @@
 """Write lightweight, single-file interpolators for the hybrid laws (hybrid2,
 hybrid4, hybrid5) on every grid (PHOENIX, MPS-ATLAS Set 1 and Set 2), one
-passband each (TESS, Kepler), with the coefficient grid embedded (numpy only).
+passband each (TESS, Kepler, CHEOPS), with the coefficient grid embedded (numpy only).
 
     .venv/bin/python scripts/make_standalone.py      -> standalone/*.py
     .venv/bin/python scripts/make_standalone.py --all-laws   (also quadratic,
@@ -28,7 +28,7 @@ from ldhybrid.paths import DATA
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "standalone"
 CDS = DATA / "release" / "cds"
-BANDS = {"TESS": "tess", "Kepler": "kepler"}
+BANDS = {"TESS": "tess", "Kepler": "kepler", "CHEOPS": "cheops"}
 GRIDS = {"phoenix": "PHOENIX-ACES-AGSS-COND SpecInt v3.0 (spherical; Husser et al. 2013)",
          "mps1": "MPS-ATLAS Set 1 (plane-parallel; Kostogryz et al. 2022)",
          "mps2": "MPS-ATLAS Set 2 (plane-parallel; Kostogryz et al. 2022)"}

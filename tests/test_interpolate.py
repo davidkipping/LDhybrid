@@ -108,14 +108,15 @@ STANDALONE_LAWS = ["hybrid2", "hybrid4", "hybrid5"]
 
 @pytest.mark.data
 @pytest.mark.skipif(not (CDS / "mps2_hybrid5.dat.gz").exists(), reason="CDS tables not built")
+@pytest.mark.parametrize("band", ["TESS", "Kepler", "CHEOPS"])
 @pytest.mark.parametrize("grid", ["phoenix", "mps1", "mps2"])
 @pytest.mark.parametrize("law", STANDALONE_LAWS)
-def test_standalone_files_reproduce_the_tables(law, grid, cds_tables):
-    sa = _standalone(f"ldhybrid_{law}_{grid}_tess")
+def test_standalone_files_reproduce_the_tables(law, grid, band, cds_tables):
+    sa = _standalone(f"ldhybrid_{law}_{grid}_{band.lower()}")
     corr = "B100G" if law.startswith("hybrid") and grid == "mps2" else None
     kw = dict(correction=corr) if corr else {}
     for x in [(5600, 4.4, 0.1), (4321, 4.37, -0.13), (6789, 4.1, -0.6)]:
-        a = cds_tables.coefficients(law, *x, "TESS", grid=grid, correction=corr)
+        a = cds_tables.coefficients(law, *x, band, grid=grid, correction=corr)
         b = sa.coefficients(*x, **kw)
         assert np.allclose(list(a["coeffs"].values()), b["coeffs"], atol=1e-7)   # float32 storage
         assert a["physical"] == b["physical"]

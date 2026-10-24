@@ -37,9 +37,9 @@ describes every column.
 ### 2. Standalone single-file interpolators (no download)
 
 [`standalone/`](standalone/) holds a single file for each hybrid law and grid in
-TESS and Kepler, with the coefficient grid embedded (numpy only):
+TESS, Kepler and CHEOPS, with the coefficient grid embedded (numpy only):
 `ldhybrid_<law>_<grid>_<band>.py` for `hybrid2`, `hybrid4`, `hybrid5`, the grids
-`phoenix`, `mps1`, `mps2` and the bands `tess`, `kepler` (18 files). Each has an **MLX** port
+`phoenix`, `mps1`, `mps2` and the bands `tess`, `kepler`, `cheops` (27 files). Each has an **MLX** port
 (`*_mlx.py`; mlx + numpy) whose coefficients can be batched, differentiated with
 respect to Teff, log g and [M/H], and compiled inside an MLX model such as
 Elómë's. Copy one anywhere:
