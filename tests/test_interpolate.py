@@ -108,11 +108,11 @@ STANDALONE_LAWS = ["hybrid2", "hybrid4", "hybrid5"]
 
 @pytest.mark.data
 @pytest.mark.skipif(not (CDS / "mps2_hybrid5.dat.gz").exists(), reason="CDS tables not built")
-@pytest.mark.parametrize("band", ["TESS", "Kepler", "CHEOPS"])
+@pytest.mark.parametrize("band", ["TESS", "Kepler", "CHEOPS", "JWST_NIRSpec_PRISM"])
 @pytest.mark.parametrize("grid", ["phoenix", "mps1", "mps2"])
 @pytest.mark.parametrize("law", STANDALONE_LAWS)
 def test_standalone_files_reproduce_the_tables(law, grid, band, cds_tables):
-    sa = _standalone(f"ldhybrid_{law}_{grid}_{band.lower()}")
+    sa = _standalone(f"ldhybrid_{law}_{grid}_{band.lower().replace('jwst_', '')}")
     corr = "B100G" if law.startswith("hybrid") and grid == "mps2" else None
     kw = dict(correction=corr) if corr else {}
     for x in [(5600, 4.4, 0.1), (4321, 4.37, -0.13), (6789, 4.1, -0.6)]:

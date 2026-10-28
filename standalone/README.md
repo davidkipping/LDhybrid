@@ -1,7 +1,7 @@
 # Standalone interpolators (numpy and MLX)
 
 Single-file interpolators for the LDhybrid v1.0 coefficients of the hybrid laws
-on every atmosphere grid, in the TESS, Kepler and CHEOPS passbands. The coefficient grid is
+on every atmosphere grid, in the TESS, Kepler, CHEOPS and JWST NIRSpec PRISM passbands. The coefficient grid is
 embedded, so no tables need downloading. Each file comes in two versions: numpy
 only (`ldhybrid_<law>_<grid>_<band>.py`) and an MLX port for MLX codes such as
 Elómë (`..._mlx.py`; mlx and numpy).
@@ -15,11 +15,12 @@ Elómë (`..._mlx.py`; mlx and numpy).
 | Grid | Models | Teff, log g, [M/H] | numpy / MLX file size |
 |---|---|---|---|
 | `phoenix`: PHOENIX-ACES v3.0 | 1,682 (+68 filled) | 2300–7400 K, 3.5–5.5, −2.0 to +1.0 | 48–77 kB |
-| `mps1`: MPS-ATLAS Set 1 | 16,974 | 3500–7500 K, 3.5–5.0, −2.0 to +1.0 | 296–547 kB |
+| `mps1`: MPS-ATLAS Set 1 | 16,974 | 3500–7500 K, 3.5–5.0, −2.0 to +1.0 | 295–547 kB |
 | `mps2`: MPS-ATLAS Set 2 | 16,974 | 3500–7500 K, 3.5–5.0, −2.0 to +1.0 | 298–553 kB |
 
-Bands: `tess`, `kepler`, `cheops`. So 27 numpy files and 27 MLX files, e.g.
-`ldhybrid_hybrid2_phoenix_kepler.py`, `ldhybrid_hybrid5_mps1_cheops.py` or
+Bands: `tess`, `kepler`, `cheops`, `nirspec_prism`. So 36 numpy files and 36 MLX
+files, e.g. `ldhybrid_hybrid2_phoenix_kepler.py`, `ldhybrid_hybrid5_mps1_cheops.py`,
+`ldhybrid_hybrid4_mps2_nirspec_prism.py` or
 `ldhybrid_hybrid4_mps2_tess_mlx.py`.
 
 The comparison laws of the paper (quadratic, power-2, Claret four-term) have no
