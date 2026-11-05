@@ -193,3 +193,29 @@ def test_mlx_standalone_matches_numpy_and_differentiates(law):
     f = lambda t: np.array(sm.coefficients(t, g, m)["coeffs"])
     fd = (f(T + 1e-3) - f(T - 1e-3)) @ c / 2e-3
     assert np.median(np.abs(np.array(gT) - fd) / np.abs(fd)) < 1e-3
+
+
+def test_profile_files_found_by_either_name_and_never_for_another_grid(tmp_path):
+    h5py = pytest.importorskip("h5py")
+
+    def write(path, teff):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with h5py.File(path, "w") as h:
+            for k in ("teff", "logg", "mh"):
+                h[k] = np.array([teff if k == "teff" else 4.5])
+            h["mu"] = h["y"] = np.ones((1, 1, 2))
+            h["bands"] = np.array([b"TESS"])
+    zen = tmp_path / "zenodo"
+    write(zen / "ldhybrid_v1.0_band_profiles_mps2.h5", 5000.0)
+    write(zen / "phoenix.h5", 3000.0)
+    # a single file is used for its own grid; its directory serves the others
+    t = LDTables(tmp_path / "cds", profiles=zen / "ldhybrid_v1.0_band_profiles_mps2.h5")
+    assert t._profiles("mps2")["teff"][0] == 5000 and t._profiles("phoenix")["teff"][0] == 3000
+    with pytest.raises(FileNotFoundError, match="ldhybrid_v1.0_band_profiles_mps1.h5"):
+        t._profiles("mps1")
+    # a file named for another grid is never used
+    with pytest.raises(FileNotFoundError):
+        LDTables(tmp_path / "cds", profiles=zen / "phoenix.h5")._profiles("mps1")
+    # without the argument: <tables>/profiles/, then <tables>/ itself
+    write(tmp_path / "cds" / "ldhybrid_v1.0_band_profiles_mps1.h5", 4000.0)
+    assert LDTables(tmp_path / "cds")._profiles("mps1")["teff"][0] == 4000

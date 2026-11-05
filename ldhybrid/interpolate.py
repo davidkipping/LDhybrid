@@ -77,6 +77,8 @@ SCALE = np.array([100.0, 0.5, 0.5])
 TABLE_FORMAT = 2
 #: MURaM magnetic states in corrections.dat
 STATES = ("ssd", "B100G", "B200G", "B300G")
+#: band-profile file names for refits (repository export; Zenodo copy)
+PROFILE_NAMES = ("{grid}.h5", "ldhybrid_v1.0_band_profiles_{grid}.h5")
 #: fixed-width layouts of the auxiliary tables (field widths, single spaces between)
 _CORR_W = [("Source", 7), ("Kind", 8), ("State", 5), ("Star", 9), ("Teff", 5), ("logg", 5),
            ("mh", 5), ("Band", 25), ("Law", 7), ("dw1", 9), ("dw2", 9), ("dw3", 9), ("dw4", 9),
@@ -861,22 +863,35 @@ class LDTables:
     # ---------------------------------------------------------- refitting
 
     def _profiles(self, grid):
-        """Band profiles after the limb cut (<grid>.h5 with datasets teff, logg,
-        mh, bands, mu, y; NaN-padded), looked for in `profiles` (constructor
-        argument), then in <tables>/profiles/. Needs h5py."""
+        """Band profiles after the limb cut (datasets teff, logg, mh, bands, mu,
+        y; NaN-padded), in a file named <grid>.h5 or, as on Zenodo,
+        ldhybrid_v1.0_band_profiles_<grid>.h5. Looked for at `profiles`
+        (constructor argument: a file, used only if named for this grid, or a
+        directory; a file's directory is searched for the other grids), then
+        in <tables>/profiles/ and <tables>/. Needs h5py."""
         if grid in self._prof:
             return self._prof[grid]
         import h5py
-        cands = ([Path(self.profiles)] if self.profiles else []) + [self.dir / "profiles"]
-        for c in cands:
-            p = c if c.suffix == ".h5" else c / f"{grid}.h5"
-            if p.exists():
-                with h5py.File(p, "r") as h:
-                    d = {k: h[k][()] for k in ("teff", "logg", "mh", "mu", "y")}
-                    d["bands"] = [b.decode() for b in h["bands"][()]]
-                self._prof[grid] = d
-                return d
-        raise FileNotFoundError(f"no profile file for {grid} in {cands}")
+        names = [n.format(grid=grid) for n in PROFILE_NAMES]
+        dirs = []
+        if self.profiles:
+            c = Path(self.profiles)
+            if c.suffix == ".h5" and c.name in names and c.exists():
+                dirs.append(c)
+            dirs.append(c.parent if c.suffix == ".h5" else c)
+        dirs += [self.dir / "profiles", self.dir]
+        for c in dirs:
+            for p in ([c] if c.suffix == ".h5" else [c / n for n in names]):
+                if p.exists():
+                    with h5py.File(p, "r") as h:
+                        d = {k: h[k][()] for k in ("teff", "logg", "mh", "mu", "y")}
+                        d["bands"] = [b.decode() for b in h["bands"][()]]
+                    self._prof[grid] = d
+                    return d
+        raise FileNotFoundError(
+            f"no {grid} band profiles ({' or '.join(names)}) in {[str(c) for c in dirs]}. "
+            f"Download {names[1]} from the LDhybrid Zenodo record and pass "
+            f"LDTables(..., profiles=<that file or its directory>), or put it in <tables>/profiles/.")
 
     def refit(self, law, teff, logg, mh, band, grid="mps2", mu_min=0.0):
         """Coefficients from interpolated *intensity profiles* rather than

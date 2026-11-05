@@ -308,9 +308,14 @@ r = t.coefficients("claret4", 5600, 4.4, 0.1, "TESS", grid="phoenix", refit=True
 
 Instead of interpolating coefficients, this interpolates the band-integrated
 intensity profiles of the surrounding models and refits the law with the
-production settings. It needs h5py and the profile files. `profiles` is a
-directory holding `<grid>.h5`, or a single `.h5` file for one grid; the
-Zenodo copies are named `ldhybrid_v1.0_band_profiles_<grid>.h5`.
+production settings. It needs h5py and the band-profile files
+`ldhybrid_v1.0_band_profiles_<grid>.h5` from Zenodo (or the repository's
+`data/products/profiles/<grid>.h5`; either name works). `profiles` is the
+directory holding them, or one of the files, whose directory is then searched
+for the other grids; a file is only used for the grid in its name. Without
+`profiles`, `<tables>/profiles/` and the tables directory itself are searched.
+The coefficients themselves (no `refit`) need none of this, and nor do the
+standalone files.
 
 For the linear laws without an active constraint, refitting gives the same
 result as interpolating coefficients. It helps power-2. `mu_min=0.02` leaves
