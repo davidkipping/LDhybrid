@@ -108,7 +108,8 @@ STANDALONE_LAWS = ["hybrid2", "hybrid4", "hybrid5"]
 
 @pytest.mark.data
 @pytest.mark.skipif(not (CDS / "mps2_hybrid5.dat.gz").exists(), reason="CDS tables not built")
-@pytest.mark.parametrize("band", ["TESS", "Kepler", "CHEOPS", "JWST_NIRSpec_PRISM"])
+@pytest.mark.parametrize("band", ["TESS", "Kepler", "CHEOPS", "JWST_NIRSpec_PRISM",
+                                  "JWST_NIRSpec_G395H_NRS1", "JWST_NIRSpec_G395H_NRS2"])
 @pytest.mark.parametrize("grid", ["phoenix", "mps1", "mps2"])
 @pytest.mark.parametrize("law", STANDALONE_LAWS)
 def test_standalone_files_reproduce_the_tables(law, grid, band, cds_tables):

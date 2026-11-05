@@ -4,7 +4,7 @@ There are three ways to get coefficients, from lightest to fullest:
 
 | Route | Needs | Covers |
 |---|---|---|
-| [Standalone files](#1-standalone-single-file-interpolators) (`standalone/*.py`) | numpy (or mlx + numpy for the `_mlx` ports) | hybrid2, hybrid4 or hybrid5; PHOENIX, MPS-ATLAS Set 1 or Set 2; TESS, Kepler, CHEOPS or NIRSpec PRISM |
+| [Standalone files](#1-standalone-single-file-interpolators) (`standalone/*.py`) | numpy (or mlx + numpy for the `_mlx` ports) | hybrid2, hybrid4 or hybrid5; PHOENIX, MPS-ATLAS Set 1 or Set 2; TESS, Kepler, CHEOPS, NIRSpec PRISM, or NIRSpec G395H NRS1 or NRS2 |
 | [Table interpolator](#2-the-table-interpolator-ldhybridinterpolatepy) (`ldhybrid/interpolate.py`) | numpy, scipy (+ h5py for refits); the CDS tables | all six laws, three grids, 40–41 passbands; priors, offsets, corrections, light curves |
 | [Full package](#3-the-full-package-ldhybridapi) (`ldhybrid.api`) | the whole repository and its `data/` products | everything above, plus custom passbands |
 
@@ -81,8 +81,8 @@ PHOENIX exists, and no grid has been validated against M-dwarf observations.
 ## 1. Standalone single-file interpolators
 
 `standalone/` holds one file per hybrid law, grid and passband (hybrid2,
-hybrid4, hybrid5; PHOENIX, MPS-ATLAS Set 1 and Set 2; TESS, Kepler, CHEOPS and
-NIRSpec PRISM: 36 files), each with its coefficient grid embedded (48–553 kB), and an MLX port of
+hybrid4, hybrid5; PHOENIX, MPS-ATLAS Set 1 and Set 2; TESS, Kepler, CHEOPS,
+NIRSpec PRISM and NIRSpec G395H NRS1 and NRS2: 54 files), each with its coefficient grid embedded (48–553 kB), and an MLX port of
 each (`*_mlx.py`, below). Copy the file anywhere; it needs only numpy (the MLX
 ports: mlx and numpy).
 
@@ -104,8 +104,10 @@ From the shell: `python ldhybrid_hybrid4_mps2_tess.py 5600 4.4 0.0`.
 
 The files are `ldhybrid_<law>_<grid>_<band>.py` with `<law>` one of `hybrid2`,
 `hybrid4`, `hybrid5`; `<grid>` one of `phoenix` (2300–7400 K, log g 3.5–5.5),
-`mps1` and `mps2` (3500–7500 K, log g 3.5–5.0); `<band>` `tess`, `kepler`, `cheops` or `nirspec_prism` (the table band
-`JWST_NIRSpec_PRISM`: the ExoTiC-LD throughput, strictly 0.6–5.3 µm, zero outside).
+`mps1` and `mps2` (3500–7500 K, log g 3.5–5.0); `<band>` `tess`, `kepler`, `cheops`, `nirspec_prism` (the table band
+`JWST_NIRSpec_PRISM`: the ExoTiC-LD throughput, strictly 0.6–5.3 µm, zero outside),
+`nirspec_g395h_nrs1` or `nirspec_g395h_nrs2` (`JWST_NIRSpec_G395H_NRS1`/`_NRS2`: the G395H
+throughput cut to the detector ranges 2.87–3.72 and 3.82–5.18 µm).
 All have the same functions, with the weights of the table above (hybrid5:
 stick-breaking `from_q`/`to_q`; hybrid2: its exact triangle). The MURaM
 corrections are defined on Set 2, so only those files take `correction=`.

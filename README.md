@@ -37,9 +37,11 @@ describes every column.
 ### 2. Standalone single-file interpolators (no download)
 
 [`standalone/`](standalone/) holds a single file for each hybrid law and grid in
-TESS, Kepler, CHEOPS and JWST NIRSpec PRISM (0.6–5.3 µm), with the coefficient grid embedded (numpy only):
+TESS, Kepler, CHEOPS, JWST NIRSpec PRISM (0.6–5.3 µm) and the two NIRSpec G395H detectors
+NRS1 (2.87–3.72 µm) and NRS2 (3.82–5.18 µm), with the coefficient grid embedded (numpy only):
 `ldhybrid_<law>_<grid>_<band>.py` for `hybrid2`, `hybrid4`, `hybrid5`, the grids
-`phoenix`, `mps1`, `mps2` and the bands `tess`, `kepler`, `cheops`, `nirspec_prism` (36 files). Each has an **MLX** port
+`phoenix`, `mps1`, `mps2` and the bands `tess`, `kepler`, `cheops`, `nirspec_prism`, `nirspec_g395h_nrs1`,
+`nirspec_g395h_nrs2` (54 files). Each has an **MLX** port
 (`*_mlx.py`; mlx + numpy) whose coefficients can be batched, differentiated with
 respect to Teff, log g and [M/H], and compiled inside an MLX model such as
 Elómë's. Copy one anywhere:

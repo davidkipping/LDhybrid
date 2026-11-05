@@ -1,6 +1,7 @@
 """Write lightweight, single-file interpolators for the hybrid laws (hybrid2,
 hybrid4, hybrid5) on every grid (PHOENIX, MPS-ATLAS Set 1 and Set 2), one
-passband each (TESS, Kepler, CHEOPS, NIRSpec PRISM), with the coefficient grid embedded (numpy only).
+passband each (TESS, Kepler, CHEOPS, NIRSpec PRISM, NIRSpec G395H NRS1 and
+NRS2), with the coefficient grid embedded (numpy only).
 
     .venv/bin/python scripts/make_standalone.py      -> standalone/*.py
     .venv/bin/python scripts/make_standalone.py --all-laws   (also quadratic,
@@ -28,8 +29,10 @@ from ldhybrid.paths import DATA
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "standalone"
 CDS = DATA / "release" / "cds"
-# JWST_NIRSpec_PRISM: the ExoTiC-LD throughput, defined on 0.6-5.3 um (zero outside)
-BANDS = {"TESS": "tess", "Kepler": "kepler", "CHEOPS": "cheops", "JWST_NIRSpec_PRISM": "nirspec_prism"}
+# JWST_NIRSpec_PRISM: the ExoTiC-LD throughput, defined on 0.6-5.3 um (zero outside);
+# G395H NRS1 / NRS2: the detector windows 2.87-3.72 / 3.82-5.18 um (ldhybrid.bands.DERIVED)
+BANDS = {"TESS": "tess", "Kepler": "kepler", "CHEOPS": "cheops", "JWST_NIRSpec_PRISM": "nirspec_prism",
+         "JWST_NIRSpec_G395H_NRS1": "nirspec_g395h_nrs1", "JWST_NIRSpec_G395H_NRS2": "nirspec_g395h_nrs2"}
 GRIDS = {"phoenix": "PHOENIX-ACES-AGSS-COND SpecInt v3.0 (spherical; Husser et al. 2013)",
          "mps1": "MPS-ATLAS Set 1 (plane-parallel; Kostogryz et al. 2022)",
          "mps2": "MPS-ATLAS Set 2 (plane-parallel; Kostogryz et al. 2022)"}
